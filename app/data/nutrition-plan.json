@@ -1,0 +1,126 @@
+{
+  "2025-08-19": {
+    "totalCalories": 2100, "totalProtein": 185, "totalCarbs": 180, "totalFats": 68,
+    "meals": [
+      {
+        "name": "Desayuno", "calories": 520,
+        "dishes": [
+          { "name": "Revuelto de claras con verduras", "ingredients": "4 claras + 1 huevo entero, 1 cebolla, 1/2 zapallo, espinaca", "preparation": "Saltear verduras en aceite de oliva (1 cdta), agregar huevos batidos. Condimentar con sal y pimienta." },
+          { "name": "Tostadas integrales", "ingredients": "2 rebanadas pan francés", "preparation": "Tostar y acompañar con queso fresco (30g)" },
+          { "name": "Mate", "ingredients": "Yerba mate", "preparation": "Cebar con agua tibia (70-80°C)" }
+        ]
+      },
+      {
+        "name": "Almuerzo", "calories": 650,
+        "dishes": [
+          { "name": "Milanesa de pollo al horno", "ingredients": "150g pechuga pollo, 1 huevo, pan rallado, aceite oliva spray", "preparation": "Rebozar con huevo y pan rallado. Hornear 25 min a 180°C con aceite en spray." },
+          { "name": "Puré de zapallo", "ingredients": "200g zapallo, 1 cdta manteca, sal", "preparation": "Hervir zapallo hasta tierno, pisar con manteca y sal. Agregar caldo si queda seco." },
+          { "name": "Ensalada mixta", "ingredients": "Lechuga, zanahoria rallada, remolacha, 1 cdta aceite oliva", "preparation": "Cortar verduras finas, aliñar con aceite, vinagre y sal." }
+        ]
+      },
+      {
+        "name": "Merienda", "calories": 380,
+        "dishes": [
+          { "name": "Yogur con frutos secos", "ingredients": "200ml yogur natural descremado, 30g nueces/almendras", "preparation": "Mezclar yogur con frutos secos picados." },
+          { "name": "Manzana", "ingredients": "1 manzana mediana", "preparation": "Pelar y cortar en gajos." }
+        ]
+      },
+      {
+        "name": "Cena", "calories": 550,
+        "dishes": [
+          { "name": "Pescado a la plancha", "ingredients": "150g merluza, 1 cdta aceite oliva, limón, ajo", "preparation": "Salpimentar pescado, cocinar en plancha con aceite. Terminar con ajo y limón." },
+          { "name": "Verduras al vapor", "ingredients": "150g brócoli, 100g zanahoria, sal marina", "preparation": "Cocinar al vapor 12-15 min hasta tiernas, sazonar con sal marina." },
+          { "name": "Arroz integral", "ingredients": "60g arroz integral crudo", "preparation": "Cocinar en agua con sal (1:2 proporción) durante 25 min." }
+        ]
+      }
+    ]
+  },
+  "2025-08-22": {
+    "totalCalories": 2480, "totalProtein": 195, "totalCarbs": 230, "totalFats": 75,
+    "meals": [
+      {
+        "name": "Desayuno Pre-Gym", "calories": 580,
+        "dishes": [
+          { "name": "Avena energética", "ingredients": "60g avena, 1 banana, 200ml leche, 1 cdta miel, canela", "preparation": "Cocinar avena con leche, agregar banana en rodajas y miel." },
+          { "name": "Huevos revueltos", "ingredients": "2 huevos enteros, sal, pimienta", "preparation": "Cocinar a fuego medio hasta cremosos." },
+          { "name": "Café con leche", "ingredients": "Café, 100ml leche", "preparation": "Preparar café fuerte con leche tibia." }
+        ]
+      },
+      {
+        "name": "Almuerzo Post-Gym", "calories": 780,
+        "dishes": [
+          { "name": "Pollo teriyaki casero", "ingredients": "170g pechuga pollo, salsa soja, miel, ajo, jengibre", "preparation": "Marinar pollo, cocinar en plancha, glasear con salsa." },
+          { "name": "Arroz japonés", "ingredients": "80g arroz blanco", "preparation": "Cocinar hasta pegajoso, ideal para recuperación." },
+          { "name": "Wok de verduras", "ingredients": "Brócoli, zanahoria, morrón, aceite sésamo", "preparation": "Saltear a fuego alto 3-4 min, mantener crocantes." }
+        ]
+      },
+      {
+        "name": "Merienda", "calories": 420,
+        "dishes": [
+          { "name": "Licuado recovery", "ingredients": "1 banana, 250ml leche, 1 cdta cacao, hielo", "preparation": "Licuar hasta espumoso, perfecto post-entrenamiento." }
+        ]
+      },
+      {
+        "name": "Cena", "calories": 700,
+        "dishes": [
+          { "name": "Pescado al horno", "ingredients": "160g merluza, 1 papa grande, calabaza, aceite oliva", "preparation": "Hornear pescado con verduras de estación 25 min a 180°C." }
+        ]
+      }
+    ]
+  },
+  "2025-11-08": {
+    "totalCalories": 2650, "totalProtein": 200, "totalCarbs": 280, "totalFats": 78,
+    "meals": [
+      {
+        "name": "Desayuno Pre-Long Run", "calories": 620,
+        "dishes": [
+          { "name": "Porridge energético", "ingredients": "80g avena, 1 banana grande, 250ml leche, 2 cdta miel, canela", "preparation": "Cocinar avena con leche, agregar banana en rodajas y miel. Ideal 2h antes del entrenamiento largo." }
+        ]
+      },
+      {
+        "name": "Durante Entrenamiento", "calories": 280,
+        "dishes": [
+          { "name": "Hidratación deportiva", "ingredients": "Agua (750ml), bebida isotónica (500ml), sal marina", "preparation": "Alternar agua e isotónica cada 15-20 min durante las 2.5-3h de entrenamiento." },
+          { "name": "Fueling cada hora", "ingredients": "2 bananas maduras, 1 barrita cereal, dátiles (4u)", "preparation": "60-80g carbohidratos por hora después de la primera hora de ejercicio." }
+        ]
+      },
+      {
+        "name": "Almuerzo Recovery", "calories": 880,
+        "dishes": [
+          { "name": "Pasta con pollo", "ingredients": "120g fideos integrales, 180g pechuga pollo, salsa tomate, queso rallado", "preparation": "Cocinar pasta al dente, pollo grillado en cubos, mezclar con salsa casera." }
+        ]
+      },
+      {
+        "name": "Cena Reparadora", "calories": 870,
+        "dishes": [
+          { "name": "Salmón al horno", "ingredients": "180g salmón, papas (250g), brócoli, limón, aceite oliva", "preparation": "Hornear salmón con verduras 20 min a 180°C. Omega-3 para antiinflamatorio." }
+        ]
+      }
+    ]
+  },
+  "2025-12-01": {
+    "totalCalories": 3200, "totalProtein": 180, "totalCarbs": 450, "totalFats": 90,
+    "meals": [
+      {
+        "name": "Desayuno Pre-Race", "calories": 650,
+        "dishes": [
+          { "name": "Avena race-day", "ingredients": "80g avena, 2 bananas, miel, canela, leche", "preparation": "3-4h antes de la largada. Máxima carga de carbohidratos." }
+        ]
+      },
+      {
+        "name": "Durante Race Day 1 (~6-8h)", "calories": 1200,
+        "dishes": [
+          { "name": "Fueling horario", "ingredients": "Bananas (6u), barritas (4u), geles (3u), dátiles", "preparation": "80-90g carbohidratos cada hora religiosamente." },
+          { "name": "Hidratación race", "ingredients": "Agua (2-3L), isotónica (1.5L), sales", "preparation": "500-750ml/hora según calor y sudoración." }
+        ]
+      },
+      {
+        "name": "Post-Race Recovery", "calories": 1150,
+        "dishes": [
+          { "name": "Recovery inmediato", "ingredients": "Chocolate con leche, banana", "preparation": "Dentro de 30 min post-llegada." },
+          { "name": "Cena reparadora", "ingredients": "Pasta (200g), pollo (200g), verduras", "preparation": "Mega-recarga de glucógeno para mañana." }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,1522 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>El Cruce — Minimal Day‑by‑Day Plan (Race: Dec 1st)</title>
+    <script>
+      // Tailwind Play CDN safelist for dynamic classes used via Alpine :class bindings
+      tailwind = window.tailwind || {};
+      tailwind.config = {
+        safelist: [
+          'bg-emerald-50','text-emerald-800','bg-emerald-100','text-emerald-700','bg-emerald-500',
+          'bg-slate-50','text-slate-700','bg-slate-100','text-slate-800','bg-slate-400','text-slate-600','hover:text-slate-700','border-slate-200','focus:ring-slate-300',
+          'bg-amber-50','bg-amber-100','text-amber-800','text-amber-900','hover:bg-amber-100',
+          'ring-amber-300','ring-amber-400','ring-2','ring-offset-1','ring-offset-white',
+          'border-2','border-amber-400','border-l-4','border','border-transparent','font-bold',
+          'font-semibold','opacity-60','transition-colors','duration-150','duration-200',
+          'bg-slate-900','bg-slate-800','text-slate-100','text-slate-300','border-slate-700',
+          'bg-emerald-600/20','bg-slate-700/40','text-emerald-200','hover:bg-slate-50',
+          'bg-blue-600','hover:bg-blue-700','text-white','shadow-sm','hover:shadow-md','transition-shadow'
+        ]
+      };
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.5/dist/cdn.min.js"></script>
+    <meta name="color-scheme" content="light dark" />
+    <style>
+      /* Make details/summary more tappable and styled */
+      details > summary { list-style: none; }
+      details > summary::-webkit-details-marker { display: none; }
+      /* Hide elements with x-cloak until Alpine is loaded */
+      [x-cloak] { display: none !important; }
+    </style>
+    <script>
+      // Define Alpine component early so Alpine can initialize immediately  
+      window.cruceApp = function cruceApp() {
+        return {
+          plan: { weeks: [] },
+          months: [],
+          todayStr: new Date().toISOString().slice(0,10),
+          dateMap: {},
+          activeDate: null,
+          selectedDate: null,
+          hoverDate: null,
+          showingNutrition: false,
+          selectedNutritionDate: null,
+          selectedNutritionData: null,
+          showingWeeklyMeals: false,
+          selectedWeekForMeals: null,
+          selectedWeekMealsData: null,
+          init() {
+            if (window.__STATIC_PLAN__?.weeks?.length) {
+              this.plan = window.__STATIC_PLAN__;
+              this.ensureExerciseFlags();
+              this.buildDateMap();
+              this.buildMonths();
+              this.pickActiveDate();
+              this.$nextTick(() => this.openCurrent());
+            }
+            document.addEventListener('alpine:init-json-ready', () => {
+              this.plan = window.__STATIC_PLAN__;
+              this.ensureExerciseFlags();
+              this.buildDateMap();
+              this.buildMonths();
+              this.pickActiveDate();
+              this.$nextTick(() => this.openCurrent());
+            });
+          },
+          ensureExerciseFlags() {
+            for (const w of (this.plan.weeks || [])) {
+              for (const r of (w.rows || [])) {
+                if (typeof r.isExercise === 'undefined') {
+                  r.isExercise = !/\boff\b/i.test(String(r.training || ''));
+                }
+              }
+            }
+          },
+          pickActiveDate() {
+            const allDates = [];
+            for (const w of this.plan.weeks) {
+              for (const r of w.rows) allDates.push(r.date);
+            }
+            allDates.sort();
+            const t = this.todayStr;
+            if (allDates.includes(t)) { 
+              this.activeDate = t; 
+              this.selectedDate = t; // Auto-select today's date
+              return; 
+            }
+            const next = allDates.find(d => d >= t);
+            this.activeDate = next || allDates[allDates.length - 1] || t;
+            this.selectedDate = this.activeDate; // Auto-select the active date
+          },
+          openCurrent() {
+            const current = this.plan.weeks.find(w => this.inRange(this.todayStr, w.start, w.end)) || this.plan.weeks[0];
+            if (!current) return;
+            const det = this.findWeekDetails(current.id);
+            if (det) det.open = true;
+          },
+          findWeekDetails(weekId) {
+            return document.querySelector(`#dynamic-weeks details[x-ref='week-${weekId}'], #dynamic-weeks [x-ref='week-${weekId}']`);
+          },
+          inRange(d, start, end) { return d >= start && d <= end; },
+          formatShort(iso) {
+            const dt = new Date(iso + 'T00:00:00');
+            return dt.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+          },
+          formatDate(iso) {
+            const dt = new Date(iso + 'T00:00:00');
+            const w = dt.toLocaleDateString(undefined, { weekday: 'short' });
+            const d = dt.toLocaleDateString(undefined, { day: '2-digit' });
+            return `${w} ${d}`;
+          },
+          isToday(iso) { return iso === this.todayStr; },
+          isActive(iso) { return iso === (this.activeDate || this.todayStr); },
+          isSelected(iso) { return iso === this.selectedDate; },
+          isPast(iso) { return iso < this.todayStr; },
+          getEntryForDate(iso) { return this.dateMap[iso] || null; },
+          buildDateMap() {
+            this.dateMap = {};
+            for (const w of this.plan.weeks) {
+              for (const r of w.rows) this.dateMap[r.date] = r;
+            }
+          },
+          selectDate(iso) {
+            this.selectedDate = iso;
+            const w = this.plan.weeks.find(w => this.inRange(iso, w.start, w.end));
+            if (!w) return;
+            const det = this.findWeekDetails(w.id);
+            if (det) det.open = true;
+            const rowEl = document.getElementById('d-' + iso);
+            if (rowEl) rowEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          },
+          buildMonths() {
+            const map = new Map();
+            const label = (ym) => {
+              const [y, m] = ym.split('-').map(n => parseInt(n, 10));
+              const dt = new Date(Date.UTC(y, m - 1, 1));
+              return dt.toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+            };
+            
+            // Build complete calendar months with all days, not just plan days
+            const startDate = new Date('2025-08-01T00:00:00');
+            const endDate = new Date('2025-12-03T23:59:59');
+            
+            for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+              const iso = d.toISOString().slice(0, 10);
+              const key = iso.slice(0, 7);
+              if (!map.has(key)) map.set(key, []);
+              map.get(key).push(iso);
+            }
+            
+            this.months = Array.from(map.entries()).map(([key, days]) => ({ 
+              key, 
+              label: label(key), 
+              days: days.sort() 
+            }));
+          },
+          monthOffset(ym) {
+            // Robust: compute using UTC to avoid TZ/DST shifts
+            const [y, m] = ym.split('-').map(n => parseInt(n, 10));
+            const firstUTC = new Date(Date.UTC(y, m - 1, 1));
+            const dow = firstUTC.getUTCDay(); // Sun=0..Sat=6
+            const monFirst = (dow + 6) % 7;   // Mon=0..Sun=6
+            return Array.from({ length: monFirst }, (_, i) => i);
+          },
+          isCurrentMonth(m) { return (this.todayStr || '').slice(0,7) === m.key; },
+          highlightPlanForDate(iso) {
+            const w = this.plan.weeks.find(w => this.inRange(iso, w.start, w.end));
+            if (!w) return;
+            const det = this.findWeekDetails(w.id);
+            if (det) {
+              if (!det.open) {
+                det.classList.add('ring-2','ring-amber-300','bg-amber-50');
+              }
+              const row = document.getElementById('d-' + iso);
+              if (row) row.classList.add('bg-amber-100');
+            }
+          },
+          clearPlanHighlights() {
+            document.querySelectorAll('#dynamic-weeks details').forEach(det=>{
+              det.classList.remove('ring-2','ring-amber-300','bg-amber-50');
+            });
+            document.querySelectorAll('#dynamic-weeks tbody tr').forEach(tr=>{
+              tr.classList.remove('bg-amber-100');
+            });
+          },
+          showNutritionModal(dateStr) {
+            this.selectedNutritionDate = dateStr;
+            // Try to get existing nutrition data, or generate it
+            this.selectedNutritionData = window.__NUTRITION_PLAN__?.[dateStr] || this.generateNutritionForDate(dateStr);
+            this.showingNutrition = true;
+          },
+          // Generate nutrition data for any missing day
+          generateNutritionForDate(dateStr) {
+            const entry = this.getEntryForDate(dateStr);
+            const isTraining = entry?.isExercise;
+            const baseCalories = isTraining ? 2400 : 2100;
+            
+            return {
+              totalCalories: baseCalories,
+              totalProtein: Math.floor(baseCalories * 0.18 / 4),
+              totalCarbs: Math.floor(baseCalories * (isTraining ? 0.50 : 0.40) / 4),
+              totalFats: Math.floor(baseCalories * 0.25 / 9),
+              meals: [
+                {
+                  name: 'Desayuno',
+                  calories: Math.floor(baseCalories * 0.23),
+                  dishes: [
+                    { name: 'Huevos revueltos', ingredients: '2-3 huevos, verduras de estación', preparation: 'Cocinar con verduras frescas y aceite de oliva.' },
+                    { name: 'Tostadas integrales', ingredients: 'Pan integral, tomate', preparation: 'Tostar y condimentar con sal y aceite.' },
+                    { name: 'Mate', ingredients: 'Yerba mate', preparation: 'Cebar mate tradicional argentino.' }
+                  ]
+                },
+                {
+                  name: 'Almuerzo',
+                  calories: Math.floor(baseCalories * 0.32),
+                  dishes: [
+                    { name: 'Proteína principal', ingredients: isTraining ? 'Pollo/carne (170g)' : 'Pescado/pollo (140g)', preparation: 'A la plancha con especias y limón.' },
+                    { name: 'Acompañamiento', ingredients: isTraining ? 'Arroz/pasta (80g)' : 'Ensalada grande', preparation: 'Preparación simple y nutritiva.' },
+                    { name: 'Verduras', ingredients: 'Vegetales de estación', preparation: 'Al vapor o salteadas.' }
+                  ]
+                },
+                {
+                  name: 'Merienda',
+                  calories: Math.floor(baseCalories * 0.16),
+                  dishes: [
+                    { name: 'Snack equilibrado', ingredients: 'Yogur natural, frutas, frutos secos (30g)', preparation: 'Combinación balanceada de macro y micronutrientes.' }
+                  ]
+                },
+                {
+                  name: 'Cena',
+                  calories: Math.floor(baseCalories * 0.29),
+                  dishes: [
+                    { name: 'Proteína magra', ingredients: 'Pescado/pollo (150g)', preparation: 'Cocción simple al horno o plancha.' },
+                    { name: 'Carbohidrato', ingredients: isTraining ? 'Batata/quinoa' : 'Ensalada de vegetales', preparation: 'Según necesidades del entrenamiento.' },
+                    { name: 'Vegetales', ingredients: 'Verduras variadas', preparation: 'Preparación al gusto.' }
+                  ]
+                }
+              ]
+            };
+          },
+          getWeeksInMonth(monthKey) {
+            return this.plan.weeks.filter(week => {
+              const weekMonth = week.start.slice(0, 7);
+              return weekMonth === monthKey;
+            });
+          },
+          getGroceriesForWeek(weekId) {
+            // First check if we have specific grocery data for this week
+            if (window.__GROCERY_LISTS__?.[weekId]) {
+              return window.__GROCERY_LISTS__[weekId];
+            }
+            
+            // Generate default grocery list based on week training intensity
+            const week = this.plan.weeks.find(w => w.id === weekId);
+            if (!week) return [];
+            
+            // Count training days in the week
+            const trainingDays = week.rows?.filter(r => r.isExercise).length || 0;
+            const isHighVolume = trainingDays >= 4;
+            
+            return [
+              { 
+                name: 'Proteínas', 
+                items: isHighVolume 
+                  ? 'Pollo (2.5kg), huevos (18u), carne magra (1kg), merluza (1kg), queso fresco (500g), yogur natural (1L)'
+                  : 'Pollo (2kg), huevos (12u), pescado blanco (800g), queso fresco (300g), yogur natural (500ml)'
+              },
+              { 
+                name: 'Carbohidratos', 
+                items: isHighVolume
+                  ? 'Arroz integral (1.5kg), avena (500g), pan integral, pasta integral (500g), papas (3kg), batatas (2kg)'
+                  : 'Arroz integral (1kg), avena (300g), pan integral, papas (2kg), batatas (1kg)'
+              },
+              { 
+                name: 'Verduras', 
+                items: 'Espinaca (500g), lechuga, tomates (1kg), zanahoria (500g), zapallo (1u), apio, pepino, cebolla, ajo, brócoli'
+              },
+              { 
+                name: 'Frutas & Grasas', 
+                items: isHighVolume
+                  ? 'Bananas (8u), manzanas (6u), palta (3u), frutos secos mix (300g), aceite oliva, semillas (200g)'
+                  : 'Bananas (5u), manzanas (4u), palta (2u), frutos secos (200g), aceite oliva, semillas (100g)'
+              },
+              { 
+                name: 'Básicos', 
+                items: 'Yerba mate, limones (6u), sal marina, pimienta, especias (orégano, perejil), vinagre, miel'
+              }
+            ];
+          },
+          showWeeklyMealsModal(weekId) {
+            this.selectedWeekForMeals = weekId;
+            const week = this.plan.weeks.find(w => w.id === weekId);
+            if (!week) return;
+            
+            // Build weekly meals data
+            this.selectedWeekMealsData = {
+              weekLabel: week.label,
+              days: week.rows.map(row => ({
+                date: row.date,
+                day: row.day,
+                meals: this.getMealsForDate(row.date)
+              }))
+            };
+            this.showingWeeklyMeals = true;
+          },
+          getMealsForDate(dateStr) {
+            const nutritionData = window.__NUTRITION_PLAN__?.[dateStr] || this.generateNutritionForDate(dateStr);
+            return nutritionData.meals || [];
+          },
+          printWeeklyMeals() {
+            const content = document.getElementById('weekly-meals-print-content').innerHTML;
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+              <html>
+                <head>
+                  <title>Weekly Meals - ${this.selectedWeekMealsData?.weekLabel}</title>
+                  <style>
+                    body { font-family: Arial, sans-serif; margin: 20px; }
+                    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; vertical-align: top; }
+                    th { background-color: #f5f5f5; font-weight: bold; }
+                    .meal-name { font-weight: bold; margin-bottom: 4px; }
+                    .dish-item { margin-bottom: 2px; font-size: 0.9em; }
+                    @media print { body { margin: 0; } }
+                  </style>
+                </head>
+                <body>${content}</body>
+              </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
+          },
+          printGroceries(weekId) {
+            const groceries = this.getGroceriesForWeek(weekId);
+            const week = this.plan.weeks.find(w => w.id === weekId);
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+              <html>
+                <head>
+                  <title>Grocery List - ${week?.label}</title>
+                  <style>
+                    body { font-family: Arial, sans-serif; margin: 20px; }
+                    h1 { color: #333; margin-bottom: 20px; }
+                    .category { margin-bottom: 20px; }
+                    .category-name { font-weight: bold; font-size: 1.1em; margin-bottom: 8px; color: #555; }
+                    .items { padding-left: 20px; line-height: 1.6; }
+                    @media print { body { margin: 0; } }
+                  </style>
+                </head>
+                <body>
+                  <h1>🛒 Shopping List - ${week?.label}</h1>
+                  ${groceries.map(cat => `
+                    <div class="category">
+                      <div class="category-name">${cat.name}</div>
+                      <div class="items">${cat.items}</div>
+                    </div>
+                  `).join('')}
+                </body>
+              </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
+          }
+        }
+      }
+    </script>
+  </head>
+  <body class="bg-slate-50 text-slate-900 antialiased">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8" x-data="cruceApp()" x-init="init()">
+      <header class="mb-8">
+        <h1 class="text-3xl sm:text-4xl font-bold tracking-tight">El Cruce — Minimal Day‑by‑Day Plan</h1>
+        <p class="mt-2 text-slate-600">Goal: finish safely with the absolute minimum effective training. <strong>Race: December 1st, 2025</strong>. Flat‑city adaptation: use building stairs/treadmill incline for vertical and a 20‑day run‑walk ramp before longer continuous sessions.</p>
+        <p class="mt-1 text-sm text-slate-500">🇦🇷 Nutrition: 100kg→92kg target. High-protein Argentine meals. Training days: ~2,500 kcal | Rest days: ~2,100 kcal</p>
+        <div class="mt-4 flex flex-wrap gap-3">
+          <button id="expandAll" class="inline-flex items-center rounded-md bg-emerald-600 px-3 py-2 text-sm font-semibold text-white hover:bg-emerald-500">Expand all</button>
+          <button id="collapseAll" class="inline-flex items-center rounded-md bg-rose-600 px-3 py-2 text-sm font-semibold text-white hover:bg-rose-500">Collapse all</button>
+        </div>
+      </header>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+        <!-- Calendar first so it occupies the left column on all sizes -->
+        <aside class="lg:col-start-1 lg:col-span-1 sticky top-4 self-start max-h-[calc(100vh-2rem)] overflow-y-auto">
+          <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <h2 class="text-lg font-semibold">Calendar</h2>
+            <p class="text-xs text-slate-500">Aug 18 → Dec 1, 2025 (Race)</p>
+            <div class="mt-3 space-y-2">
+              <template x-for="m in months" :key="m.key">
+                <details class="rounded-md border border-slate-200" :open="isCurrentMonth(m)" :data-month="m.key">
+                  <summary class="flex items-center justify-between px-2 py-1 cursor-pointer select-none">
+                    <span class="font-medium" x-text="m.label"></span>
+                    <span class="text-slate-400">▾</span>
+                  </summary>
+                  <div class="p-2 pt-0">
+                    <div class="grid grid-cols-7 gap-2 text-[11px] text-slate-500 mb-2">
+                      <span class="text-center">Mon</span>
+                      <span class="text-center">Tue</span>
+                      <span class="text-center">Wed</span>
+                      <span class="text-center">Thu</span>
+                      <span class="text-center">Fri</span>
+                      <span class="text-center">Sat</span>
+                      <span class="text-center">Sun</span>
+                    </div>
+                    <div class="grid grid-cols-7 gap-1">
+                      <template x-for="i in monthOffset(m.key)" :key="'pad-'+i">
+                        <div></div>
+                      </template>
+                      <template x-for="d in m.days" :key="d">
+                        <button class="relative rounded-md p-2 text-center text-sm hover:border-slate-200"
+                          :class="{
+                            'border-2 border-amber-400': isSelected(d),
+                            'border border-transparent': !isSelected(d),
+                            'bg-emerald-50 text-emerald-800': getEntryForDate(d)?.isExercise,
+                            'bg-slate-50 text-slate-700': getEntryForDate(d) && !getEntryForDate(d).isExercise,
+                            'opacity-60': isPast(d) && !isToday(d)
+                          }"
+                          x-on:click="selectDate(d)"
+                          x-on:mouseenter="hoverDate = d; highlightPlanForDate(d)"
+                          x-on:mouseleave="hoverDate = null; clearPlanHighlights()"
+                          :title="getEntryForDate(d)?.training || 'No entry'">
+                          <span class="font-medium" :class="{'text-amber-900 font-semibold': isToday(d)}" x-text="new Date(d+'T00:00:00').getDate()"></span>
+                          <span x-show="isToday(d) || isActive(d)" class="absolute right-1 top-1 inline-block h-2 w-2 rounded-full bg-amber-400" aria-hidden="true"></span>
+                        </button>
+                      </template>
+                    </div>
+                  </div>
+                </details>
+              </template>
+            </div>
+            <div class="mt-3 text-xs text-slate-500 space-y-1">
+              <div class="flex items-center gap-2"><span class="inline-block h-3 w-3 rounded bg-amber-200"></span> Today</div>
+              <div class="flex items-center gap-2"><span class="inline-block h-3 w-3 rounded bg-emerald-200"></span> Exercise</div>
+              <div class="flex items-center gap-2"><span class="inline-block h-3 w-3 rounded bg-slate-200"></span> Off</div>
+            </div>
+          </div>
+
+          <!-- Weekly Grocery List -->
+          <div class="mt-6 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <h2 class="text-lg font-semibold mb-3">Shopping List</h2>
+            <div class="space-y-3">
+              <template x-for="month in months" :key="'grocery-'+month.key">
+                <details class="rounded-md border border-slate-200">
+                  <summary class="flex items-center justify-between px-3 py-2 cursor-pointer select-none hover:bg-slate-50">
+                    <span class="font-medium text-sm" x-text="month.label"></span>
+                    <span class="text-slate-400 text-xs">🛒</span>
+                  </summary>
+                  <div class="p-3 pt-0">
+                    <template x-for="week in getWeeksInMonth(month.key)" :key="'week-grocery-'+week.id">
+                      <div class="mb-4 last:mb-0">
+                        <div class="flex items-center justify-between mb-2">
+                          <h4 class="text-sm font-semibold text-emerald-700" x-text="week.label"></h4>
+                          <button 
+                            x-on:click="printGroceries(week.id)"
+                            class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-md text-green-600 bg-green-50 hover:bg-green-100 hover:text-green-700 transition-colors duration-200"
+                            title="Print grocery list">
+                            🖨️ Print
+                          </button>
+                        </div>
+                        <div class="bg-slate-50 rounded-lg p-3">
+                          <div class="grid grid-cols-1 gap-2">
+                            <template x-for="category in getGroceriesForWeek(week.id)" :key="category.name">
+                              <div>
+                                <div class="text-xs font-medium text-slate-600 mb-1" x-text="category.name"></div>
+                                <div class="text-xs text-slate-500 leading-relaxed" x-text="category.items"></div>
+                              </div>
+                            </template>
+                          </div>
+                        </div>
+                      </div>
+                    </template>
+                  </div>
+                </details>
+              </template>
+            </div>
+          </div>
+        </aside>
+
+        <main class="lg:col-start-2 lg:col-span-2">
+          <section class="grid md:grid-cols-2 gap-6 mb-8">
+            <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+          <h2 class="text-lg font-semibold">Weekly rhythm (minimal, flat‑city)</h2>
+          <ul class="mt-2 list-disc pl-5 text-sm text-slate-700 space-y-1">
+            <li>Mon: Off + 10–15 min mobility</li>
+            <li>Tue: Stairs 20–50 min (Z2/Z3) + Gym Lower (hard)</li>
+            <li>Wed: Easy 30–45 min Z2 run‑walk (flat) + Gym Upper/Core (hard)</li>
+            <li>Thu: Off or 20–30 min easy walk + mobility (Oct→Nov: optional steady stairs 30–45 min)</li>
+            <li>Fri: Off + Gym Maintenance/Prehab (moderate)</li>
+            <li>Sat: Long Z2 run‑walk (flat or incline walk) — gradually 45 → 210–240 min (peak)</li>
+            <li>Sun: Off — except Nov B2B weekends and stage sim</li>
+          </ul>
+            </div>
+            <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+          <h2 class="text-lg font-semibold">Nutrition rules (simple)</h2>
+          <ul class="mt-2 list-disc pl-5 text-sm text-slate-700 space-y-1">
+            <li>Training days: carbs before/during/after; protein 1.8–2.2 g/kg target BW; hydrate + sodium.</li>
+            <li>Rest days: small calorie deficit; high protein; veg; limit evening starches; hydrate.</li>
+            <li>Long day fueling: 60–90 g carbs/h + 500–750 ml fluids/h + 400–800 mg sodium/h. Practice your race products.</li>
+          </ul>
+            </div>
+          </section>
+
+          <!-- Dynamic plan rendering -->
+          <section class="space-y-4" id="dynamic-weeks">
+            <template x-for="week in (plan?.weeks || [])" :key="week.id">
+              <details class="group rounded-xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition-shadow duration-200" :data-start="week.start" :data-end="week.end" :x-ref="'week-'+week.id">
+                <summary class="flex items-center justify-between cursor-pointer select-none p-6 hover:bg-slate-50 transition-colors duration-150 rounded-t-xl group-open:rounded-b-none">
+                  <div class="flex-1">
+                    <div class="flex items-center space-x-3">
+                      <div class="flex-shrink-0">
+                        <div class="w-3 h-3 rounded-full bg-gradient-to-r from-emerald-500 to-blue-500"></div>
+                      </div>
+                      <div>
+                        <h3 class="text-lg font-bold text-slate-900" x-text="week.label"></h3>
+                        <p class="text-sm text-slate-600 mt-1 leading-relaxed" x-text="week.summary || ''"></p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex items-center space-x-2 ml-4">
+                    <button 
+                      x-on:click.stop="showWeeklyMealsModal(week.id)"
+                      class="hidden sm:inline-flex items-center px-2 py-1 text-xs font-medium rounded-md text-blue-600 bg-blue-50 hover:bg-blue-100 hover:text-blue-700 transition-colors duration-200"
+                      title="View weekly meal table">
+                      📋
+                    </button>
+                    <span class="hidden sm:inline text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-full" x-text="week.rows?.length + ' days'"></span>
+                    <span class="text-slate-400 group-open:rotate-180 transition-transform duration-200">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                      </svg>
+                    </span>
+                  </div>
+                </summary>
+                <div class="px-6 pb-6">
+                  <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+                    <div class="overflow-x-auto">
+                      <table class="min-w-full">
+                        <thead class="bg-gradient-to-r from-slate-50 to-slate-100 border-b border-slate-200">
+                          <tr>
+                            <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-700 w-20">Date</th>
+                            <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-700 w-16">Day</th>
+                            <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-700">Training</th>
+                            <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-700">Focus</th>
+                            <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-700 w-32">Nutrition</th>
+                          </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                          <template x-for="row in week.rows" :key="row.date">
+                            <tr :id="'d-'+row.date" 
+                                class="hover:bg-slate-50 transition-colors duration-150"
+                                :class="{
+                                  'bg-amber-50 hover:bg-amber-100': isActive(row.date), 
+                                  'border-l-4 border-amber-400': isSelected(row.date),
+                                  'border-l-4 border-transparent': !isSelected(row.date)
+                                }">
+                              <!-- Date Column -->
+                              <td class="px-4 py-4 whitespace-nowrap">
+                                <div class="flex flex-col">
+                                  <span class="text-sm font-semibold text-slate-900" 
+                                        :class="{'text-amber-900': isActive(row.date) || isSelected(row.date)}" 
+                                        x-text="formatShort(row.date)"></span>
+                                  <span class="text-xs text-slate-500" x-text="row.day"></span>
+                                </div>
+                              </td>
+                              <!-- Day Column (Hidden on mobile) -->
+                              <td class="hidden sm:table-cell px-4 py-4 whitespace-nowrap">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                                      :class="{
+                                        'bg-emerald-100 text-emerald-800': row.isExercise,
+                                        'bg-slate-100 text-slate-800': !row.isExercise
+                                      }"
+                                      x-text="row.day"></span>
+                              </td>
+                              <!-- Training Column -->
+                              <td class="px-4 py-4">
+                                <div class="flex items-start space-x-2">
+                                  <div class="flex-shrink-0">
+                                    <div class="w-2 h-2 rounded-full mt-2"
+                                         :class="{
+                                           'bg-emerald-500': row.isExercise,
+                                           'bg-slate-400': !row.isExercise
+                                         }"></div>
+                                  </div>
+                                  <div class="min-w-0 flex-1">
+                                    <p class="text-sm font-medium text-slate-900" 
+                                       :class="{ 'text-emerald-700': row.isExercise }"
+                                       x-text="row.training"></p>
+                                  </div>
+                                </div>
+                              </td>
+                              <!-- Food Focus Column -->
+                              <td class="px-4 py-4">
+                                <p class="text-sm text-slate-600 leading-relaxed" x-text="row.food"></p>
+                              </td>
+                              <!-- Nutrition Column -->
+                              <td class="px-4 py-4 whitespace-nowrap">
+                                <button class="inline-flex items-center px-3 py-1.5 border border-slate-200 text-xs font-medium rounded-lg text-slate-600 bg-slate-50 hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-300 transition-colors duration-200" 
+                                        x-on:click="showNutritionModal(row.date)">
+                                  <svg class="w-3 h-3 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                                  </svg>
+                                  <span class="hidden sm:inline">View meals</span>
+                                  <span class="sm:hidden">Menu</span>
+                                </button>
+                                <div class="mt-1 text-xs text-slate-500" x-text="(row.calories || '~2300') + ' kcal'"></div>
+                              </td>
+                            </tr>
+                          </template>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </details>
+            </template>
+          </section>
+
+        </main>
+
+      <footer class="mt-10 border-t border-slate-200 pt-6 text-xs text-slate-500">
+        <p>This page is a minimal plan focused on finishing El Cruce safely. Adjust dates if the official schedule differs.</p>
+      </footer>
+    </div>
+
+    <div id="tooltip" class="hidden fixed z-50 px-3 py-2 text-xs rounded-md bg-slate-900 text-white shadow-lg max-w-xs"></div>
+
+    <!-- Nutrition Modal -->
+    <div x-show="showingNutrition" x-cloak class="fixed inset-0 z-50 overflow-y-auto" x-on:keydown.escape="showingNutrition = false">
+      <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" x-on:click="showingNutrition = false"></div>
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+          <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+            <div class="sm:flex sm:items-start">
+              <div class="w-full mt-3 text-center sm:mt-0 sm:text-left">
+                <h3 class="text-lg leading-6 font-medium text-gray-900" x-text="'Meals for ' + formatDate(selectedNutritionDate)"></h3>
+                <div class="mt-4" x-show="selectedNutritionData">
+                  <div class="grid md:grid-cols-2 gap-4">
+                    <template x-for="meal in (selectedNutritionData?.meals || [])" :key="meal.name">
+                      <div class="border rounded-lg p-3">
+                        <h4 class="font-semibold text-emerald-700" x-text="meal.name + ' (' + meal.calories + ' kcal)'"></h4>
+                        <div class="mt-2 space-y-1">
+                          <template x-for="dish in meal.dishes" :key="dish.name">
+                            <div>
+                              <div class="font-medium text-sm" x-text="dish.name"></div>
+                              <div class="text-xs text-slate-600" x-text="dish.ingredients"></div>
+                              <div class="text-xs text-slate-500" x-text="dish.preparation"></div>
+                            </div>
+                          </template>
+                        </div>
+                      </div>
+                    </template>
+                  </div>
+                  <div class="mt-4 text-sm text-slate-600 bg-slate-50 p-3 rounded">
+                    <div class="font-semibold">Daily totals:</div>
+                    <div x-text="'Calories: ' + (selectedNutritionData?.totalCalories || 0) + ' kcal'"></div>
+                    <div x-text="'Protein: ' + (selectedNutritionData?.totalProtein || 0) + 'g'"></div>
+                    <div x-text="'Carbs: ' + (selectedNutritionData?.totalCarbs || 0) + 'g'"></div>
+                    <div x-text="'Fats: ' + (selectedNutritionData?.totalFats || 0) + 'g'"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+            <button type="button" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm" x-on:click="showingNutrition = false">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Weekly Meals Modal -->
+    <div x-show="showingWeeklyMeals" x-cloak class="fixed inset-0 z-50 overflow-y-auto" x-on:keydown.escape="showingWeeklyMeals = false">
+      <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+        <div x-show="showingWeeklyMeals" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" x-on:click="showingWeeklyMeals = false"></div>
+
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+
+        <div x-show="showingWeeklyMeals" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" class="inline-block w-full max-w-6xl p-6 my-8 text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
+          
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl leading-6 font-bold text-gray-900" x-text="'Weekly Meals: ' + (selectedWeekMealsData?.weekLabel || '')"></h3>
+            <div class="flex space-x-2">
+              <button 
+                x-on:click="printWeeklyMeals()"
+                class="inline-flex items-center px-3 py-2 text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
+                🖨️ Print Table
+              </button>
+              <button x-on:click="showingWeeklyMeals = false" class="inline-flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-700 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors duration-200">
+                Close
+              </button>
+            </div>
+          </div>
+
+          <div id="weekly-meals-print-content">
+            <h1 class="text-lg font-bold mb-4" x-text="'🍽️ Weekly Meal Plan: ' + (selectedWeekMealsData?.weekLabel || '')"></h1>
+            
+            <table class="w-full border-collapse border border-gray-300">
+              <thead>
+                <tr class="bg-gray-100">
+                  <th class="border border-gray-300 px-3 py-2 text-left font-bold">Day</th>
+                  <th class="border border-gray-300 px-3 py-2 text-left font-bold">Desayuno</th>
+                  <th class="border border-gray-300 px-3 py-2 text-left font-bold">Almuerzo</th>
+                  <th class="border border-gray-300 px-3 py-2 text-left font-bold">Merienda</th>
+                  <th class="border border-gray-300 px-3 py-2 text-left font-bold">Cena</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template x-for="day in (selectedWeekMealsData?.days || [])" :key="day.date">
+                  <tr>
+                    <td class="border border-gray-300 px-3 py-3 font-semibold">
+                      <div x-text="day.day"></div>
+                      <div class="text-xs text-gray-500" x-text="new Date(day.date + 'T00:00:00').toLocaleDateString('es-AR', {month: 'short', day: 'numeric'})"></div>
+                    </td>
+                    <template x-for="(meal, mealIndex) in day.meals" :key="day.date + '-' + mealIndex">
+                      <td class="border border-gray-300 px-3 py-3 align-top">
+                        <div class="meal-name text-sm font-semibold mb-2" x-text="meal.name"></div>
+                        <template x-for="dish in (meal.dishes || [])" :key="dish.name">
+                          <div class="dish-item text-xs mb-1">
+                            <div class="font-medium" x-text="dish.name"></div>
+                            <div class="text-gray-600" x-text="dish.ingredients"></div>
+                          </div>
+                        </template>
+                        <div class="text-xs text-blue-600 mt-1" x-text="meal.calories + ' kcal'"></div>
+                      </td>
+                    </template>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const expandAllBtn = document.getElementById('expandAll');
+      const collapseAllBtn = document.getElementById('collapseAll');
+      const allDetails = () => Array.from(document.querySelectorAll('#dynamic-weeks details'));
+
+      expandAllBtn?.addEventListener('click', () => {
+        allDetails().forEach(d => d.open = true);
+      });
+      collapseAllBtn?.addEventListener('click', () => {
+        allDetails().forEach(d => d.open = false);
+      });
+
+
+
+      // Tooltips for activity explanations (kept for dynamic rows)
+      const tooltip = document.getElementById('tooltip');
+      function showTooltip(text, x, y) {
+        tooltip.textContent = text;
+        tooltip.style.left = Math.min(x + 12, window.innerWidth - 220) + 'px';
+        tooltip.style.top = (y + 12) + 'px';
+        tooltip.classList.remove('hidden');
+      }
+      function hideTooltip() { tooltip.classList.add('hidden'); }
+
+      function explainActivity(raw) {
+        const t = raw.toLowerCase();
+        const parts = [];
+        if (t.includes('off')) parts.push('Rest day. Optional gentle mobility 10–15 min. Hydrate.');
+        if (t.includes('hills')) parts.push('Uphill work: Z2–Z3 steady or repeats. Power hike steeper grades; run easy on flats/downs. Focus on posture and poles.');
+        if (t.includes('stair')) parts.push('Stairs: repeats or continuous climbing. Tall posture, short steps; use handrail for balance only. Walk descents easy to protect knees.');
+        if (t.includes('run‑walk') || t.includes('run-walk') || t.includes('runwalk') || t.includes('run walk')) parts.push('Run‑walk method: alternate short jogs with short walks to keep Z2 and reduce impact.');
+
+        if (t.includes('easy')) parts.push('Easy Z2 aerobic walk/jog on soft surfaces. Conversational pace.');
+        if (t.includes('long z2')) parts.push('Long aerobic run‑walk: mostly brisk walk when needed; jog easy when comfortable. Practice fueling: 60–90 g carbs/h, 500–750 ml fluids/h, 400–800 mg sodium/h.');
+        if (t.includes('z2 hike')) parts.push('Easy Z2 hike only: keep effort relaxed; focus on technique and recovery.');
+        if (t.includes('descents')) parts.push('Downhill technique: short, light steps; increase cadence; avoid hard braking.');
+        if (t.includes('stage sim')) parts.push('Stage simulation: practice 2–4 h Z2 back-to-back days with full race kit and fueling. Focus on pacing and feet care.');
+        if (t.includes('pack') || t.includes('poles')) parts.push('Use race kit: pack fit, poles deploy/collapse, check chafe points.');
+        if (t.includes('strides')) parts.push('Strides: 4–6×10 s fast-but-relaxed on flat, full recovery between.');
+        if (t.includes('shakeout')) parts.push('Shakeout: very easy 20–30 min to stay loose; stop if legs feel heavy.');
+        if (t.includes('kit check')) parts.push('Kit check: run with full mandatory gear to validate comfort and pockets.');
+        if (t.includes('gym lower')) parts.push('Gym Lower (hard): squat/hinge, step-ups, lunges, calves; leave 1–2 reps in reserve.');
+        if (t.includes('gym upper/core')) parts.push('Gym Upper/Core: pull/push/press + anti-rotation, planks, dead bug.');
+        if (t.includes('maintenance') || t.includes('prehab')) parts.push('Gym Maintenance/Prehab: lighter full-body + calves, hips, feet, tibialis, mobility.');
+        if (parts.length === 0) parts.push('Z2 aerobic emphasis. Keep it comfortable.');
+        return parts.join(' ');
+      }
+
+      // Delegate tooltip setup for dynamic rows
+      document.addEventListener('mouseover', (e) => {
+        const td = e.target.closest('td');
+        if (!td) return;
+        const tr = td.parentElement;
+        if (!tr || tr.children.length < 3) return;
+        if (td !== tr.children[2]) return;
+        const text = td.textContent.trim();
+        const explanation = explainActivity(text);
+        showTooltip(explanation, e.clientX, e.clientY);
+      });
+      document.addEventListener('mousemove', (e) => {
+        const td = e.target.closest('td');
+        if (!td) return;
+        const tr = td.parentElement;
+        if (!tr || tr.children.length < 3) return;
+        if (td !== tr.children[2]) return;
+        const text = td.textContent.trim();
+        const explanation = explainActivity(text);
+        showTooltip(explanation, e.clientX, e.clientY);
+      });
+      document.addEventListener('mouseout', (e) => {
+        if (e.target.closest('td')) hideTooltip();
+      });
+
+      // Hide tooltip on scroll or resize
+      window.addEventListener('scroll', hideTooltip, { passive: true });
+      window.addEventListener('resize', hideTooltip);
+    </script>
+
+    <script>
+      // Single source of truth: JSON plan with all weeks/days
+      window.__STATIC_PLAN__ = {
+        weeks: [
+          { id: 'W0', label: 'W0 (Aug 19–24)', start: '2025-08-19', end: '2025-08-24', summary: 'Kick-off: routine, footwear check, poles intro.', rows: [
+            { date: '2025-08-19', day: 'Tue', training: 'Off', food: 'Hydrate; normal meals', notes: '', isExercise: false },
+            { date: '2025-08-20', day: 'Wed', training: 'Off + 10–15 min mobility', food: 'High‑protein meals; hydrate', notes: 'Mobility focus; light walk optional', isExercise: false },
+            { date: '2025-08-21', day: 'Thu', training: '20–30 min easy walk', food: 'Protein + veg; light carbs', notes: '' },
+            { date: '2025-08-22', day: 'Fri', training: 'Gym Maintenance (moderate)', food: 'Protein 35–45 g/meal', notes: 'Full-body + calves/hips/feet' },
+            { date: '2025-08-23', day: 'Sat', training: 'Long Z2 run‑walk 45–60 min (flat)', food: '40–60 g carbs/h + electrolytes', notes: 'Run‑walk method Z2' },
+            { date: '2025-08-24', day: 'Sun', training: 'Off', food: 'Deficit small; fiber + hydration', notes: 'Recovery' },
+          ]},
+          { id: 'W1', label: 'W1 (Aug 25–31)', start: '2025-08-25', end: '2025-08-31', rows: [
+            { date: '2025-08-25', day: 'Mon', training: 'Off + mobility', food: 'Protein focus' },
+            { date: '2025-08-26', day: 'Tue', training: 'Stairs 6×3–4 min Z2/Z3 + Gym Lower (hard)', food: 'Carbs pre/post gym' },
+            { date: '2025-08-27', day: 'Wed', training: 'Easy 30–40 min Z2 run‑walk + Gym Upper/Core', food: 'Moderate carbs + protein' },
+            { date: '2025-08-28', day: 'Thu', training: 'Off or 20–30 min easy walk', food: 'Veg + protein; light carbs' },
+            { date: '2025-08-29', day: 'Fri', training: 'Gym Maintenance/Prehab', food: 'Protein + fluids' },
+            { date: '2025-08-30', day: 'Sat', training: 'Long Z2 run‑walk 55–65 min (flat), light pack', food: '40–60 g carbs/h + sodium' },
+            { date: '2025-08-31', day: 'Sun', training: 'Off', food: 'Small deficit; hydrate' },
+          ]},
+          { id: 'W2', label: 'W2 (Sep 1–7)', start: '2025-09-01', end: '2025-09-07', rows: [
+            { date: '2025-09-01', day: 'Mon', training: 'Off + mobility', food: 'Protein focus' },
+            { date: '2025-09-02', day: 'Tue', training: 'Stair tempo 25–35 min + Gym Lower', food: 'Carbs pre/post' },
+            { date: '2025-09-03', day: 'Wed', training: 'Easy 35–45 min Z2 run‑walk + Gym Upper/Core', food: 'Moderate carbs' },
+            { date: '2025-09-04', day: 'Thu', training: 'Off or 20–30 min walk', food: 'Light carbs' },
+            { date: '2025-09-05', day: 'Fri', training: 'Gym Maintenance/Prehab', food: 'Protein + fluids' },
+            { date: '2025-09-06', day: 'Sat', training: 'Long Z2 60 min (flat), pack/poles test', food: '50–70 g carbs/h + sodium' },
+            { date: '2025-09-07', day: 'Sun', training: 'Off', food: 'Small deficit' },
+          ]},
+          { id: 'W3', label: 'W3 (Sep 8–14) — Deload', start: '2025-09-08', end: '2025-09-14', rows: [
+            { date: '2025-09-08', day: 'Mon', training: 'Off + mobility', food: 'Protein focus' },
+            { date: '2025-09-09', day: 'Tue', training: 'Stairs 20–25 min + Gym Lower (lighter)', food: 'Carbs pre/post small' },
+            { date: '2025-09-10', day: 'Wed', training: 'Easy 25–30 min run‑walk + Gym Upper/Core (lighter)', food: 'Balanced' },
+            { date: '2025-09-11', day: 'Thu', training: 'Off', food: 'Veg + protein' },
+            { date: '2025-09-12', day: 'Fri', training: 'Gym Maintenance (light)', food: 'Protein' },
+            { date: '2025-09-13', day: 'Sat', training: 'Long Z2 60 min (cap)', food: '40–60 g carbs/h' },
+            { date: '2025-09-14', day: 'Sun', training: 'Off', food: 'Small deficit' },
+          ]},
+          { id: 'W4', label: 'W4 (Sep 15–21)', start: '2025-09-15', end: '2025-09-21', rows: [
+            { date: '2025-09-15', day: 'Mon', training: 'Off + mobility', food: 'Protein focus' },
+            { date: '2025-09-16', day: 'Tue', training: 'Stairs 40–45 min + Gym Lower', food: 'Carbs pre/post' },
+            { date: '2025-09-17', day: 'Wed', training: 'Easy 35–45 min Z2 run‑walk + Gym Upper/Core', food: 'Moderate carbs' },
+            { date: '2025-09-18', day: 'Thu', training: 'Off or easy walk', food: 'Light carbs' },
+            { date: '2025-09-19', day: 'Fri', training: 'Gym Maintenance/Prehab', food: 'Protein + fluids' },
+            { date: '2025-09-20', day: 'Sat', training: 'Long Z2 110–120 min, light pack', food: '50–70 g carbs/h + sodium' },
+            { date: '2025-09-21', day: 'Sun', training: 'Off', food: 'Small deficit' },
+          ]},
+          { id: 'W5', label: 'W5 (Sep 22–28)', start: '2025-09-22', end: '2025-09-28', rows: [
+            { date: '2025-09-22', day: 'Mon', training: 'Off + mobility', food: 'Protein focus' },
+            { date: '2025-09-23', day: 'Tue', training: 'Stairs 40–45 min + Gym Lower', food: 'Carbs pre/post' },
+            { date: '2025-09-24', day: 'Wed', training: 'Easy 35–45 min Z2 run‑walk + Gym Upper/Core', food: 'Balanced' },
+            { date: '2025-09-25', day: 'Thu', training: 'Off', food: 'Veg + protein' },
+            { date: '2025-09-26', day: 'Fri', training: 'Gym Maintenance/Prehab', food: 'Protein' },
+            { date: '2025-09-27', day: 'Sat', training: 'Long Z2 120–130 min, poles', food: '60–80 g carbs/h' },
+            { date: '2025-09-28', day: 'Sun', training: 'Off', food: 'Small deficit' },
+          ]},
+          { id: 'W6', label: 'W6 (Sep 29–Oct 5)', start: '2025-09-29', end: '2025-10-05', rows: [
+            { date: '2025-09-29', day: 'Mon', training: 'Off + mobility', food: 'Protein focus' },
+            { date: '2025-09-30', day: 'Tue', training: 'Stairs 45 min + Gym Lower', food: 'Carbs pre/post' },
+            { date: '2025-10-01', day: 'Wed', training: 'Easy 35–45 min Z2 run‑walk + Gym Upper/Core', food: 'Moderate carbs' },
+            { date: '2025-10-02', day: 'Thu', training: 'Off', food: 'Veg + protein' },
+            { date: '2025-10-03', day: 'Fri', training: 'Gym Maintenance/Prehab', food: 'Protein' },
+            { date: '2025-10-04', day: 'Sat', training: 'Long Z2 130–140 min, include descents', food: '60–80 g carbs/h + sodium' },
+            { date: '2025-10-05', day: 'Sun', training: 'Off', food: 'Small deficit' },
+          ]},
+          { id: 'W7', label: 'W7 (Oct 6–12) — Deload', start: '2025-10-06', end: '2025-10-12', rows: [
+            { date: '2025-10-06', day: 'Mon', training: 'Off + mobility', food: 'Protein focus' },
+            { date: '2025-10-07', day: 'Tue', training: 'Stairs 30–35 min + Gym Lower (lighter)', food: 'Carbs small' },
+            { date: '2025-10-08', day: 'Wed', training: 'Easy 25–35 min + Gym Upper/Core (lighter)', food: 'Balanced' },
+            { date: '2025-10-09', day: 'Thu', training: 'Off', food: 'Veg + protein' },
+            { date: '2025-10-10', day: 'Fri', training: 'Gym Maintenance (light)', food: 'Protein' },
+            { date: '2025-10-11', day: 'Sat', training: 'Long Z2 90–100 min', food: '40–60 g carbs/h' },
+            { date: '2025-10-12', day: 'Sun', training: 'Off', food: 'Small deficit' },
+          ]},
+          { id: 'W8', label: 'W8 (Oct 13–19)', start: '2025-10-13', end: '2025-10-19', rows: [
+            { date: '2025-10-13', day: 'Mon', training: 'Off + mobility', food: 'Protein focus' },
+            { date: '2025-10-14', day: 'Tue', training: 'Stairs 45 min + Gym Lower', food: 'Carbs pre/post' },
+            { date: '2025-10-15', day: 'Wed', training: 'Easy 35–45 min Z2 run‑walk + Gym Upper/Core', food: 'Moderate carbs' },
+            { date: '2025-10-16', day: 'Thu', training: 'Off', food: 'Veg + protein' },
+            { date: '2025-10-17', day: 'Fri', training: 'Gym Maintenance/Prehab', food: 'Protein' },
+            { date: '2025-10-18', day: 'Sat', training: 'Long Z2 140–150 min, pack/poles', food: '60–80 g carbs/h + sodium' },
+            { date: '2025-10-19', day: 'Sun', training: 'Off', food: 'Small deficit' },
+          ]},
+          { id: 'W9', label: 'W9 (Oct 20–26)', start: '2025-10-20', end: '2025-10-26', rows: [
+            { date: '2025-10-20', day: 'Mon', training: 'Off + mobility', food: 'Protein focus' },
+            { date: '2025-10-21', day: 'Tue', training: 'Stairs 45–50 min + Gym Lower', food: 'Carbs pre/post' },
+            { date: '2025-10-22', day: 'Wed', training: 'Easy 35–45 min Z2 run‑walk + Gym Upper/Core', food: 'Balanced' },
+            { date: '2025-10-23', day: 'Thu', training: 'Off', food: 'Veg + protein' },
+            { date: '2025-10-24', day: 'Fri', training: 'Gym Maintenance/Prehab', food: 'Protein' },
+            { date: '2025-10-25', day: 'Sat', training: 'Long Z2 150–165 min, include descents', food: '60–90 g carbs/h' },
+            { date: '2025-10-26', day: 'Sun', training: 'Off', food: 'Small deficit' },
+          ]},
+          { id: 'W10', label: 'W10 (Oct 27–Nov 2)', start: '2025-10-27', end: '2025-11-02', rows: [
+            { date: '2025-10-27', day: 'Mon', training: 'Off + mobility', food: 'Protein focus' },
+            { date: '2025-10-28', day: 'Tue', training: 'Stairs 45–50 min + Gym Lower', food: 'Carbs pre/post' },
+            { date: '2025-10-29', day: 'Wed', training: 'Easy 35–45 min Z2 run‑walk + Gym Upper/Core', food: 'Moderate carbs' },
+            { date: '2025-10-30', day: 'Thu', training: 'Off', food: 'Veg + protein' },
+            { date: '2025-10-31', day: 'Fri', training: 'Gym Maintenance/Prehab', food: 'Protein' },
+            { date: '2025-11-01', day: 'Sat', training: 'Long Z2 165–180 min, pack/poles', food: '60–90 g carbs/h + sodium' },
+            { date: '2025-11-02', day: 'Sun', training: 'Off', food: 'Small deficit' },
+          ]},
+          { id: 'W11', label: 'W11 (Nov 3–9) — B2B Weekend (mandatory)', start: '2025-11-03', end: '2025-11-09', rows: [
+            { date: '2025-11-03', day: 'Mon', training: 'Off + mobility', food: 'Protein focus' },
+            { date: '2025-11-04', day: 'Tue', training: 'Stairs 45–50 min + Gym Lower', food: 'Carbs pre/post' },
+            { date: '2025-11-05', day: 'Wed', training: 'Easy 35–45 min Z2 run‑walk + Gym Upper/Core', food: 'Balanced' },
+            { date: '2025-11-06', day: 'Thu', training: 'Off', food: 'Veg + protein' },
+            { date: '2025-11-07', day: 'Fri', training: 'Gym Maintenance/Prehab', food: 'Protein' },
+            { date: '2025-11-08', day: 'Sat', training: 'Long Z2 150–165 min', food: '60–90 g carbs/h' },
+            { date: '2025-11-09', day: 'Sun', training: 'Z2 run‑walk 120–150 min (easy)', food: '60–90 g carbs/h + sodium' },
+          ]},
+          { id: 'W12', label: 'W12 (Nov 10–16) — B2B Weekend', start: '2025-11-10', end: '2025-11-16', rows: [
+            { date: '2025-11-10', day: 'Mon', training: 'Off + mobility', food: 'Protein focus' },
+            { date: '2025-11-11', day: 'Tue', training: 'Stairs 45–55 min + Gym Lower', food: 'Carbs pre/post' },
+            { date: '2025-11-12', day: 'Wed', training: 'Easy 35–45 min Z2 run‑walk + Gym Upper/Core', food: 'Balanced' },
+            { date: '2025-11-13', day: 'Thu', training: 'Off', food: 'Veg + protein' },
+            { date: '2025-11-14', day: 'Fri', training: 'Gym Maintenance/Prehab', food: 'Protein' },
+            { date: '2025-11-15', day: 'Sat', training: 'Long Z2 180–195 min, pack/poles', food: '60–90 g carbs/h + sodium' },
+            { date: '2025-11-16', day: 'Sun', training: 'Z2 run‑walk 120–150 min (easy)', food: '60–90 g carbs/h + sodium' },
+          ]},
+          { id: 'W13', label: 'W13 (Nov 17–23) — Stage Simulation (3 days)', start: '2025-11-17', end: '2025-11-23', rows: [
+            { date: '2025-11-17', day: 'Mon', training: 'Off + mobility', food: 'Protein focus' },
+            { date: '2025-11-18', day: 'Tue', training: 'Stairs 45–55 min + Gym Lower', food: 'Carbs pre/post' },
+            { date: '2025-11-19', day: 'Wed', training: 'Easy 35–45 min Z2 run‑walk + Gym Upper/Core', food: 'Balanced' },
+            { date: '2025-11-20', day: 'Thu', training: 'Off', food: 'Veg + protein' },
+            { date: '2025-11-21', day: 'Fri', training: 'Stage sim Day 1 — Z2 2h15–2h30 (run‑walk)', food: 'Protein' },
+            { date: '2025-11-22', day: 'Sat', training: 'Stage sim Day 2 — Z2 3h45–4h (run‑walk)', food: '60–90 g carbs/h + sodium' },
+            { date: '2025-11-23', day: 'Sun', training: 'Stage sim Day 3 — Z2 2h45–3h (run‑walk)', food: 'Small deficit' },
+          ]},
+          { id: 'W14', label: 'W14 (Nov 24–30) — Deload', start: '2025-11-24', end: '2025-11-30', rows: [
+            { date: '2025-11-24', day: 'Mon', training: 'Off + mobility', food: 'Protein focus' },
+            { date: '2025-11-25', day: 'Tue', training: 'Stairs 25–35 min + Gym Lower (light)', food: 'Carbs small' },
+            { date: '2025-11-26', day: 'Wed', training: 'Easy 25–35 min + Gym Upper/Core (light)', food: 'Balanced' },
+            { date: '2025-11-27', day: 'Thu', training: 'Off', food: 'Veg + protein' },
+            { date: '2025-11-28', day: 'Fri', training: 'Gym Maintenance (light)', food: 'Protein' },
+            { date: '2025-11-29', day: 'Sat', training: 'Z2 75–90 min', food: '40–60 g carbs/h' },
+            { date: '2025-11-30', day: 'Sun', training: 'Off', food: 'Small deficit' },
+          ]},
+
+          { id: 'RACE', label: 'Race (Dec 1–3) — Finish‑focused', start: '2025-12-01', end: '2025-12-03', summary: '3 days ~30 km/day, strict cutoffs. Keep Z2, protect quads, fuel well.', rows: [
+            { date: '2025-12-01', day: 'Mon', training: 'Stage Day 1 ~30 km Z2 run‑walk; hike ups, jog flats/downs', food: '60–90 g carbs/h + 500–750 ml fluids/h + sodium' },
+            { date: '2025-12-02', day: 'Tue', training: 'Stage Day 2 ~30 km Z2 run‑walk; manage effort', food: 'Carbs/protein within 30 min post; feet care; sleep' },
+            { date: '2025-12-03', day: 'Wed', training: 'Stage Day 3 ~30 km Z2 run‑walk; finish strong', food: 'Maintain fueling; protect quads' },
+          ]}
+        ]
+      };
+      // Comprehensive Argentine Nutrition Plan (100kg→92kg, high-protein, 4-meal structure)
+      window.__NUTRITION_PLAN__ = {
+        '2025-08-19': {
+          totalCalories: 2100, totalProtein: 185, totalCarbs: 180, totalFats: 68,
+          meals: [
+            {
+              name: 'Desayuno', calories: 520,
+              dishes: [
+                { name: 'Revuelto de claras con verduras', ingredients: '4 claras + 1 huevo entero, 1 cebolla, 1/2 zapallo, espinaca', preparation: 'Saltear verduras en aceite de oliva (1 cdta), agregar huevos batidos. Condimentar con sal y pimienta.' },
+                { name: 'Tostadas integrales', ingredients: '2 rebanadas pan francés', preparation: 'Tostar y acompañar con queso fresco (30g)' },
+                { name: 'Mate', ingredients: 'Yerba mate', preparation: 'Cebar con agua tibia (70-80°C)' }
+              ]
+            },
+            {
+              name: 'Almuerzo', calories: 650,
+              dishes: [
+                { name: 'Milanesa de pollo al horno', ingredients: '150g pechuga pollo, 1 huevo, pan rallado, aceite oliva spray', preparation: 'Rebozar con huevo y pan rallado. Hornear 25 min a 180°C con aceite en spray.' },
+                { name: 'Puré de zapallo', ingredients: '200g zapallo, 1 cdta manteca, sal', preparation: 'Hervir zapallo hasta tierno, pisar con manteca y sal. Agregar caldo si queda seco.' },
+                { name: 'Ensalada mixta', ingredients: 'Lechuga, zanahoria rallada, remolacha, 1 cdta aceite oliva', preparation: 'Cortar verduras finas, aliñar con aceite, vinagre y sal.' }
+              ]
+            },
+            {
+              name: 'Merienda', calories: 380,
+              dishes: [
+                { name: 'Yogur con frutos secos', ingredients: '200ml yogur natural descremado, 30g nueces/almendras', preparation: 'Mezclar yogur con frutos secos picados.' },
+                { name: 'Manzana', ingredients: '1 manzana mediana', preparation: 'Pelar y cortar en gajos.' }
+              ]
+            },
+            {
+              name: 'Cena', calories: 550,
+              dishes: [
+                { name: 'Pescado a la plancha', ingredients: '150g merluza, 1 cdta aceite oliva, limón, ajo', preparation: 'Salpimentar pescado, cocinar en plancha con aceite. Terminar con ajo y limón.' },
+                { name: 'Verduras al vapor', ingredients: '150g brócoli, 100g zanahoria, sal marina', preparation: 'Cocinar al vapor 12-15 min hasta tiernas, sazonar con sal marina.' },
+                { name: 'Arroz integral', ingredients: '60g arroz integral crudo', preparation: 'Cocinar en agua con sal (1:2 proporción) durante 25 min.' }
+              ]
+            }
+          ]
+        },
+        '2025-08-20': {
+          totalCalories: 2050, totalProtein: 182, totalCarbs: 175, totalFats: 65,
+          meals: [
+            {
+              name: 'Desayuno', calories: 495,
+              dishes: [
+                { name: 'Tortilla de avena', ingredients: '2 huevos enteros, 40g avena, 1/2 banana pisada', preparation: 'Mezclar ingredients, cocinar como tortilla en sartén antiadherente.' },
+                { name: 'Queso fresco', ingredients: '40g queso fresco', preparation: 'Cortar en cubos y servir al lado.' },
+                { name: 'Té de hierbas', ingredients: 'Boldo o menta', preparation: 'Infusionar 5 min en agua caliente.' }
+              ]
+            },
+            {
+              name: 'Almuerzo', calories: 635,
+              dishes: [
+                { name: 'Guiso de lentejas', ingredients: '80g lentejas secas, 100g zapallo, 1 cebolla, 1 zanahoria, 1 cdta aceite', preparation: 'Remojar lentejas 4h. Rehogar verduras, agregar lentejas y caldo. Cocinar 45 min.' },
+                { name: 'Carne magra', ingredients: '100g nalga o cuadril', preparation: 'Cocinar a la plancha con sal y pimienta, evitar exceso de grasa.' },
+                { name: 'Ensalada verde', ingredients: 'Lechuga, apio, 1 cdta aceite oliva', preparation: 'Cortar verduras, aliñar simplemente.' }
+              ]
+            },
+            {
+              name: 'Merienda', calories: 360,
+              dishes: [
+                { name: 'Licuado de banana', ingredients: '1 banana, 200ml leche descremada, canela', preparation: 'Licuar todos los ingredients hasta cremoso.' },
+                { name: 'Tostadas con dulce', ingredients: '2 tostadas integrales, 1 cdta dulce de membrillo', preparation: 'Tostar pan y untar con dulce moderadamente.' }
+              ]
+            },
+            {
+              name: 'Cena', calories: 560,
+              dishes: [
+                { name: 'Pollo al limón', ingredients: '150g pechuga pollo, jugo 1 limón, ajo, romero', preparation: 'Marinar pollo 30 min, cocinar en plancha hasta dorar.' },
+                { name: 'Batatas al horno', ingredients: '200g batata', preparation: 'Hornear enteras a 200°C por 40 min hasta tiernas.' },
+                { name: 'Ensalada de repollo', ingredients: 'Repollo colorado, 1 cdta aceite oliva, vinagre', preparation: 'Cortar repollo fino, masajear con sal, aliñar.' }
+              ]
+            }
+          ]
+        },
+        '2025-08-21': {
+          totalCalories: 2250, totalProtein: 190, totalCarbs: 195, totalFats: 72,
+          meals: [
+            {
+              name: 'Desayuno', calories: 540,
+              dishes: [
+                { name: 'Scramble proteico', ingredients: '3 huevos enteros, 100g queso fresco, espinaca', preparation: 'Revolver huevos con queso desmenuzado y espinaca salteada.' },
+                { name: 'Tostadas con palta', ingredients: '2 tostadas integrales, 1/2 aguacate', preparation: 'Tostar pan, machacar aguacate con sal y limón.' },
+                { name: 'Mate', ingredients: 'Yerba mate', preparation: 'Preparar mate tradicional.' }
+              ]
+            },
+            {
+              name: 'Almuerzo', calories: 720,
+              dishes: [
+                { name: 'Bife con chimichurri', ingredients: '180g bife angosto, perejil, ajo, aceite oliva, vinagre', preparation: 'Cocinar bife a la plancha 3 min por lado. Preparar chimichurri fresco.' },
+                { name: 'Papas rústicas', ingredients: '150g papas, 1 cdta aceite oliva, romero', preparation: 'Cortar papas en gajos, hornear con aceite y romero 30 min a 200°C.' },
+                { name: 'Ensalada de tomate', ingredients: 'Tomates, cebolla morada, albahaca, aceite oliva', preparation: 'Cortar en rodajas, condimentar con sal, aceite y albahaca.' }
+              ]
+            },
+            {
+              name: 'Merienda', calories: 390,
+              dishes: [
+                { name: 'Smoothie post-entrenamiento', ingredients: '1 banana, 200ml leche, 1 cdta miel, canela', preparation: 'Licuar hasta cremoso, ideal post-caminata.' },
+                { name: 'Frutos secos', ingredients: '25g nueces', preparation: 'Porción controlada de nueces para grasas saludables.' }
+              ]
+            },
+            {
+              name: 'Cena', calories: 600,
+              dishes: [
+                { name: 'Salmón a la parrilla', ingredients: '160g salmón, limón, eneldo, 1 cdta aceite oliva', preparation: 'Marinar con limón y eneldo, cocinar a la parrilla 4 min por lado.' },
+                { name: 'Quinoa con verduras', ingredients: '70g quinoa, zapallitos, morrones, cebolla', preparation: 'Cocinar quinoa, saltear verduras por separado, mezclar.' },
+                { name: 'Ensalada verde', ingredients: 'Lechuga, apio, pepino, vinagreta liviana', preparation: 'Aliñar con limón, aceite oliva y hierbas frescas.' }
+              ]
+            }
+          ]
+        },
+        // ALL SEPTEMBER DAYS
+        '2025-09-01': {
+          totalCalories: 2050, totalProtein: 180, totalCarbs: 170, totalFats: 68,
+          meals: [
+            { name: 'Desayuno', calories: 480, dishes: [
+              { name: 'Huevos revueltos', ingredients: '2 huevos enteros + 1 clara, espinaca', preparation: 'Cocinar con poco aceite, agregar espinaca.' },
+              { name: 'Tostadas', ingredients: '2 rebanadas pan integral', preparation: 'Tostar y acompañar con tomate.' },
+              { name: 'Mate', ingredients: 'Yerba mate', preparation: 'Preparar mate tradicional.' }
+            ]},
+            { name: 'Almuerzo', calories: 620, dishes: [
+              { name: 'Pollo grillado', ingredients: '150g pechuga pollo, verduras mixtas', preparation: 'Grillar pollo, acompañar con verduras salteadas.' },
+              { name: 'Arroz', ingredients: '70g arroz integral', preparation: 'Cocinar con caldo de verduras.' }
+            ]},
+            { name: 'Merienda', calories: 350, dishes: [
+              { name: 'Yogur con frutas', ingredients: '200ml yogur, 1 banana', preparation: 'Mezclar yogur con banana en rodajas.' }
+            ]},
+            { name: 'Cena', calories: 600, dishes: [
+              { name: 'Pescado al horno', ingredients: '150g merluza, papas', preparation: 'Hornear con limón y hierbas.' }
+            ]}
+          ]
+        },
+        '2025-09-02': {
+          totalCalories: 2380, totalProtein: 190, totalCarbs: 220, totalFats: 75,
+          meals: [
+            { name: 'Desayuno Pre-Gym', calories: 550, dishes: [
+              { name: 'Avena energética', ingredients: '60g avena, banana, miel', preparation: 'Cocinar con leche, agregar frutas.' }
+            ]},
+            { name: 'Almuerzo Post-Gym', calories: 750, dishes: [
+              { name: 'Pasta con pollo', ingredients: '100g fideos, 160g pollo', preparation: 'Combinar pasta con pollo grillado.' }
+            ]},
+            { name: 'Merienda', calories: 380, dishes: [
+              { name: 'Licuado recovery', ingredients: 'Banana, leche, cacao', preparation: 'Licuar hasta cremoso.' }
+            ]},
+            { name: 'Cena', calories: 700, dishes: [
+              { name: 'Bife con ensalada', ingredients: '160g bife, ensalada grande', preparation: 'Grillar carne, preparar ensalada fresca.' }
+            ]}
+          ]
+        },
+        // Training Day Template (Higher Carbs)
+        '2025-08-22': {
+          totalCalories: 2480, totalProtein: 195, totalCarbs: 230, totalFats: 75,
+          meals: [
+            {
+              name: 'Desayuno Pre-Gym', calories: 580,
+              dishes: [
+                { name: 'Avena energética', ingredients: '60g avena, 1 banana, 200ml leche, 1 cdta miel, canela', preparation: 'Cocinar avena con leche, agregar banana en rodajas y miel.' },
+                { name: 'Huevos revueltos', ingredients: '2 huevos enteros, sal, pimienta', preparation: 'Cocinar a fuego medio hasta cremosos.' },
+                { name: 'Café con leche', ingredients: 'Café, 100ml leche', preparation: 'Preparar café fuerte con leche tibia.' }
+              ]
+            },
+            {
+              name: 'Almuerzo Post-Gym', calories: 780,
+              dishes: [
+                { name: 'Pollo teriyaki casero', ingredients: '170g pechuga pollo, salsa soja, miel, ajo, jengibre', preparation: 'Marinar pollo, cocinar en plancha, glasear con salsa.' },
+                { name: 'Arroz japonés', ingredients: '80g arroz blanco', preparation: 'Cocinar hasta pegajoso, ideal para recuperación.' },
+                { name: 'Wok de verduras', ingredients: 'Brócoli, zanahoria, morrón, aceite sésamo', preparation: 'Saltear a fuego alto 3-4 min, mantener crocantes.' },
+                { name: 'Palta', ingredients: '1/2 aguacate', preparation: 'Cortar en láminas como acompañamiento.' }
+              ]
+            },
+            {
+              name: 'Merienda', calories: 420,
+              dishes: [
+                { name: 'Licuado recovery', ingredients: '1 banana, 250ml leche, 1 cdta cacao, hielo', preparation: 'Licuar hasta espumoso, perfecto post-entrenamiento.' },
+                { name: 'Pan con dulce', ingredients: '2 tostadas, 1 cdta dulce de batata', preparation: 'Carbohidratos simples para reponer glucógeno.' }
+              ]
+            },
+            {
+              name: 'Cena', calories: 700,
+              dishes: [
+                { name: 'Pescado al horno', ingredients: '160g merluza, 1 papa grande, calabaza, aceite oliva', preparation: 'Hornear pescado con verduras de estación 25 min a 180°C.' },
+                { name: 'Ensalada tibia', ingredients: 'Espinaca, remolacha cocida, queso de cabra', preparation: 'Mezclar espinaca fresca con remolacha tibia y queso.' },
+                { name: 'Pan integral', ingredients: '1 rebanada pan casero', preparation: 'Acompañar para completar carbohidratos del día.' }
+              ]
+            }
+          ]
+        },
+        // November W11 - B2B Weekend (High-intensity training)
+        '2025-11-08': {
+          totalCalories: 2650, totalProtein: 200, totalCarbs: 280, totalFats: 78,
+          meals: [
+            {
+              name: 'Desayuno Pre-Long Run', calories: 620,
+              dishes: [
+                { name: 'Porridge energético', ingredients: '80g avena, 1 banana grande, 250ml leche, 2 cdta miel, canela', preparation: 'Cocinar avena con leche, agregar banana en rodajas y miel. Ideal 2h antes del entrenamiento largo.' },
+                { name: 'Tostadas con dulce', ingredients: '3 tostadas integrales, 2 cdta dulce de batata', preparation: 'Tostar pan y untar generosamente para carbohidratos de acción rápida.' },
+                { name: 'Café con leche', ingredients: 'Café fuerte, 150ml leche', preparation: 'Cafeína para el rendimiento, leche para proteínas adicionales.' }
+              ]
+            },
+            {
+              name: 'Durante Entrenamiento', calories: 280,
+              dishes: [
+                { name: 'Hidratación deportiva', ingredients: 'Agua (750ml), bebida isotónica (500ml), sal marina', preparation: 'Alternar agua e isotónica cada 15-20 min durante las 2.5-3h de entrenamiento.' },
+                { name: 'Fueling cada hora', ingredients: '2 bananas maduras, 1 barrita cereal, dátiles (4u)', preparation: '60-80g carbohidratos por hora después de la primera hora de ejercicio.' }
+              ]
+            },
+            {
+              name: 'Almuerzo Recovery', calories: 880,
+              dishes: [
+                { name: 'Pasta con pollo', ingredients: '120g fideos integrales, 180g pechuga pollo, salsa tomate, queso rallado', preparation: 'Cocinar pasta al dente, pollo grillado en cubos, mezclar con salsa casera.' },
+                { name: 'Ensalada completa', ingredients: 'Lechuga, tomate, zanahoria, aguacate (1/2), aceite oliva (2 cdta)', preparation: 'Vegetales frescos para vitaminas y minerales, aguacate para grasas saludables.' },
+                { name: 'Jugo natural', ingredients: '2 naranjas exprimidas, agua', preparation: 'Vitamina C y potasio para recuperación muscular.' }
+              ]
+            },
+            {
+              name: 'Cena Reparadora', calories: 870,
+              dishes: [
+                { name: 'Salmón al horno', ingredients: '180g salmón, papas (250g), brócoli, limón, aceite oliva', preparation: 'Hornear salmón con verduras 20 min a 180°C. Omega-3 para antiinflamatorio.' },
+                { name: 'Quinoa con verduras', ingredients: '80g quinoa, zapallitos, morrones, cebolla', preparation: 'Proteína completa vegetal más carbohidratos de bajo índice glucémico.' },
+                { name: 'Yogur con frutos secos', ingredients: '200ml yogur griego, 30g nueces, 1 cdta miel', preparation: 'Proteínas adicionales y grasas para recuperación nocturna.' }
+              ]
+            }
+          ]
+        },
+        '2025-11-09': {
+          totalCalories: 2550, totalProtein: 195, totalCarbs: 260, totalFats: 75,
+          meals: [
+            {
+              name: 'Desayuno B2B Day 2', calories: 580,
+              dishes: [
+                { name: 'Tortilla de claras', ingredients: '4 claras + 1 huevo entero, jamón magro (50g), queso fresco', preparation: 'Proteínas magras para músculos fatigados del día anterior.' },
+                { name: 'Pan con miel', ingredients: '2 rebanadas pan integral, 2 cdta miel pura', preparation: 'Carbohidratos simples para energía rápida en piernas cansadas.' },
+                { name: 'Smoothie digestivo', ingredients: 'Banana, 200ml leche, jengibre fresco, canela', preparation: 'Fácil digestión para estómago sensible post-esfuerzo.' }
+              ]
+            },
+            {
+              name: 'Almuerzo Ligero', calories: 650,
+              dishes: [
+                { name: 'Arroz con pollo simple', ingredients: '100g arroz blanco, 150g pollo hervido, zanahoria, apio', preparation: 'Comida suave y familiar para no alterar digestión antes del segundo día largo.' },
+                { name: 'Puré de zapallo', ingredients: '200g zapallo, 1 cdta manteca, sal', preparation: 'Carbohidratos complejos de fácil digestión y betacarotenos.' }
+              ]
+            },
+            {
+              name: 'Pre-Entrenamiento 2', calories: 320,
+              dishes: [
+                { name: 'Snack energético', ingredients: '1 banana, 2 dátiles, té verde', preparation: 'Combustible rápido 30 min antes del segundo entrenamiento largo.' },
+                { name: 'Hidratación previa', ingredients: 'Agua con sal marina y limón', preparation: 'Pre-hidratación especialmente importante en día 2.' }
+              ]
+            },
+            {
+              name: 'Cena Recovery Total', calories: 1000,
+              dishes: [
+                { name: 'Bife con batatas', ingredients: '200g bife magro, 300g batatas al horno, espinaca salteada', preparation: 'Hierro para transporte de oxígeno, carbohidratos para reponer glucógeno totalmente.' },
+                { name: 'Ensalada antioxidante', ingredients: 'Remolacha, zanahoria, aguacate, semillas girasol', preparation: 'Antioxidantes para reparación del daño muscular intenso.' },
+                { name: 'Postre reparador', ingredients: 'Yogur griego (250ml), frutas rojas, granola', preparation: 'Proteínas caseinaa para recuperación nocturna prolongada.' }
+              ]
+            }
+          ]
+        },
+        // W13 Stage Simulation - High calories for 3-day intense training
+        '2025-11-21': {
+          totalCalories: 2400, totalProtein: 190, totalCarbs: 240, totalFats: 78,
+          meals: [
+            {
+              name: 'Desayuno Stage Sim Day 1', calories: 550,
+              dishes: [
+                { name: 'Avena con frutas', ingredients: '70g avena, 1 banana, 200ml leche, 1 cdta miel, canela', preparation: 'Cocinar avena, agregar banana y miel. Pre-carga de carbohidratos.' },
+                { name: 'Tostadas', ingredients: '2 tostadas integrales, mermelada', preparation: 'Energía adicional para el día largo.' },
+                { name: 'Café', ingredients: 'Café con 100ml leche', preparation: 'Cafeína para rendimiento.' }
+              ]
+            },
+            {
+              name: 'Almuerzo Pre-Stage', calories: 700,
+              dishes: [
+                { name: 'Arroz con pollo', ingredients: '100g arroz, 160g pollo, verduras mixtas', preparation: 'Comida familiar y segura antes del esfuerzo prolongado.' },
+                { name: 'Ensalada simple', ingredients: 'Lechuga, tomate, aceite oliva', preparation: 'Vitaminas sin complicar digestión.' }
+              ]
+            },
+            {
+              name: 'Durante Stage Sim (2h30)', calories: 320,
+              dishes: [
+                { name: 'Hidratación', ingredients: 'Agua, bebida isotónica, sal', preparation: 'Estrategia de hidratación cada 15-20 min.' },
+                { name: 'Combustible', ingredients: 'Bananas, barritas energéticas, dátiles', preparation: '70g carbohidratos por hora después de la 1ra hora.' }
+              ]
+            },
+            {
+              name: 'Cena Recovery', calories: 830,
+              dishes: [
+                { name: 'Bife con papas', ingredients: '180g bife, 250g papas, brócoli', preparation: 'Proteínas y carbohidratos para recuperación muscular.' },
+                { name: 'Ensalada completa', ingredients: 'Verduras mixtas, aguacate, aceite oliva', preparation: 'Antioxidantes y grasas saludables.' },
+                { name: 'Postre', ingredients: 'Yogur griego con miel', preparation: 'Proteínas adicionales para reparación nocturna.' }
+              ]
+            }
+          ]
+        },
+        '2025-11-22': {
+          totalCalories: 2750, totalProtein: 200, totalCarbs: 290, totalFats: 82,
+          meals: [
+            {
+              name: 'Desayuno Stage Day 2', calories: 630,
+              dishes: [
+                { name: 'Tortilla energética', ingredients: '3 huevos, jamón, queso, pan tostado', preparation: 'Proteínas y grasas para energía sostenida en día 2.' },
+                { name: 'Frutas', ingredients: 'Banana, jugo de naranja', preparation: 'Vitaminas y azúcares naturales.' },
+                { name: 'Café fuerte', ingredients: 'Café doble con leche', preparation: 'Extra cafeína para el día más largo.' }
+              ]
+            },
+            {
+              name: 'Pre-Stage Principal', calories: 400,
+              dishes: [
+                { name: 'Snack pre-ejercicio', ingredients: 'Banana, 2 dátiles, té', preparation: '90 min antes del ejercicio más largo (4h).' },
+                { name: 'Hidratación', ingredients: 'Agua con electrolitos', preparation: 'Pre-hidratación crucial.' }
+              ]
+            },
+            {
+              name: 'Durante Stage 4h', calories: 480,
+              dishes: [
+                { name: 'Fueling intensivo', ingredients: 'Bananas (3u), barritas (3u), geles, dátiles', preparation: '80-90g carbohidratos/hora durante 4h de ejercicio.' },
+                { name: 'Hidratación deportiva', ingredients: 'Agua (1.5L), isotónica (1L), sal marina', preparation: 'Reemplazo de líquidos y electrolitos perdidos.' }
+              ]
+            },
+            {
+              name: 'Cena Mega-Recovery', calories: 1240,
+              dishes: [
+                { name: 'Pasta con carne', ingredients: '150g fideos, 200g carne molida, salsa tomate', preparation: 'Mega-dosis de carbohidratos y proteínas.' },
+                { name: 'Ensalada gigante', ingredients: 'Verduras variadas, aguacate entero, frutos secos', preparation: 'Máxima densidad nutricional.' },
+                { name: 'Postre reparador', ingredients: 'Helado de vainilla, frutas', preparation: 'Placer y carbohidratos simples para glucógeno.' }
+              ]
+            }
+          ]
+        },
+        '2025-11-23': {
+          totalCalories: 2600, totalProtein: 195, totalCarbs: 270, totalFats: 80,
+          meals: [
+            {
+              name: 'Desayuno Stage Day 3', calories: 580,
+              dishes: [
+                { name: 'Pancakes proteicos', ingredients: '2 huevos, 50g avena, banana, miel', preparation: 'Fácil digestión para piernas muy fatigadas.' },
+                { name: 'Yogur', ingredients: 'Yogur griego con granola', preparation: 'Proteínas adicionales.' },
+                { name: 'Jugo', ingredients: 'Jugo de naranja fresco', preparation: 'Vitamina C y energía rápida.' }
+              ]
+            },
+            {
+              name: 'Almuerzo Ligero', calories: 650,
+              dishes: [
+                { name: 'Sopa nutritiva', ingredients: 'Caldo de pollo, arroz, verduras', preparation: 'Comida líquida para digestión fácil antes del último esfuerzo.' },
+                { name: 'Pan', ingredients: 'Pan tostado con miel', preparation: 'Carbohidratos simples adicionales.' }
+              ]
+            },
+            {
+              name: 'Durante Stage Final', calories: 350,
+              dishes: [
+                { name: 'Estrategia final', ingredients: 'Bananas muy maduras, geles, bebida dulce', preparation: 'Carbohidratos de absorción rápida para el sprint final.' },
+                { name: 'Hidratación final', ingredients: 'Bebida isotónica, agua', preparation: 'Mantenimiento hasta el final.' }
+              ]
+            },
+            {
+              name: 'Cena Celebración', calories: 1020,
+              dishes: [
+                { name: 'Asado completo', ingredients: 'Bife grande (250g), chorizo, morcilla, papas', preparation: '¡Celebración post-simulacro! Comida argentina completa.' },
+                { name: 'Ensalada festiva', ingredients: 'Tomate, lechuga, aguacate, aceitunas', preparation: 'Acompañamiento fresco.' },
+                { name: 'Flan con dulce de leche', ingredients: 'Flan casero', preparation: 'Recompensa dulce bien merecida.' }
+              ]
+            }
+          ]
+        },
+        // W14 Deload - Lower calories
+        '2025-11-29': {
+          totalCalories: 2200, totalProtein: 180, totalCarbs: 190, totalFats: 70,
+          meals: [
+            {
+              name: 'Desayuno Taper', calories: 500,
+              dishes: [
+                { name: 'Tostadas francesas', ingredients: '2 huevos, 2 rebanadas pan, leche, canela', preparation: 'Desayuno clásico para semana de descarga.' },
+                { name: 'Frutas frescas', ingredients: 'Banana, manzana', preparation: 'Vitaminas naturales.' },
+                { name: 'Café con leche', ingredients: 'Café, 150ml leche', preparation: 'Ritual matutino relajado.' }
+              ]
+            },
+            {
+              name: 'Almuerzo Moderado', calories: 600,
+              dishes: [
+                { name: 'Milanesa liviana', ingredients: '120g pollo, ensalada verde grande', preparation: 'Proteína magra con abundantes vegetales.' },
+                { name: 'Puré de calabaza', ingredients: 'Calabaza, leche, nuez moscada', preparation: 'Carbohidratos suaves y nutritivos.' }
+              ]
+            },
+            {
+              name: 'Merienda Taper', calories: 320,
+              dishes: [
+                { name: 'Yogur con nueces', ingredients: 'Yogur natural, nueces, miel', preparation: 'Snack equilibrado y satisfactorio.' },
+                { name: 'Mate', ingredients: 'Yerba mate', preparation: 'Tradición argentina relajante.' }
+              ]
+            },
+            {
+              name: 'Cena Ligera', calories: 780,
+              dishes: [
+                { name: 'Pescado al vapor', ingredients: '150g merluza, verduras al vapor, limón', preparation: 'Cena ligera pero nutritiva.' },
+                { name: 'Quinoa', ingredients: '60g quinoa con hierbas', preparation: 'Proteína vegetal completa.' },
+                { name: 'Ensalada de frutas', ingredients: 'Frutas de estación', preparation: 'Postre fresco y antioxidante.' }
+              ]
+            }
+          ]
+        },
+        // RACE DAY 1 - December 1st
+        '2025-12-01': {
+          totalCalories: 3200, totalProtein: 180, totalCarbs: 450, totalFats: 90,
+          meals: [
+            {
+              name: 'Desayuno Pre-Race', calories: 650,
+              dishes: [
+                { name: 'Avena race-day', ingredients: '80g avena, 2 bananas, miel, canela, leche', preparation: '3-4h antes de la largada. Máxima carga de carbohidratos.' },
+                { name: 'Tostadas', ingredients: '3 tostadas con mermelada', preparation: 'Carbohidratos adicionales de fácil digestión.' },
+                { name: 'Café suave', ingredients: 'Café con leche tibia', preparation: 'Cafeína controlada para no alterar estómago.' }
+              ]
+            },
+            {
+              name: 'Pre-Largada', calories: 200,
+              dishes: [
+                { name: 'Última carga', ingredients: '1 banana madura, té dulce', preparation: '30-60 min antes de largar. Energía inmediata.' },
+                { name: 'Hidratación', ingredients: 'Agua con sal y limón', preparation: 'Estado óptimo de hidratación.' }
+              ]
+            },
+            {
+              name: 'Durante Race Day 1 (~6-8h)', calories: 1200,
+              dishes: [
+                { name: 'Fueling horario', ingredients: 'Bananas (6u), barritas (4u), geles (3u), dátiles', preparation: '80-90g carbohidratos cada hora religiosamente.' },
+                { name: 'Hidratación race', ingredients: 'Agua (2-3L), isotónica (1.5L), sales', preparation: '500-750ml/hora según calor y sudoración.' },
+                { name: 'Emergencia', ingredients: 'Coca-Cola, caramelos', preparation: 'Para momentos de crisis energética.' }
+              ]
+            },
+            {
+              name: 'Post-Race Recovery', calories: 1150,
+              dishes: [
+                { name: 'Recovery inmediato', ingredients: 'Chocolate con leche, banana', preparation: 'Dentro de 30 min post-llegada.' },
+                { name: 'Cena reparadora', ingredients: 'Pasta (200g), pollo (200g), verduras', preparation: 'Mega-recarga de glucógeno para mañana.' },
+                { name: 'Hidratación nocturna', ingredients: 'Agua abundante, bebida isotónica', preparation: 'Rehidratación completa antes de dormir.' }
+              ]
+            }
+          ]
+        },
+        // RACE DAY 2
+        '2025-12-02': {
+          totalCalories: 3100, totalProtein: 175, totalCarbs: 430, totalFats: 85,
+          meals: [
+            {
+              name: 'Desayuno Race Day 2', calories: 600,
+              dishes: [
+                { name: 'Desayuno suave', ingredients: 'Avena líquida, banana, miel', preparation: 'Estómago puede estar sensible del día 1.' },
+                { name: 'Pan tostado', ingredients: 'Pan blanco con mermelada', preparation: 'Carbohidratos simples y familiares.' },
+                { name: 'Té digestivo', ingredients: 'Té de manzanilla con miel', preparation: 'Calma estómago y aporta energía.' }
+              ]
+            },
+            {
+              name: 'Durante Race Day 2', calories: 1150,
+              dishes: [
+                { name: 'Fueling day 2', ingredients: 'Bananas extra-maduras, geles más líquidos', preparation: 'Digestión más difícil en día 2.' },
+                { name: 'Hidratación intensa', ingredients: 'Más isotónica que agua, sales extra', preparation: 'Pérdidas acumuladas de día 1.' },
+                { name: 'Comfort food', ingredients: 'Dulces conocidos, bebidas familiares', preparation: 'Priorizar lo que sabés que funciona.' }
+              ]
+            },
+            {
+              name: 'Recovery Day 2', calories: 1350,
+              dishes: [
+                { name: 'Recovery potente', ingredients: 'Batido proteico, frutas', preparation: 'Recuperación más agresiva para día 3.' },
+                { name: 'Cena abundante', ingredients: 'Arroz (250g), carne (180g), vegetales', preparation: 'Última gran recarga antes del final.' },
+                { name: 'Antiinflamatorios naturales', ingredients: 'Cúrcuma, jengibre en té', preparation: 'Reducir inflamación acumulada.' }
+              ]
+            }
+          ]
+        },
+        // RACE DAY 3 - FINAL
+        '2025-12-03': {
+          totalCalories: 2800, totalProtein: 160, totalCarbs: 380, totalFats: 80,
+          meals: [
+            {
+              name: 'Desayuno Final', calories: 550,
+              dishes: [
+                { name: 'Último desayuno', ingredients: 'Lo que mejor te haya funcionado días 1-2', preparation: 'Sin experimentos. Solo lo probado.' },
+                { name: 'Energía extra', ingredients: 'Miel pura, banana muy madura', preparation: 'Boost final para completar la aventura.' }
+              ]
+            },
+            {
+              name: 'Durante Final Stage', calories: 900,
+              dishes: [
+                { name: 'Sprint final', ingredients: 'Geles cada 30 min, bebidas dulces', preparation: 'Estrategia agresiva para el final.' },
+                { name: 'Hidratación de llegada', ingredients: 'Lo que sea necesario para llegar', preparation: 'El objetivo es TERMINAR.' }
+              ]
+            },
+            {
+              name: 'CELEBRACIÓN FINAL', calories: 1350,
+              dishes: [
+                { name: '¡LO LOGRASTE!', ingredients: 'Asado completo, vino, lo que quieras', preparation: '¡FELICITACIONES! ¡EL CRUCE ESTÁ TERMINADO!' },
+                { name: 'Festa argentina', ingredients: 'Empanadas, choripán, fernet', preparation: 'Celebración a lo grande. Te lo merecés.' }
+              ]
+            }
+          ]
+        }
+      };
+
+      // Updated Grocery Lists - Matched to Actual Meals
+      window.__GROCERY_LISTS__ = {
+        'W0': [
+          { name: '🥩 Proteínas', items: 'Huevos (24u), queso fresco (600g), merluza (1kg), yogur natural descremado (1L)' },
+          { name: '🌾 Carbohidratos', items: 'Pan francés (2 paquetes), arroz integral (500g), avena (500g)' },
+          { name: '🥬 Verduras', items: 'Zapallo (1u), espinaca (2 atados), lechuga (2u), cebolla (3u), ajo, brócoli, zanahoria (1kg)' },
+          { name: '🍎 Frutas & Otros', items: 'Bananas (15u), manzanas (8u), limones (6u), nueces/almendras (200g)' },
+          { name: '🧂 Básicos', items: 'Aceite oliva, sal marina, pimienta, yerba mate, vinagre' }
+        ],
+        'W11': [
+          { name: '🥩 Proteínas', items: 'Pollo pechuga (2kg), salmón (800g), huevos (36u), yogur griego (1.5L), jamón magro (300g)' },
+          { name: '🌾 Carbohidratos', items: 'Avena (1kg), fideos integrales (1kg), arroz blanco (1kg), pan integral (3 paquetes), quinoa (500g)' },
+          { name: '🥬 Verduras', items: 'Lechuga (3u), tomate (2kg), zanahoria (1.5kg), brócoli (2u), zapallitos (6u), morrones (4u)' },
+          { name: '🍎 Frutas & Energía', items: 'Bananas (30u), naranjas (12u), aguacate (6u), miel (500g), dátiles (500g)' },
+          { name: '⚡ Deportivos', items: 'Bebidas isotónicas (12u), barritas energéticas (20u), sales/electrolitos, agua mineral (12L)' },
+          { name: '🧂 Condimentos', items: 'Aceite oliva (1L), limones (10u), sal marina, canela, jengibre fresco' }
+        ],
+        'W13': [
+          { name: '🥩 Proteínas STAGE', items: 'Pollo (3kg), bife/carne molida (2kg), huevos (48u), chorizo (500g), morcilla (300g)' },
+          { name: '🌾 Carbohidratos STAGE', items: 'Avena (1.5kg), fideos/pasta (2kg), arroz (2kg), pan (5 paquetes), papas (4kg)' },
+          { name: '🥬 Verduras STAGE', items: 'Verduras mixtas abundantes, lechuga (4u), tomate (3kg), aguacate (8u)' },
+          { name: '⚡ Combustible RACE', items: 'Bananas (50u), barritas (30u), geles energéticos (20u), mermelada (3 frascos), miel (1kg)' },
+          { name: '💧 Hidratación STAGE', items: 'Bebidas isotónicas (24u), agua mineral (24L), sales extras, té variado' },
+          { name: '🎉 Celebración', items: 'Helado, flan, dulce de leche, vino, ingredientes para asado' }
+        ],
+        'W14': [
+          { name: '🥩 Proteínas TAPER', items: 'Merluza (800g), pollo (1kg), huevos (18u), yogur natural (500ml)' },
+          { name: '🌾 Carbohidratos TAPER', items: 'Pan integral (2 paquetes), quinoa (300g), calabaza (1kg)' },
+          { name: '🥬 Verduras TAPER', items: 'Verduras al vapor (brócoli, zanahoria), ensalada verde, limones' },
+          { name: '🍎 Frutas TAPER', items: 'Frutas de estación variadas, manzanas, bananas (8u), nueces (100g)' },
+          { name: '☕ Relajación', items: 'Té de hierbas, yerba mate, miel' }
+        ],
+        'RACE': [
+          { name: '⚡ COMBUSTIBLE RACE', items: 'Bananas (60u), geles (30u), barritas (25u), dátiles (1kg), mermelada (2 frascos), miel (500g)' },
+          { name: '💧 HIDRATACIÓN RACE', items: 'Bebidas isotónicas (36u), agua mineral (30L), sales extra, Coca-Cola (6u), caramelos' },
+          { name: '🥩 RECOVERY RACE', items: 'Pollo (2kg), pasta (1.5kg), carne para asado (3kg), huevos (24u), chocolate con leche (6u)' },
+          { name: '🌾 RECARGA RACE', items: 'Avena (500g), arroz (1kg), pan blanco (4 paquetes), papas (2kg)' },
+          { name: '🎊 CELEBRACIÓN FINAL', items: 'Empanadas, choripán, fernet, vino, asado completo - ¡LO LOGRASTE!' }
+        ]
+      };
+
+      // Mount JSON into Alpine app and clean static remnants
+      (function mountPlanIntoAlpine(){
+        document.querySelectorAll('details[data-start][data-end]').forEach(el => el.remove());
+        const apply = () => {
+          const root = document.querySelector('[x-data]');
+          if (root && root.__x) {
+            const state = root.__x.$data;
+            state.plan = window.__STATIC_PLAN__;
+            if (typeof state.buildMonths === 'function') state.buildMonths();
+            if (typeof state.openCurrent === 'function') state.openCurrent();
+          } else {
+            requestAnimationFrame(apply);
+          }
+        };
+        apply();
+        // Broadcast events for any listeners
+        document.dispatchEvent(new CustomEvent('plan:ready'));
+        document.dispatchEvent(new CustomEvent('alpine:init-json-ready'));
+      })();
+    </script>
+  </body>
+  </html>
+
+

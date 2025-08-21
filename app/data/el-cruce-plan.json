@@ -1,0 +1,142 @@
+{
+  "id": "el-cruce-2025",
+  "title": "El Cruce — Minimal Day‑by‑Day Plan",
+  "subtitle": "Goal: finish safely with the absolute minimum effective training",
+  "raceDate": "2025-12-01",
+  "startDate": "2025-08-19",
+  "endDate": "2025-12-03",
+  "description": "Flat‑city adaptation: use building stairs/treadmill incline for vertical and a 20‑day run‑walk ramp before longer continuous sessions.",
+  "weeks": [
+    {
+      "id": "W0",
+      "label": "W0 (Aug 19–24)",
+      "start": "2025-08-19",
+      "end": "2025-08-24",
+      "summary": "Kick-off: routine, footwear check, poles intro.",
+      "phase": "base",
+      "rows": [
+        { "date": "2025-08-19", "day": "Tue", "training": "Off", "food": "Hydrate; normal meals", "notes": "", "isExercise": false },
+        { "date": "2025-08-20", "day": "Wed", "training": "Off + 10–15 min mobility", "food": "High‑protein meals; hydrate", "notes": "Mobility focus; light walk optional", "isExercise": false },
+        { "date": "2025-08-21", "day": "Thu", "training": "20–30 min easy walk", "food": "Protein + veg; light carbs", "notes": "", "isExercise": true },
+        { "date": "2025-08-22", "day": "Fri", "training": "Gym Maintenance (moderate)", "food": "Protein 35–45 g/meal", "notes": "Full-body + calves/hips/feet", "isExercise": true },
+        { "date": "2025-08-23", "day": "Sat", "training": "Long Z2 run‑walk 45–60 min (flat)", "food": "40–60 g carbs/h + electrolytes", "notes": "Run‑walk method Z2", "isExercise": true },
+        { "date": "2025-08-24", "day": "Sun", "training": "Off", "food": "Deficit small; fiber + hydration", "notes": "Recovery", "isExercise": false }
+      ]
+    },
+    {
+      "id": "W1",
+      "label": "W1 (Aug 25–31)",
+      "start": "2025-08-25",
+      "end": "2025-08-31",
+      "summary": "Building routine with stairs introduction.",
+      "phase": "base",
+      "rows": [
+        { "date": "2025-08-25", "day": "Mon", "training": "Off + mobility", "food": "Protein focus", "isExercise": false },
+        { "date": "2025-08-26", "day": "Tue", "training": "Stairs 6×3–4 min Z2/Z3 + Gym Lower (hard)", "food": "Carbs pre/post gym", "isExercise": true },
+        { "date": "2025-08-27", "day": "Wed", "training": "Easy 30–40 min Z2 run‑walk + Gym Upper/Core", "food": "Moderate carbs + protein", "isExercise": true },
+        { "date": "2025-08-28", "day": "Thu", "training": "Off or 20–30 min easy walk", "food": "Veg + protein; light carbs", "isExercise": false },
+        { "date": "2025-08-29", "day": "Fri", "training": "Gym Maintenance/Prehab", "food": "Protein + fluids", "isExercise": true },
+        { "date": "2025-08-30", "day": "Sat", "training": "Long Z2 run‑walk 55–65 min (flat), light pack", "food": "40–60 g carbs/h + sodium", "isExercise": true },
+        { "date": "2025-08-31", "day": "Sun", "training": "Off", "food": "Small deficit; hydrate", "isExercise": false }
+      ]
+    },
+    {
+      "id": "W2",
+      "label": "W2 (Sep 1–7)",
+      "start": "2025-09-01",
+      "end": "2025-09-07",
+      "summary": "Continuing base building with stair tempo.",
+      "phase": "base",
+      "rows": [
+        { "date": "2025-09-01", "day": "Mon", "training": "Off + mobility", "food": "Protein focus", "isExercise": false },
+        { "date": "2025-09-02", "day": "Tue", "training": "Stair tempo 25–35 min + Gym Lower", "food": "Carbs pre/post", "isExercise": true },
+        { "date": "2025-09-03", "day": "Wed", "training": "Easy 35–45 min Z2 run‑walk + Gym Upper/Core", "food": "Moderate carbs", "isExercise": true },
+        { "date": "2025-09-04", "day": "Thu", "training": "Off or 20–30 min walk", "food": "Light carbs", "isExercise": false },
+        { "date": "2025-09-05", "day": "Fri", "training": "Gym Maintenance/Prehab", "food": "Protein + fluids", "isExercise": true },
+        { "date": "2025-09-06", "day": "Sat", "training": "Long Z2 60 min (flat), pack/poles test", "food": "50–70 g carbs/h + sodium", "isExercise": true },
+        { "date": "2025-09-07", "day": "Sun", "training": "Off", "food": "Small deficit", "isExercise": false }
+      ]
+    },
+    {
+      "id": "W3",
+      "label": "W3 (Sep 8–14) — Deload",
+      "start": "2025-09-08",
+      "end": "2025-09-14",
+      "summary": "Recovery week with reduced intensity.",
+      "phase": "base",
+      "rows": [
+        { "date": "2025-09-08", "day": "Mon", "training": "Off + mobility", "food": "Protein focus", "isExercise": false },
+        { "date": "2025-09-09", "day": "Tue", "training": "Stairs 20–25 min + Gym Lower (lighter)", "food": "Carbs pre/post small", "isExercise": true },
+        { "date": "2025-09-10", "day": "Wed", "training": "Easy 25–30 min run‑walk + Gym Upper/Core (lighter)", "food": "Balanced", "isExercise": true },
+        { "date": "2025-09-11", "day": "Thu", "training": "Off", "food": "Veg + protein", "isExercise": false },
+        { "date": "2025-09-12", "day": "Fri", "training": "Gym Maintenance (light)", "food": "Protein", "isExercise": true },
+        { "date": "2025-09-13", "day": "Sat", "training": "Long Z2 60 min (cap)", "food": "40–60 g carbs/h", "isExercise": true },
+        { "date": "2025-09-14", "day": "Sun", "training": "Off", "food": "Small deficit", "isExercise": false }
+      ]
+    },
+    {
+      "id": "W11",
+      "label": "W11 (Nov 3–9) — B2B Weekend (mandatory)",
+      "start": "2025-11-03",
+      "end": "2025-11-09",
+      "summary": "Back-to-back weekend training simulation.",
+      "phase": "peak",
+      "rows": [
+        { "date": "2025-11-03", "day": "Mon", "training": "Off + mobility", "food": "Protein focus", "isExercise": false },
+        { "date": "2025-11-04", "day": "Tue", "training": "Stairs 45–50 min + Gym Lower", "food": "Carbs pre/post", "isExercise": true },
+        { "date": "2025-11-05", "day": "Wed", "training": "Easy 35–45 min Z2 run‑walk + Gym Upper/Core", "food": "Balanced", "isExercise": true },
+        { "date": "2025-11-06", "day": "Thu", "training": "Off", "food": "Veg + protein", "isExercise": false },
+        { "date": "2025-11-07", "day": "Fri", "training": "Gym Maintenance/Prehab", "food": "Protein", "isExercise": true },
+        { "date": "2025-11-08", "day": "Sat", "training": "Long Z2 150–165 min", "food": "60–90 g carbs/h", "isExercise": true },
+        { "date": "2025-11-09", "day": "Sun", "training": "Z2 run‑walk 120–150 min (easy)", "food": "60–90 g carbs/h + sodium", "isExercise": true }
+      ]
+    },
+    {
+      "id": "W13",
+      "label": "W13 (Nov 17–23) — Stage Simulation (3 days)",
+      "start": "2025-11-17",
+      "end": "2025-11-23",
+      "summary": "Three-day stage race simulation.",
+      "phase": "peak",
+      "rows": [
+        { "date": "2025-11-17", "day": "Mon", "training": "Off + mobility", "food": "Protein focus", "isExercise": false },
+        { "date": "2025-11-18", "day": "Tue", "training": "Stairs 45–55 min + Gym Lower", "food": "Carbs pre/post", "isExercise": true },
+        { "date": "2025-11-19", "day": "Wed", "training": "Easy 35–45 min Z2 run‑walk + Gym Upper/Core", "food": "Balanced", "isExercise": true },
+        { "date": "2025-11-20", "day": "Thu", "training": "Off", "food": "Veg + protein", "isExercise": false },
+        { "date": "2025-11-21", "day": "Fri", "training": "Stage sim Day 1 — Z2 2h15–2h30 (run‑walk)", "food": "Protein", "isExercise": true },
+        { "date": "2025-11-22", "day": "Sat", "training": "Stage sim Day 2 — Z2 3h45–4h (run‑walk)", "food": "60–90 g carbs/h + sodium", "isExercise": true },
+        { "date": "2025-11-23", "day": "Sun", "training": "Stage sim Day 3 — Z2 2h45–3h (run‑walk)", "food": "Small deficit", "isExercise": true }
+      ]
+    },
+    {
+      "id": "W14",
+      "label": "W14 (Nov 24–30) — Deload",
+      "start": "2025-11-24",
+      "end": "2025-11-30",
+      "summary": "Final taper before race.",
+      "phase": "taper",
+      "rows": [
+        { "date": "2025-11-24", "day": "Mon", "training": "Off + mobility", "food": "Protein focus", "isExercise": false },
+        { "date": "2025-11-25", "day": "Tue", "training": "Stairs 25–35 min + Gym Lower (light)", "food": "Carbs small", "isExercise": true },
+        { "date": "2025-11-26", "day": "Wed", "training": "Easy 25–35 min + Gym Upper/Core (light)", "food": "Balanced", "isExercise": true },
+        { "date": "2025-11-27", "day": "Thu", "training": "Off", "food": "Veg + protein", "isExercise": false },
+        { "date": "2025-11-28", "day": "Fri", "training": "Gym Maintenance (light)", "food": "Protein", "isExercise": true },
+        { "date": "2025-11-29", "day": "Sat", "training": "Z2 75–90 min", "food": "40–60 g carbs/h", "isExercise": true },
+        { "date": "2025-11-30", "day": "Sun", "training": "Off", "food": "Small deficit", "isExercise": false }
+      ]
+    },
+    {
+      "id": "RACE",
+      "label": "Race (Dec 1–3) — Finish‑focused",
+      "start": "2025-12-01",
+      "end": "2025-12-03",
+      "summary": "3 days ~30 km/day, strict cutoffs. Keep Z2, protect quads, fuel well.",
+      "phase": "race",
+      "rows": [
+        { "date": "2025-12-01", "day": "Mon", "training": "Stage Day 1 ~30 km Z2 run‑walk; hike ups, jog flats/downs", "food": "60–90 g carbs/h + 500–750 ml fluids/h + sodium", "isExercise": true, "isRaceDay": true },
+        { "date": "2025-12-02", "day": "Tue", "training": "Stage Day 2 ~30 km Z2 run‑walk; manage effort", "food": "Carbs/protein within 30 min post; feet care; sleep", "isExercise": true, "isRaceDay": true },
+        { "date": "2025-12-03", "day": "Wed", "training": "Stage Day 3 ~30 km Z2 run‑walk; finish strong", "food": "Maintain fueling; protect quads", "isExercise": true, "isRaceDay": true }
+      ]
+    }
+  ]
+}
