@@ -1,173 +1,203 @@
 <template>
-  <div class="h-screen flex flex-col bg-gray-50">
-    <!-- Header with title and controls -->
-    <div class="bg-white border-b border-gray-200 px-6 py-4">
-      <div class="flex items-center justify-between">
-        <div>
-          <h1 class="text-2xl font-bold text-gray-900">{{ currentPlan?.title || 'El Cruce — Minimal Day‑by‑Day Plan' }}</h1>
-          <p class="text-sm text-gray-600 mt-1">
-            {{ currentPlan?.subtitle || 'Goal: finish safely with the absolute minimum effective training' }}
-            <span v-if="currentPlan" class="ml-4">
-              <strong>Race:</strong> {{ formatDate(currentPlan.raceDate) }}
-            </span>
-          </p>
-        </div>
-        <div class="flex items-center gap-4">
-          <div class="text-sm text-gray-600">
-            🍽️ Nutrition: 100kg→92kg target. High-protein Argentine meals. Training days: ~2,500 kcal | Rest days: ~2,100 kcal
-          </div>
-          <div class="flex gap-2">
-            <BaseButton variant="outline" size="sm" @click="expandAll">Expand all</BaseButton>
-            <BaseButton variant="outline" size="sm" @click="collapseAll">Collapse all</BaseButton>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Main layout with three columns -->
-    <div class="flex-1 flex overflow-hidden">
-      <!-- Left: Calendar -->
-      <div class="w-80 bg-white border-r border-gray-200 flex flex-col">
-        <div class="p-4 border-b border-gray-200">
-          <h2 class="font-semibold text-gray-900">Calendar</h2>
-          <p class="text-xs text-gray-500 mt-1">Aug 18 → Dec 1, 2025 (Race)</p>
-        </div>
-        <div class="flex-1 overflow-y-auto p-4">
-          <CalendarView 
-            :training-plan="currentPlan"
-            :selected-date="selectedDate"
-            @date-select="onDateSelect"
-            :compact="true"
-          />
-        </div>
-        
-        <!-- Shopping List Section -->
-        <div class="border-t border-gray-200 p-4">
-          <h3 class="font-semibold text-gray-900 mb-3">Shopping List</h3>
-          <div class="space-y-2">
-            <select
-              v-model="selectedShoppingWeek"
-              class="w-full text-sm px-2 py-1 border border-gray-300 rounded"
-            >
-              <option value="">Select month...</option>
-              <option value="August 2025">August 2025</option>
-              <option value="September 2025">September 2025</option>
-              <option value="October 2025">October 2025</option>
-              <option value="November 2025">November 2025</option>
-              <option value="December 2025">December 2025</option>
-            </select>
-            <button class="w-full text-xs text-gray-600 hover:text-gray-900 flex items-center justify-center gap-1">
-              🛒 Generate shopping list
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Center: Training Plan -->
-      <div class="flex-1 flex flex-col">
-        <div class="p-4 border-b border-gray-200 bg-white">
+  <div class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-10">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="py-4">
           <div class="flex items-center justify-between">
-            <h2 class="font-semibold text-gray-900">Weekly rhythm (minimal, flat-city)</h2>
-            <div class="text-xs text-gray-500">
-              Today: {{ new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) }}
+            <div>
+              <h1 class="text-2xl font-bold text-gray-900">
+                RaceDay
+              </h1>
+              <p class="text-sm text-gray-600 mt-1">
+                {{ currentPlan?.subtitle || 'Plan, track, and fuel your athletic goals' }}
+                <span v-if="currentPlan" class="ml-4">
+                  <strong>Race:</strong> {{ formatDate(currentPlan.raceDate) }}
+                </span>
+              </p>
+            </div>
+            <div class="hidden lg:flex items-center gap-4">
+              <div class="text-sm text-gray-600">
+                🍽️ Nutrition: High-protein focus. Training days: ~2,500 kcal | Rest days: ~2,100 kcal
+              </div>
+              <div class="flex gap-2">
+                <BaseButton variant="outline" size="sm" @click="expandAll">Expand all</BaseButton>
+                <BaseButton variant="outline" size="sm" @click="collapseAll">Collapse all</BaseButton>
+              </div>
             </div>
           </div>
-          
-          <!-- Weekly rhythm summary -->
-          <div class="mt-3 grid grid-cols-7 gap-2 text-xs">
-            <div><strong>Mon:</strong> Off + 10-15 min mobility</div>
-            <div><strong>Tue:</strong> Long 30-90 min (Z2/Z3) + Gym Lower (hard)</div>
-            <div><strong>Wed:</strong> Easy 30-45 min Z2 run-walk (flat) + Gym Upper/Core (hard)</div>
-            <div><strong>Thu:</strong> Off or 20-30 min easy walk + mobility (Oct→Nov optional steady stairs 30-45 min)</div>
-            <div><strong>Fri:</strong> Off + Gym Maintenance/Prehab (moderate)</div>
-            <div><strong>Sat:</strong> Long Z2 run-walk (flat or incline walk) — gradually 45 → 210-240 min (peak)</div>
-            <div><strong>Sun:</strong> Off — except Nov B2B weekends and stage sim</div>
-          </div>
         </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div class="lg:grid lg:grid-cols-12 lg:gap-8">
         
-        <div class="flex-1 overflow-y-auto">
-          <LoadingSpinner v-if="isLoading" message="Loading training plan..." />
-          
-          <div v-else-if="error" class="text-center py-12">
-            <div class="text-red-400 mb-4">
-              <svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <p class="text-gray-600 mb-4">{{ error }}</p>
-            <BaseButton @click="loadPlan">Try again</BaseButton>
-          </div>
-
-          <TrainingPlanView 
-            v-else
-            :plan="currentPlan"
-            :selected-date="selectedDate"
-            :expanded-weeks="expandedWeeks"
-            @date-select="onDateSelect"
-            @nutrition-click="onNutritionClick"
-            @grocery-click="onGroceryClick"
-            @weekly-meals-click="onWeeklyMealsClick"
-            @toggle-expand="toggleWeekExpansion"
-          />
-        </div>
-      </div>
-
-      <!-- Right: Nutrition Rules -->
-      <div class="w-80 bg-white border-l border-gray-200 flex flex-col">
-        <div class="p-4 border-b border-gray-200">
-          <h2 class="font-semibold text-gray-900">Nutrition rules (simple)</h2>
-        </div>
-        <div class="flex-1 overflow-y-auto p-4">
-          <div class="space-y-4 text-sm">
-            <div>
-              <h3 class="font-medium text-gray-900 mb-2">Training days:</h3>
-              <p class="text-gray-600">carbs before/during/after; protein 1.8-2.2 g/kg target BW; hydrate + sodium</p>
-            </div>
+        <!-- Left Sidebar: Calendar & Shopping -->
+        <aside class="lg:col-span-4 mb-8 lg:mb-0">
+          <div class="sticky top-24 space-y-6">
             
-            <div>
-              <h3 class="font-medium text-gray-900 mb-2">Rest days:</h3>
-              <p class="text-gray-600">small calorie deficit; high protein; veg; limit evening starches; hydrate.</p>
-            </div>
-            
-            <div>
-              <h3 class="font-medium text-gray-900 mb-2">Long day fueling:</h3>
-              <p class="text-gray-600">60-90 g carbs/h + 500-750 ml fluids/h + 400-800 mg sodium/h. Practice your race products.</p>
-            </div>
-          </div>
-
-          <!-- Selected day nutrition -->
-          <div v-if="selectedDayData" class="mt-6 pt-4 border-t border-gray-200">
-            <div class="flex items-center justify-between mb-2">
-              <h3 class="font-medium text-gray-900">{{ formatSelectedDate(selectedDate) }}</h3>
-              <button 
-                @click="onNutritionClick(selectedDate)"
-                class="text-xs text-blue-600 hover:text-blue-700"
-              >
-                + View meals
-              </button>
-            </div>
-            <div class="text-sm space-y-1">
-              <div class="flex justify-between">
-                <span class="text-gray-600">Focus:</span>
-                <span>{{ selectedDayData.food }}</span>
+            <!-- Calendar Section -->
+            <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+              <div class="p-4 border-b border-gray-200 bg-gradient-to-r from-slate-50 to-slate-100">
+                <h2 class="font-semibold text-gray-900">Training Calendar</h2>
+                <p class="text-xs text-gray-500 mt-1">
+                  {{ currentPlan ? 'Aug 18 → Dec 1, 2025 (Race)' : 'Select a training plan' }}
+                </p>
               </div>
-              <div class="flex justify-between">
-                <span class="text-gray-600">Calories:</span>
-                <span>~{{ selectedDayData.calories || 2300 }} kcal</span>
+              <div class="p-4 max-h-96 overflow-y-auto">
+                <CalendarView 
+                  v-if="currentPlan"
+                  :training-plan="currentPlan"
+                  :selected-date="selectedDate"
+                  @date-select="onDateSelect"
+                  :compact="true"
+                />
+                <div v-else class="text-center py-8 text-gray-500">
+                  <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <p class="text-sm">Load a training plan to view calendar</p>
+                </div>
               </div>
             </div>
+
+            <!-- Shopping List Section -->
+            <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+              <div class="p-4 border-b border-gray-200 bg-gradient-to-r from-emerald-50 to-emerald-100">
+                <h3 class="font-semibold text-gray-900 flex items-center">
+                  <span class="mr-2">🛒</span>
+                  Shopping Lists
+                </h3>
+              </div>
+              <div class="p-4">
+                <div class="space-y-3">
+                  <select
+                    v-model="selectedShoppingWeek"
+                    class="w-full text-sm px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  >
+                    <option value="">Select training week...</option>
+                    <option value="W0">W0 - Kick-off Week</option>
+                    <option value="W11">W11 - B2B Weekend</option>
+                    <option value="W13">W13 - Stage Simulation</option>
+                    <option value="W14">W14 - Taper Week</option>
+                    <option value="RACE">RACE - Race Week</option>
+                  </select>
+                  <BaseButton 
+                    variant="outline" 
+                    size="sm" 
+                    class="w-full"
+                    @click="onGroceryClick(selectedShoppingWeek)"
+                    :disabled="!selectedShoppingWeek"
+                  >
+                    <span class="mr-2">🖨️</span>
+                    View Shopping List
+                  </BaseButton>
+                </div>
+              </div>
+            </div>
+
+            <!-- Today's Focus (if date selected) -->
+            <div v-if="selectedDayData" class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+              <div class="p-4 border-b border-gray-200 bg-gradient-to-r from-amber-50 to-amber-100">
+                <h3 class="font-semibold text-gray-900">Today's Focus</h3>
+                <p class="text-xs text-gray-500 mt-1">{{ formatSelectedDate(selectedDate) }}</p>
+              </div>
+              <div class="p-4">
+                <div class="space-y-3 text-sm">
+                  <div>
+                    <label class="block text-gray-600 font-medium mb-1">Training:</label>
+                    <p class="text-gray-900">{{ selectedDayData.training }}</p>
+                  </div>
+                  <div>
+                    <label class="block text-gray-600 font-medium mb-1">Nutrition Focus:</label>
+                    <p class="text-gray-900">{{ selectedDayData.food }}</p>
+                  </div>
+                  <BaseButton 
+                    variant="primary" 
+                    size="sm" 
+                    class="w-full"
+                    @click="onNutritionClick(selectedDate)"
+                  >
+                    <span class="mr-2">📋</span>
+                    View Meal Plan
+                  </BaseButton>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </aside>
+
+        <!-- Main Content: Training Plan -->
+        <div class="lg:col-span-8">
+          <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+            
+            <!-- Training Plan Header -->
+            <div class="p-6 border-b border-gray-200 bg-gradient-to-r from-slate-50 to-slate-100">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h2 class="text-xl font-semibold text-gray-900">Training Plan</h2>
+                  <p class="text-sm text-gray-600 mt-1">
+                    {{ currentPlan ? 'Weekly schedule and progression' : 'Load a plan to get started' }}
+                  </p>
+                </div>
+                <div class="text-xs text-gray-500">
+                  Today: {{ new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Training Plan Content -->
+            <div class="min-h-96">
+              <LoadingSpinner v-if="isLoading" message="Loading training plan..." />
+              
+              <div v-else-if="error" class="text-center py-12">
+                <div class="text-red-400 mb-4">
+                  <svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <p class="text-gray-600 mb-4">{{ error }}</p>
+                <BaseButton @click="loadPlan">Try again</BaseButton>
+              </div>
+
+              <div v-else-if="!currentPlan" class="text-center py-12">
+                <div class="text-gray-400 mb-4">
+                  <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Welcome to RaceDay</h3>
+                <p class="text-gray-600 mb-4">Your comprehensive training and nutrition planner</p>
+                <BaseButton @click="loadPlan">Load Training Plan</BaseButton>
+              </div>
+
+              <TrainingPlanView 
+                v-else
+                :plan="currentPlan"
+                :selected-date="selectedDate"
+                :expanded-weeks="expandedWeeks"
+                @date-select="onDateSelect"
+                @nutrition-click="onNutritionClick"
+                @grocery-click="onGroceryClick"
+                @weekly-meals-click="onWeeklyMealsClick"
+                @toggle-expand="toggleWeekExpansion"
+              />
+            </div>
           </div>
         </div>
-      </div>
-    </div>
 
-    <!-- Nutrition Modal -->
+      </div>
+    </main>
+
+    <!-- Modals -->
     <NutritionModal 
       v-model:show="showNutritionModal"
       :date="selectedNutritionDate"
     />
 
-    <!-- Weekly Meals Modal -->
     <WeeklyMealsModal
       :show="showingWeeklyMeals"
       :week-data="selectedWeekMealsData"
@@ -182,7 +212,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useTrainingStore, useNutritionStore } from '@/stores'
+import { useTrainingStore, useNutritionStore, useGroceryStore } from '@/stores'
 import CalendarView from '@/components/calendar/CalendarView.vue'
 import TrainingPlanView from '@/components/training/TrainingPlanView.vue'
 import NutritionModal from '@/components/nutrition/NutritionModal.vue'
@@ -195,6 +225,7 @@ import type { Week } from '@/types'
 
 const trainingStore = useTrainingStore()
 const nutritionStore = useNutritionStore()
+const groceryStore = useGroceryStore()
 
 const { currentPlan, selectedDate, isLoading, error } = storeToRefs(trainingStore)
 
@@ -288,8 +319,11 @@ const collapseAll = () => {
 }
 
 const loadPlan = async () => {
-  await trainingStore.loadPlan()
-  await nutritionStore.loadNutritionData()
+  await Promise.all([
+    trainingStore.loadPlan(),
+    nutritionStore.loadNutritionData(),
+    groceryStore.loadGroceryData()
+  ])
   
   // Expand first week by default
   if (currentPlan.value && currentPlan.value.weeks.length > 0) {

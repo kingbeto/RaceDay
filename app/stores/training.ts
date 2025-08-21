@@ -13,14 +13,9 @@ export const useTrainingStore = defineStore('training', () => {
     error.value = null
     
     try {
-      // For now, load from JSON file
-      const response = await fetch('/data/el-cruce-plan.json')
-      if (!response.ok) {
-        throw new Error('Failed to load training plan')
-      }
-      
-      const data = await response.json()
-      currentPlan.value = data
+      // Import the JSON file directly
+      const trainingPlanModule = await import('@/data/el-cruce-plan.json')
+      currentPlan.value = trainingPlanModule.default
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to load training plan'
       console.error('Error loading training plan:', err)

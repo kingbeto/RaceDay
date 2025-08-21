@@ -3,6 +3,8 @@
     :id="`week-${week.id}`"
     class="transition-all duration-300"
     :class="{ 'ring-2 ring-primary-500': hasSelectedDate }"
+    :data-week-start="week.start"
+    :data-week-end="week.end"
   >
     <template #header>
       <div class="flex items-center justify-between">
@@ -10,6 +12,7 @@
           <button
             @click="$emit('toggle-expand', week.id)"
             class="flex items-center gap-2 hover:text-primary-600 transition-colors"
+            :data-week-toggle="week.id"
           >
             <svg 
               :class="['w-5 h-5 transition-transform duration-200', { 'rotate-90': isExpanded }]"
@@ -59,21 +62,89 @@
       leave-from-class="opacity-100 max-h-screen"
       leave-to-class="opacity-0 max-h-0"
     >
-      <div v-if="isExpanded" class="space-y-3">
-        <TrainingDay
-          v-for="day in week.rows"
-          :key="day.date"
-          :day="day"
-          :is-selected="day.date === selectedDate"
-          @click="$emit('date-select', day.date)"
-          @nutrition-click="$emit('nutrition-click', day.date)"
-        />
+      <div v-if="isExpanded" class="overflow-hidden">
+        <!-- Training table with proper design (specs requirement) -->
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <!-- Table header with gradient background (specs requirement) -->
+            <thead>
+              <tr class="bg-gradient-to-r from-slate-50 to-slate-100 border-b border-gray-200">
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Date</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider hidden sm:table-cell">Day</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Training</th>
+                <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider hidden lg:table-cell">Focus</th>
+                <th class="px-4 py-3 text-center text-xs font-medium text-gray-700 uppercase tracking-wider">Nutrition</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              <tr
+                v-for="day in week.rows"
+                :key="day.date"
+                :id="`d-${day.date}`"
+                :class="[
+                  'hover:bg-gray-50 transition-colors duration-150 cursor-pointer',
+                  {
+                    'border-l-4 border-amber-400 bg-amber-50': day.date === selectedDate,
+                    'bg-white': day.date !== selectedDate
+                  }
+                ]"
+                @click="$emit('date-select', day.date)"
+              >
+                <!-- Date -->
+                <td class="px-4 py-3">
+                  <div class="flex items-center">
+                    <span class="text-sm font-medium text-gray-900">
+                      {{ formatDayDate(day.date) }}
+                    </span>
+                    <!-- Exercise indicator dot -->
+                    <div
+                      v-if="day.isExercise"
+                      class="ml-2 w-2 h-2 bg-emerald-500 rounded-full"
+                      title="Exercise day"
+                    ></div>
+                  </div>
+                </td>
+                
+                <!-- Day (hidden on small screens) -->
+                <td class="px-4 py-3 hidden sm:table-cell">
+                  <span class="text-sm text-gray-600">{{ getDayName(day.date) }}</span>
+                </td>
+                
+                <!-- Training -->
+                <td class="px-4 py-3">
+                  <div class="text-sm text-gray-900">
+                    {{ day.training || 'Off' }}
+                  </div>
+                </td>
+                
+                <!-- Focus (hidden on small screens) -->
+                <td class="px-4 py-3 hidden lg:table-cell">
+                  <div class="text-sm text-gray-600">
+                    {{ day.focus || day.food || '-' }}
+                  </div>
+                </td>
+                
+                <!-- Nutrition button -->
+                <td class="px-4 py-3 text-center">
+                  <button
+                    @click.stop="$emit('nutrition-click', day.date)"
+                    class="inline-flex items-center justify-center w-8 h-8 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-full transition-colors duration-150"
+                    title="View meals"
+                  >
+                    📋
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </Transition>
   </BaseCard>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import type { Week } from '@/types'
 import BaseCard from '@/components/ui/BaseCard.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
@@ -150,5 +221,18 @@ const formatDateRange = (start: string, end: string): string => {
   }
   
   return `${startDate.toLocaleDateString('es-ES', options)} - ${endDate.toLocaleDateString('es-ES', options)}`
+}
+
+const formatDayDate = (dateString: string): string => {
+  const date = new Date(dateString)
+  return date.toLocaleDateString('en-US', { 
+    month: 'short', 
+    day: 'numeric' 
+  })
+}
+
+const getDayName = (dateString: string): string => {
+  const date = new Date(dateString)
+  return date.toLocaleDateString('en-US', { weekday: 'short' })
 }
 </script>

@@ -12,13 +12,9 @@ export const useGroceryStore = defineStore('grocery', () => {
     error.value = null
     
     try {
-      const response = await fetch('/data/grocery-lists.json')
-      if (!response.ok) {
-        throw new Error('Failed to load grocery data')
-      }
-      
-      const data = await response.json()
-      groceryLists.value = data
+      // Import the JSON file directly
+      const groceryModule = await import('@/data/grocery-lists.json')
+      groceryLists.value = groceryModule.default
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to load grocery data'
       console.error('Error loading grocery data:', err)

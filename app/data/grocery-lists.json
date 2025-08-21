@@ -13,6 +13,69 @@
     { "name": "🍎 Frutas", "items": "Bananas (20u), manzanas (6u), limones (4u), frutos secos mix (150g)" },
     { "name": "🧂 Condimentos", "items": "Aceite oliva, sal marina, especias básicas, yerba mate" }
   ],
+  "W2": [
+    { "name": "🥩 Proteínas", "items": "Pollo pechuga (1.5kg), huevos (20u), yogur natural (1L), queso fresco (500g)" },
+    { "name": "🌾 Carbohidratos", "items": "Avena (800g), arroz integral (800g), pan integral (2 paquetes), quinoa (300g)" },
+    { "name": "🥬 Verduras", "items": "Verduras mixtas para salteados, lechuga (2u), tomate (1.2kg), brócoli (1u), zapallitos (4u)" },
+    { "name": "🍎 Frutas", "items": "Bananas (22u), manzanas (6u), limones (5u), aguacate (2u)" },
+    { "name": "🧂 Condimentos", "items": "Aceite oliva, sal marina, especias para quinoa, yerba mate" }
+  ],
+  "W3": [
+    { "name": "🥩 Proteínas DELOAD", "items": "Merluza (800g), pollo (1kg), huevos (15u), yogur natural (600ml)" },
+    { "name": "🌾 Carbohidratos DELOAD", "items": "Avena (600g), arroz integral (600g), pan integral (2 paquetes)" },
+    { "name": "🥬 Verduras DELOAD", "items": "Verduras al vapor, lechuga (2u), tomate (800g), brócoli (1u)" },
+    { "name": "🍎 Frutas DELOAD", "items": "Bananas (15u), manzanas (5u), limones (4u), frutos secos (100g)" },
+    { "name": "☕ Relajación", "items": "Té de hierbas, yerba mate, miel natural" }
+  ],
+  "W4": [
+    { "name": "🥩 Proteínas", "items": "Pollo pechuga (1.8kg), huevos (24u), yogur natural (1.2L), queso fresco (600g)" },
+    { "name": "🌾 Carbohidratos", "items": "Avena (1kg), arroz integral (1kg), pan integral (3 paquetes), quinoa (400g)" },
+    { "name": "🥬 Verduras", "items": "Verduras mixtas abundantes, lechuga (3u), tomate (1.5kg), brócoli (2u), zapallitos (6u)" },
+    { "name": "🍎 Frutas & Energía", "items": "Bananas (25u), manzanas (8u), aguacate (3u), miel (250g)" },
+    { "name": "🧂 Condimentos", "items": "Aceite oliva, sal marina, especias variadas, yerba mate" }
+  ],
+  "W5": [
+    { "name": "🥩 Proteínas", "items": "Pollo pechuga (1.8kg), huevos (24u), yogur natural (1.2L), queso fresco (600g)" },
+    { "name": "🌾 Carbohidratos", "items": "Avena (1kg), arroz integral (1kg), pan integral (3 paquetes), quinoa (400g)" },
+    { "name": "🥬 Verduras", "items": "Verduras mixtas, lechuga (3u), tomate (1.5kg), brócoli (2u), morrones (4u)" },
+    { "name": "🍎 Frutas & Energía", "items": "Bananas (28u), aguacate (3u), miel (300g), dátiles (200g)" },
+    { "name": "🧂 Condimentos", "items": "Aceite oliva, limones (8u), sal marina, yerba mate" }
+  ],
+  "W6": [
+    { "name": "🥩 Proteínas", "items": "Pollo pechuga (2kg), huevos (26u), yogur natural (1.3L), queso fresco (650g)" },
+    { "name": "🌾 Carbohidratos", "items": "Avena (1.1kg), arroz integral (1.1kg), pan integral (3 paquetes), quinoa (450g)" },
+    { "name": "🥬 Verduras", "items": "Verduras para descensos, lechuga (3u), tomate (1.6kg), brócoli (2u), zapallitos (6u)" },
+    { "name": "🍎 Frutas & Energía", "items": "Bananas (30u), aguacate (4u), miel (350g), dátiles (250g)" },
+    { "name": "⚡ Deportivos", "items": "Bebidas isotónicas (6u), barritas energéticas (10u), agua mineral (6L)" }
+  ],
+  "W7": [
+    { "name": "🥩 Proteínas DELOAD", "items": "Merluza (900g), pollo (1.2kg), huevos (18u), yogur natural (800ml)" },
+    { "name": "🌾 Carbohidratos DELOAD", "items": "Avena (700g), arroz integral (700g), pan integral (2 paquetes)" },
+    { "name": "🥬 Verduras DELOAD", "items": "Verduras ligeras, lechuga (2u), tomate (1kg), brócoli (1u)" },
+    { "name": "🍎 Frutas DELOAD", "items": "Bananas (18u), manzanas (6u), limones (5u), frutos secos (120g)" },
+    { "name": "☕ Recuperación", "items": "Té relajante, yerba mate, miel" }
+  ],
+  "W8": [
+    { "name": "🥩 Proteínas", "items": "Pollo pechuga (2kg), huevos (28u), yogur natural (1.4L), queso fresco (700g)" },
+    { "name": "🌾 Carbohidratos", "items": "Avena (1.2kg), arroz integral (1.2kg), pan integral (3 paquetes), quinoa (500g)" },
+    { "name": "🥬 Verduras", "items": "Verduras abundantes, lechuga (3u), tomate (1.7kg), brócoli (2u), morrones (5u)" },
+    { "name": "🍎 Frutas & Energía", "items": "Bananas (32u), aguacate (4u), miel (400g), dátiles (300g)" },
+    { "name": "⚡ Deportivos", "items": "Bebidas isotónicas (8u), barritas energéticas (12u), agua mineral (8L)" }
+  ],
+  "W9": [
+    { "name": "🥩 Proteínas", "items": "Pollo pechuga (2.2kg), huevos (30u), yogur natural (1.5L), queso fresco (750g)" },
+    { "name": "🌾 Carbohidratos", "items": "Avena (1.3kg), arroz integral (1.3kg), pan integral (4 paquetes), quinoa (550g)" },
+    { "name": "🥬 Verduras", "items": "Verduras peak, lechuga (4u), tomate (1.8kg), brócoli (2u), zapallitos (8u)" },
+    { "name": "🍎 Frutas & Energía", "items": "Bananas (35u), aguacate (5u), miel (450g), dátiles (350g)" },
+    { "name": "⚡ Deportivos", "items": "Bebidas isotónicas (10u), barritas energéticas (15u), agua mineral (10L)" }
+  ],
+  "W10": [
+    { "name": "🥩 Proteínas", "items": "Pollo pechuga (2.2kg), huevos (32u), yogur natural (1.6L), queso fresco (800g)" },
+    { "name": "🌾 Carbohidratos", "items": "Avena (1.4kg), arroz integral (1.4kg), pan integral (4 paquetes), quinoa (600g)" },
+    { "name": "🥬 Verduras", "items": "Verduras máximo volumen, lechuga (4u), tomate (2kg), brócoli (3u), morrones (6u)" },
+    { "name": "🍎 Frutas & Energía", "items": "Bananas (38u), aguacate (5u), miel (500g), dátiles (400g)" },
+    { "name": "⚡ Deportivos", "items": "Bebidas isotónicas (12u), barritas energéticas (18u), agua mineral (12L)" }
+  ],
   "W11": [
     { "name": "🥩 Proteínas", "items": "Pollo pechuga (2kg), salmón (800g), huevos (36u), yogur griego (1.5L), jamón magro (300g)" },
     { "name": "🌾 Carbohidratos", "items": "Avena (1kg), fideos integrales (1kg), arroz blanco (1kg), pan integral (3 paquetes), quinoa (500g)" },
@@ -20,6 +83,14 @@
     { "name": "🍎 Frutas & Energía", "items": "Bananas (30u), naranjas (12u), aguacate (6u), miel (500g), dátiles (500g)" },
     { "name": "⚡ Deportivos", "items": "Bebidas isotónicas (12u), barritas energéticas (20u), sales/electrolitos, agua mineral (12L)" },
     { "name": "🧂 Condimentos", "items": "Aceite oliva (1L), limones (10u), sal marina, canela, jengibre fresco" }
+  ],
+  "W12": [
+    { "name": "🥩 Proteínas B2B MAX", "items": "Pollo pechuga (2.5kg), salmón (1kg), huevos (40u), yogur griego (2L), jamón magro (400g)" },
+    { "name": "🌾 Carbohidratos B2B", "items": "Avena (1.2kg), fideos integrales (1.2kg), arroz blanco (1.2kg), pan integral (4 paquetes), quinoa (600g)" },
+    { "name": "🥬 Verduras B2B", "items": "Lechuga (4u), tomate (2.5kg), zanahoria (2kg), brócoli (3u), zapallitos (8u), morrones (6u)" },
+    { "name": "🍎 Frutas & Energía B2B", "items": "Bananas (40u), naranjas (15u), aguacate (8u), miel (600g), dátiles (600g)" },
+    { "name": "⚡ Deportivos B2B", "items": "Bebidas isotónicas (16u), barritas energéticas (25u), geles (10u), sales extra, agua mineral (16L)" },
+    { "name": "🧂 Recovery Extra", "items": "Aceite oliva (1L), limones (12u), sal marina, antiinflamatorios naturales" }
   ],
   "W13": [
     { "name": "🥩 Proteínas STAGE", "items": "Pollo (3kg), bife/carne molida (2kg), huevos (48u), chorizo (500g), morcilla (300g)" },

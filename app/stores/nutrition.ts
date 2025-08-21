@@ -12,13 +12,9 @@ export const useNutritionStore = defineStore('nutrition', () => {
     error.value = null
     
     try {
-      const response = await fetch('/data/nutrition-plan.json')
-      if (!response.ok) {
-        throw new Error('Failed to load nutrition data')
-      }
-      
-      const data = await response.json()
-      nutritionData.value = data
+      // Import the JSON file directly
+      const nutritionModule = await import('@/data/nutrition-plan.json')
+      nutritionData.value = nutritionModule.default
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to load nutrition data'
       console.error('Error loading nutrition data:', err)
