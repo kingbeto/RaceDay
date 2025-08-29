@@ -2,16 +2,24 @@
   <header class="bg-white border-b border-gray-200 sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-4 sm:px-6">
       <div class="flex items-center justify-between h-16">
-        <!-- Logo and title -->
-        <div class="flex items-center gap-3">
+        <!-- Logo and title (clickable to reset to today) -->
+        <button
+          @click="resetToToday"
+          class="flex items-center gap-3 hover:bg-gray-50 px-3 py-2 rounded-lg transition-colors duration-200 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          :title="'Reset to today\'s date'"
+        >
           <div class="flex-shrink-0">
-            <span class="text-2xl">🏃‍♂️</span>
+            <img
+              :src="logoSrc"
+              alt="RaceDay Logo"
+              class="w-8 h-8 group-hover:scale-110 transition-transform duration-200"
+            />
           </div>
           <div>
-            <h1 class="text-xl font-bold text-gray-900">RaceDay</h1>
-            <p class="text-xs text-gray-500">Training & Nutrition Planner</p>
+            <h1 class="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors duration-200">RaceDay</h1>
+            <p class="text-xs text-gray-500 group-hover:text-gray-600 transition-colors duration-200">Training & Nutrition Planner</p>
           </div>
-        </div>
+        </button>
 
         <!-- Navigation -->
         <nav class="hidden md:flex items-center space-x-6">
@@ -111,6 +119,12 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useTrainingStore } from '@/stores'
+import logoSrc from '../../assets/images/logo.webp'
+
+const router = useRouter()
+const trainingStore = useTrainingStore()
 
 const showMobileMenu = ref(false)
 
@@ -120,4 +134,25 @@ const mobileLinks = [
   { name: 'Nutrición', path: '/nutrition' },
   { name: 'Compras', path: '/grocery' }
 ]
+
+const resetToToday = async () => {
+  // Reset to today's date using the store method
+  const today = trainingStore.resetToToday()
+
+  // Navigate to home page if not already there (to see the full training plan)
+  if (router.currentRoute.value.path !== '/') {
+    await router.push('/')
+  }
+
+  // Scroll to today's date in the training plan after navigation
+  setTimeout(() => {
+    const todayRow = document.querySelector(`#d-${today}`)
+    if (todayRow) {
+      todayRow.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      })
+    }
+  }, 100)
+}
 </script>

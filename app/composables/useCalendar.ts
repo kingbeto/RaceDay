@@ -5,22 +5,43 @@ export const useCalendar = (trainingPlan: Ref<TrainingPlan | null>) => {
   const selectedDate = ref<string | null>(null)
   const currentMonth = ref(new Date())
 
+  // Fast lookup map for date data (specs requirement)
+  const dateMap = computed((): Record<string, any> => {
+    if (!trainingPlan.value) return {}
+
+    const map: Record<string, any> = {}
+    const plan = trainingPlan.value
+
+    for (const week of plan.weeks) {
+      for (const day of week.rows) {
+        map[day.date] = {
+          training: day.training,
+          isExercise: day.isExercise,
+          calories: day.calories || (day.isExercise ? 2300 : 2100),
+          isRaceDay: day.isRaceDay || false
+        }
+      }
+    }
+
+    return map
+  })
+
   const months = computed((): CalendarMonth[] => {
     if (!trainingPlan.value) return []
 
     const plan = trainingPlan.value
     const startDate = new Date(plan.startDate)
     const endDate = new Date(plan.endDate)
-    
+
     const monthsArray: CalendarMonth[] = []
     const current = new Date(startDate.getFullYear(), startDate.getMonth(), 1)
-    
+
     while (current <= endDate) {
       const month = buildMonth(current, plan)
       monthsArray.push(month)
       current.setMonth(current.getMonth() + 1)
     }
-    
+
     return monthsArray
   })
 
@@ -111,31 +132,38 @@ export const useCalendar = (trainingPlan: Ref<TrainingPlan | null>) => {
 
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString)
-    return date.toLocaleDateString('es-ES', { 
+    return date.toLocaleDateString('es-ES', {
       weekday: 'long',
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
     })
   }
 
   const getWeekNumber = (dateString: string): number => {
     if (!trainingPlan.value) return 0
-    
-    const weekIndex = trainingPlan.value.weeks.findIndex(week => 
+
+    const weekIndex = trainingPlan.value.weeks.findIndex(week =>
       week.rows.some(row => row.date === dateString)
     )
-    
+
     return weekIndex >= 0 ? weekIndex + 1 : 0
+  }
+
+  // Fast lookup function for date data (specs requirement)
+  const getEntryForDate = (dateString: string): any => {
+    return dateMap.value[dateString] || null
   }
 
   return {
     selectedDate,
     currentMonth,
     months,
+    dateMap,
     selectDate,
     navigateToMonth,
     formatDate,
-    getWeekNumber
+    getWeekNumber,
+    getEntryForDate
   }
 }

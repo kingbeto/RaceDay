@@ -5,7 +5,10 @@
 </template>
 
 <script setup lang="ts">
-// Single page app - no header needed
+import { usePerformance } from '@/composables/usePerformance'
+
+// Initialize performance monitoring
+const { metrics } = usePerformance()
 </script>
 
 <style>

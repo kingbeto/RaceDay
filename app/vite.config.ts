@@ -16,11 +16,48 @@ export default defineConfig({
     }
   },
   build: {
-    outDir: 'dist'
+    outDir: 'dist',
+    // Enable source maps for production debugging
+    sourcemap: false,
+    // Optimize chunk splitting
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Separate Vue core
+          'vue-vendor': ['vue', 'vue-router', 'pinia'],
+          // Separate UI libraries (only include actually used ones)
+          'ui-vendor': ['@headlessui/vue'],
+          // Separate utilities
+          'utils-vendor': ['@vueuse/core']
+        },
+        // Optimize chunk file names
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js',
+        assetFileNames: 'assets/[name]-[hash].[ext]'
+      }
+    },
+    // Enable minification
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true
+      }
+    },
+    // Increase chunk size warning limit
+    chunkSizeWarningLimit: 1000
   },
   server: {
     host: true,
     port: 5173
   },
-  publicDir: 'public'
+  publicDir: 'public',
+  // Optimize dependencies
+  optimizeDeps: {
+    include: ['vue', 'vue-router', 'pinia', '@vueuse/core']
+  },
+  // Enable CSS code splitting
+  css: {
+    devSourcemap: true
+  }
 })

@@ -60,6 +60,12 @@ export const useTrainingStore = defineStore('training', () => {
     selectedDate.value = date
   }
 
+  const resetToToday = () => {
+    const today = new Date().toISOString().split('T')[0]
+    selectedDate.value = today
+    return today
+  }
+
   const clearError = () => {
     error.value = null
   }
@@ -81,6 +87,7 @@ export const useTrainingStore = defineStore('training', () => {
     // Actions
     loadPlan,
     setSelectedDate,
+    resetToToday,
     clearError
   }
 })

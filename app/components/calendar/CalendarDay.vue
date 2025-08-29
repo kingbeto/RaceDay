@@ -14,19 +14,19 @@
     <!-- Day number -->
     <span :class="textClasses">{{ day.day }}</span>
     
-    <!-- Today indicator dot (specs requirement) -->
+    <!-- Today indicator dot - spec compliant (8px amber circle in top-right) -->
     <div 
       v-if="day.isToday" 
-      class="absolute -top-1 -right-1 w-2 h-2 bg-amber-500 rounded-full"
+      class="absolute right-1 top-1 w-2 h-2 bg-amber-400 rounded-full"
       title="Today"
     ></div>
     
     <!-- Training indicator -->
     <div v-if="day.hasTraining" :class="indicatorClasses"></div>
     
-    <!-- Race day indicator -->
-    <div 
-      v-if="day.trainingDay?.isRaceDay" 
+    <!-- Race day indicator - integrated with exercise/off states -->
+    <div
+      v-if="day.trainingDay?.isRaceDay"
       class="absolute -top-1 -left-1 w-2 h-2 bg-red-500 rounded-full"
       title="Race Day"
     ></div>
@@ -41,6 +41,8 @@ interface Props {
   day: CalendarDay
   compact?: boolean
   hoverDate?: string | null
+  dateMap?: Record<string, any>
+  getEntryForDate?: (date: string) => any
 }
 
 interface Emits {
@@ -53,45 +55,77 @@ const props = defineProps<Props>()
 defineEmits<Emits>()
 
 const dayClasses = computed(() => {
-  const base = props.compact 
-    ? 'relative flex items-center justify-center min-h-[2rem] w-full text-xs rounded-md transition-all duration-200 hover:scale-105' 
-    : 'relative flex flex-col items-center justify-center min-h-[2.5rem] w-full rounded-md transition-all duration-200 hover:scale-105'
-  
-  // Past dates - reduced opacity but still interactive
+  const base = props.compact
+    ? 'relative flex items-center justify-center min-h-[2rem] w-full text-xs rounded-md p-2 text-center border border-transparent transition-all duration-150'
+    : 'relative flex flex-col items-center justify-center min-h-[2.5rem] w-full rounded-md p-2 text-center border border-transparent transition-all duration-150'
+
+  // Calculate if date is in the past
   const isPast = new Date(props.day.date) < new Date(new Date().toDateString())
-  const opacityClass = isPast ? 'opacity-60' : ''
-  
-  // Not current month - muted
+  const opacityClass = isPast && !props.day.isToday ? ' opacity-60' : ''
+
+  // Not current month - muted but still clickable
   if (!props.day.isCurrentMonth) {
-    return `${base} text-gray-300 cursor-not-allowed ${opacityClass}`
+    return `${base} text-gray-300 hover:text-gray-400 hover:border-slate-200${opacityClass}`
   }
-  
-  // Selected date - amber/yellow border (specs requirement)
+
+  // Priority 1: Selected State (highest priority - yellow border)
   if (props.day.isSelected) {
-    return `${base} border-2 border-amber-400 bg-white text-gray-900 shadow-md ${opacityClass}`
+    let selectedClasses = `${base} border-2 border-amber-400${opacityClass}`
+
+    // Add background based on exercise status even when selected
+    if (props.day.hasTraining) {
+      if (props.day.trainingDay?.isRaceDay) {
+        selectedClasses += ' bg-red-50 text-red-900'
+      } else if (props.day.trainingDay?.isExercise) {
+        selectedClasses += ' bg-emerald-50 text-emerald-800'
+      } else {
+        selectedClasses += ' bg-slate-50 text-slate-700'
+      }
+    } else {
+      selectedClasses += ' bg-white text-gray-900'
+    }
+
+    // Today text styling overrides others
+    if (props.day.isToday) {
+      selectedClasses += ' text-amber-900 font-semibold'
+    }
+
+    return selectedClasses
   }
-  
-  // Today's date - yellow dot indicator and special styling (specs requirement)
+
+  // Priority 2: Today Marker (amber text and font weight)
+  let classes = base
+
   if (props.day.isToday) {
-    return `${base} bg-amber-50 text-amber-900 ring-1 ring-amber-300 font-semibold ${opacityClass}`
+    classes += ' text-amber-900 font-semibold'
   }
-  
-  // Training day styling based on exercise type (specs requirement)
+
+  // Priority 3: Exercise/Off Color (data-driven background)
   if (props.day.hasTraining) {
     if (props.day.trainingDay?.isRaceDay) {
       // Race days - red theme
-      return `${base} bg-red-50 text-red-900 border border-red-200 hover:bg-red-100 ${opacityClass}`
+      classes += ' bg-red-50 text-red-900 hover:bg-red-100'
+    } else if (props.day.trainingDay?.isExercise) {
+      // Exercise days - emerald/green theme
+      classes += ' bg-emerald-50 text-emerald-800 hover:bg-emerald-100'
+    } else {
+      // Off days - slate/gray theme
+      classes += ' bg-slate-50 text-slate-700 hover:bg-slate-100'
     }
-    if (props.day.trainingDay?.isExercise) {
-      // Exercise days - emerald/green theme (specs requirement)
-      return `${base} bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 ${opacityClass}`
-    }
-    // Off days with notes - slate/gray theme (specs requirement)
-    return `${base} bg-slate-50 text-slate-700 border border-slate-200 hover:bg-slate-100 ${opacityClass}`
+  } else {
+    // Default empty days
+    classes += ' text-gray-900 hover:bg-gray-50'
   }
-  
-  // Default empty days
-  return `${base} text-gray-900 hover:bg-gray-50 ${opacityClass}`
+
+  // Priority 4: Past Date (opacity reduction)
+  if (opacityClass) {
+    classes += opacityClass
+  }
+
+  // Priority 5: Hover State (border highlight)
+  classes += ' hover:border-slate-200'
+
+  return classes
 })
 
 const textClasses = computed(() => {
@@ -114,22 +148,30 @@ const hoverClasses = computed(() => {
 // Tooltip text with training preview (specs requirement)
 const tooltipText = computed(() => {
   if (!props.day.isCurrentMonth) return ''
-  
+
+  // Use getEntryForDate for faster lookup (specs requirement)
+  const entry = props.getEntryForDate ? props.getEntryForDate(props.day.date) : null
+
+  if (entry) {
+    return entry.training || 'Training scheduled'
+  }
+
+  // Fallback to existing trainingDay data
   const trainingText = props.day.trainingDay?.training
-  
+
   if (trainingText) {
     return trainingText
   }
-  
+
   if (props.day.trainingDay?.isExercise === false) {
     return 'Off day - rest and recovery'
   }
-  
+
   if (props.day.hasTraining) {
     return 'Training scheduled'
   }
-  
-  return 'No training data'
+
+  return 'No entry'
 })
 
 const indicatorClasses = computed(() => {

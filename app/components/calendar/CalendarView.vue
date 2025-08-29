@@ -1,6 +1,6 @@
 <template>
-  <!-- Compact mode for sidebar (main implementation) -->
-  <div class="sticky top-6 max-h-[calc(100vh-2rem)] overflow-y-auto">
+  <!-- Compact mode for sidebar with spec-compliant positioning -->
+  <div class="sticky top-4 max-h-[calc(100vh - 2rem)] overflow-y-auto">
     <div class="space-y-4">
       
       <!-- Collapsible months structure (specs requirement) -->
@@ -59,8 +59,10 @@
                 }"
                 :compact="true"
                 :hover-date="hoverDate"
+                :date-map="dateMap"
+                :get-entry-for-date="getEntryForDate"
                 @click="handleDateClick"
-                @mouseenter="handleDateHover"
+                @mouseenter="(event) => handleDateHover(day.date)"
                 @mouseleave="handleDateLeave"
               />
             </div>
@@ -125,7 +127,9 @@ const todayStr = ref<string>(new Date().toISOString().slice(0, 10))
 const {
   months,
   formatDate,
-  getWeekNumber
+  getWeekNumber,
+  dateMap,
+  getEntryForDate
 } = useCalendar(toRef(props, 'trainingPlan'))
 
 const dayHeaders = ['L', 'M', 'X', 'J', 'V', 'S', 'D'] // Spanish day headers
@@ -159,13 +163,13 @@ const toggleMonth = (monthIndex: number) => {
   expandedMonths.value = newExpanded
 }
 
-// Enhanced date click handler with scroll synchronization (specs requirement)
+// Enhanced date click handler with cross-month support
 const handleDateClick = async (date: string) => {
   emit('date-select', date)
   
-  // Auto-expand month containing selected date if collapsed
+  // Auto-expand month containing selected date if collapsed (support any month)
   const monthIndex = months.value.findIndex(month =>
-    month.days.some(day => day.date === date && day.isCurrentMonth)
+    month.days.some(day => day.date === date)
   )
   
   if (monthIndex >= 0 && !expandedMonths.value.has(monthIndex)) {
@@ -173,7 +177,7 @@ const handleDateClick = async (date: string) => {
     newExpanded.add(monthIndex)
     expandedMonths.value = newExpanded
     
-    // Wait for month expansion animation before scrolling
+    // Wait for month expansion animation before scrolling (spec: 100ms delay)
     await nextTick()
     await new Promise(resolve => setTimeout(resolve, 100))
   }
@@ -182,7 +186,7 @@ const handleDateClick = async (date: string) => {
   scrollToTrainingPlan(date)
 }
 
-// Hover interactions for cross-component integration (specs requirement)
+// Enhanced hover interactions for cross-component integration
 const handleDateHover = (date: string) => {
   hoverDate.value = date
   highlightPlanForDate(date)
@@ -193,59 +197,86 @@ const handleDateLeave = () => {
   clearPlanHighlights()
 }
 
-// Cross-component integration functions (specs requirement)
+// Enhanced cross-component highlighting functions (specs requirement)
 const highlightPlanForDate = (dateString: string) => {
-  // Clear previous highlights
+  // Clear previous highlights first
   clearPlanHighlights()
-  
+
   // Find and highlight the corresponding training plan row
   const planRow = document.querySelector(`#d-${dateString}`)
   if (planRow) {
-    planRow.classList.add('bg-amber-50', 'ring-1', 'ring-amber-200')
+    // Light background color change (specs requirement)
+    planRow.classList.add('bg-amber-50', 'transition-all', 'duration-200')
+    planRow.setAttribute('data-calendar-hover', 'true')
   }
-  
-  // Also highlight the week containing this date
-  const weekElement = document.querySelector(`[data-week-contains="${dateString}"]`)
-  if (weekElement) {
-    weekElement.classList.add('ring-1', 'ring-amber-300')
+
+  // Highlight the week containing this date
+  const allWeeks = document.querySelectorAll('[data-week-start]')
+  for (const week of allWeeks) {
+    const startDate = week.getAttribute('data-week-start')
+    const endDate = week.getAttribute('data-week-end')
+
+    if (startDate && endDate && dateString >= startDate && dateString <= endDate) {
+      // Subtle glow effect for the week (specs requirement)
+      week.classList.add('ring-2', 'ring-amber-300', 'ring-opacity-50', 'transition-all', 'duration-200')
+      week.setAttribute('data-calendar-hover', 'true')
+      break
+    }
   }
 }
 
 const clearPlanHighlights = () => {
-  // Remove all temporary highlights from training plan
-  const highlightedRows = document.querySelectorAll('.bg-amber-50')
-  highlightedRows.forEach(row => {
-    row.classList.remove('bg-amber-50', 'ring-1', 'ring-amber-200', 'ring-amber-300')
+  // Remove all temporary highlights from training plan (specs requirement)
+  const highlightedElements = document.querySelectorAll('[data-calendar-hover="true"]')
+  highlightedElements.forEach(element => {
+    // Remove all calendar hover related classes
+    element.classList.remove(
+      'bg-amber-50', 'bg-slate-100',
+      'border-l-4', 'border-amber-400',
+      'ring-1', 'ring-2', 'ring-amber-200', 'ring-amber-300', 'ring-slate-300', 'ring-opacity-50',
+      'transition-colors', 'transition-all', 'duration-150', 'duration-200', 'shadow-sm'
+    )
+    element.removeAttribute('data-calendar-hover')
+
+    // Reset any transform effects
+    if (element.style) {
+      element.style.transform = ''
+    }
   })
 }
 
-// Scroll synchronization (specs requirement)
+// Scroll synchronization with spec-compliant timing and behavior
 const scrollToTrainingPlan = async (dateString: string) => {
-  // First, try to open the week containing this date
-  const weekElement = document.querySelector(`[data-week-start]`)
-  if (weekElement) {
-    // Check if the date falls within any week's range
-    const allWeeks = document.querySelectorAll('[data-week-start]')
-    for (const week of allWeeks) {
-      const startDate = week.getAttribute('data-week-start')
-      const endDate = week.getAttribute('data-week-end')
-      
-      if (startDate && endDate && dateString >= startDate && dateString <= endDate) {
-        // Expand this week if it's collapsed
-        const expandButton = week.querySelector('[data-week-toggle]')
-        if (expandButton && !week.querySelector('.expanded')) {
-          (expandButton as HTMLElement).click()
-          await new Promise(resolve => setTimeout(resolve, 300)) // Wait for expansion
-        }
-        break
-      }
+  // Step 1: Find and open the week containing this date (specs requirement)
+  const allWeeks = document.querySelectorAll('[data-week-start]')
+  let targetWeek = null
+
+  for (const week of allWeeks) {
+    const startDate = week.getAttribute('data-week-start')
+    const endDate = week.getAttribute('data-week-end')
+
+    if (startDate && endDate && dateString >= startDate && dateString <= endDate) {
+      targetWeek = week
+      break
     }
   }
-  
-  // Then scroll to the specific day row
+
+  if (targetWeek) {
+    // Check if week is collapsed (details element is not open)
+    const detailsElement = targetWeek as HTMLDetailsElement
+    if (!detailsElement.open) {
+      // Open the week by setting the open attribute (specs requirement)
+      detailsElement.open = true
+      // Wait for week expansion animation (spec: 100ms delay)
+      await new Promise(resolve => setTimeout(resolve, 100))
+    }
+  }
+
+  // Step 2: Scroll to the specific day row (specs requirement)
   await nextTick()
   const dayRow = document.querySelector(`#d-${dateString}`)
   if (dayRow) {
+    // Smooth scroll to center the target row (spec requirement)
     dayRow.scrollIntoView({
       behavior: 'smooth',
       block: 'center'
@@ -257,7 +288,7 @@ const scrollToTrainingPlan = async (dateString: string) => {
 watch(() => props.selectedDate, (newDate) => {
   if (newDate && months.value.length > 0) {
     const monthIndex = months.value.findIndex(month =>
-      month.days.some(day => day.date === newDate && day.isCurrentMonth)
+      month.days.some(day => day.date === newDate)
     )
     
     if (monthIndex >= 0) {
