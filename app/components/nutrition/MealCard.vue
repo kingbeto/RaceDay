@@ -1,5 +1,6 @@
 <template>
-  <BaseCard class="transition-shadow hover:shadow-md">
+  <!-- Static meal card - no interactions -->
+  <BaseCard>
     <div class="space-y-3">
       <!-- Meal header -->
       <div class="flex items-center justify-between">

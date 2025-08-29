@@ -119,16 +119,7 @@ export const useCalendar = (trainingPlan: Ref<TrainingPlan | null>) => {
     }
   }
 
-  const selectDate = (date: string) => {
-    selectedDate.value = date
-    
-    // Auto-scroll to the selected week in the training plan
-    // This will be handled by the parent component
-  }
-
-  const navigateToMonth = (year: number, month: number) => {
-    currentMonth.value = new Date(year, month, 1)
-  }
+  // No interactive functions - static data only
 
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString)
@@ -160,8 +151,6 @@ export const useCalendar = (trainingPlan: Ref<TrainingPlan | null>) => {
     currentMonth,
     months,
     dateMap,
-    selectDate,
-    navigateToMonth,
     formatDate,
     getWeekNumber,
     getEntryForDate

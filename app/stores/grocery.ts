@@ -1,57 +1,46 @@
-import { defineStore } from 'pinia'
-import { ref, computed, readonly } from 'vue'
-import type { GroceryLists, GroceryCategory } from '@/types'
+// Simplified grocery store - no state management behaviors
+import type { GroceryCategory } from '@/types'
 
-export const useGroceryStore = defineStore('grocery', () => {
-  const groceryLists = ref<GroceryLists>({})
-  const isLoading = ref(false)
-  const error = ref<string | null>(null)
-
-  const loadGroceryData = async () => {
-    isLoading.value = true
-    error.value = null
-    
-    try {
-      // Import the JSON file directly
-      const groceryModule = await import('@/data/grocery-lists.json')
-      groceryLists.value = groceryModule.default
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Failed to load grocery data'
-      console.error('Error loading grocery data:', err)
-    } finally {
-      isLoading.value = false
-    }
+// Sample grocery data for demonstration
+const sampleGroceryData: GroceryCategory[] = [
+  {
+    name: 'Frutas y Verduras',
+    items: 'Plátanos, Manzanas, Brócoli, Espinacas, Tomates'
+  },
+  {
+    name: 'Proteínas',
+    items: 'Pollo, Salmón, Huevos, Yogur griego, Leche'
+  },
+  {
+    name: 'Granos y Cereales',
+    items: 'Avena, Quinoa, Pan integral, Pasta integral, Arroz integral'
+  },
+  {
+    name: 'Frutos Secos',
+    items: 'Almendras, Nueces, Semillas de chía, Semillas de lino'
   }
+]
 
-  const getGroceriesForWeek = computed(() => (weekId: string): GroceryCategory[] => {
-    return groceryLists.value[weekId] || []
-  })
+const getGroceriesForWeek = (weekId: string): GroceryCategory[] => {
+  // Return sample data for any week
+  return sampleGroceryData
+}
 
-  const getAllWeekIds = computed(() => {
-    return Object.keys(groceryLists.value)
-  })
+const getAllWeekIds = (): string[] => {
+  // Return sample week IDs
+  return ['week-1', 'week-2', 'week-3', 'week-4']
+}
 
-  const hasGroceriesForWeek = computed(() => (weekId: string): boolean => {
-    return weekId in groceryLists.value && groceryLists.value[weekId].length > 0
-  })
+const hasGroceriesForWeek = (weekId: string): boolean => {
+  // Always return true for demonstration
+  return true
+}
 
-  const clearError = () => {
-    error.value = null
-  }
-
+export const useGroceryStore = () => {
   return {
-    // State
-    groceryLists: readonly(groceryLists),
-    isLoading: readonly(isLoading),
-    error: readonly(error),
-    
-    // Getters
+    // Static functions
     getGroceriesForWeek,
     getAllWeekIds,
-    hasGroceriesForWeek,
-    
-    // Actions
-    loadGroceryData,
-    clearError
+    hasGroceriesForWeek
   }
-})
+}

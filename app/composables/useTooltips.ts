@@ -1,26 +1,5 @@
-import { ref } from 'vue'
-
-const tooltip = ref({
-  show: false,
-  text: '',
-  x: 0,
-  y: 0
-})
-
+// Simplified tooltip composable - no interactive behaviors
 export function useTooltips() {
-  const showTooltip = (text: string, x: number, y: number) => {
-    tooltip.value = {
-      show: true,
-      text,
-      x: Math.min(x + 12, window.innerWidth - 320),
-      y: y + 12
-    }
-  }
-
-  const hideTooltip = () => {
-    tooltip.value.show = false
-  }
-
   const explainActivity = (training: string): string => {
     const t = training.toLowerCase()
     const parts: string[] = []
@@ -44,16 +23,13 @@ export function useTooltips() {
     if (t.includes('gym lower')) parts.push('Gym Lower (hard): squat/hinge, step-ups, lunges, calves; leave 1–2 reps in reserve.')
     if (t.includes('gym upper/core')) parts.push('Gym Upper/Core: pull/push/press + anti-rotation, planks, dead bug.')
     if (t.includes('maintenance') || t.includes('prehab')) parts.push('Gym Maintenance/Prehab: lighter full-body + calves, hips, feet, tibialis, mobility.')
-    
+
     if (parts.length === 0) parts.push('Z2 aerobic emphasis. Keep it comfortable.')
-    
+
     return parts.join(' ')
   }
 
   return {
-    tooltip,
-    showTooltip,
-    hideTooltip,
     explainActivity
   }
 }

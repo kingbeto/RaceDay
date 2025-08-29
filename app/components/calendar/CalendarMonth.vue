@@ -10,12 +10,11 @@
         {{ day }}
       </div>
 
-      <!-- Calendar days -->
+      <!-- Calendar days - static display -->
       <CalendarDay
         v-for="day in month.days"
         :key="`${day.date}`"
         :day="{ ...day, isSelected: day.date === selectedDate }"
-        @click="$emit('date-select', day.date)"
       />
     </div>
   </BaseCard>
@@ -31,12 +30,7 @@ interface Props {
   selectedDate: string | null
 }
 
-interface Emits {
-  (e: 'date-select', date: string): void
-}
-
-defineProps<Props>()
-defineEmits<Emits>()
+const props = defineProps<Props>()
 
 const dayHeaders = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
 </script>

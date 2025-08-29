@@ -5,10 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import { usePerformance } from '@/composables/usePerformance'
-
-// Initialize performance monitoring
-const { metrics } = usePerformance()
+// No interactive behaviors - just basic layout
 </script>
 
 <style>

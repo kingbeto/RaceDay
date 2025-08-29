@@ -1,3 +1,4 @@
+// Simplified router - no navigation behaviors
 import { createRouter, createWebHistory } from 'vue-router'
 import HomePage from '@/pages/HomePage.vue'
 
@@ -7,52 +8,19 @@ const routes = [
     name: 'Home',
     component: HomePage,
     meta: {
-      title: 'Plan de Entrenamiento'
-    }
-  },
-  {
-    path: '/calendar',
-    name: 'Calendar',
-    component: () => import('@/pages/CalendarPage.vue'),
-    meta: {
-      title: 'Calendario'
-    }
-  },
-  {
-    path: '/nutrition',
-    name: 'Nutrition',
-    component: () => import('@/pages/NutritionPage.vue'),
-    meta: {
-      title: 'Nutrición'
-    }
-  },
-  {
-    path: '/grocery',
-    name: 'Grocery',
-    component: () => import('@/pages/GroceryPage.vue'),
-    meta: {
-      title: 'Lista de Compras'
+      title: 'RaceDay - Static Display'
     }
   }
+  // All other routes removed - static display only
 ]
 
 const router = createRouter({
   history: createWebHistory(),
-  routes,
-  scrollBehavior(to, from, savedPosition) {
-    if (savedPosition) {
-      return savedPosition
-    } else {
-      return { top: 0 }
-    }
-  }
+  routes
+  // Removed scroll behavior and navigation guards
 })
 
-// Update document title
-router.beforeEach((to, from, next) => {
-  const title = to.meta?.title as string
-  document.title = title ? `${title} - RaceDay` : 'RaceDay'
-  next()
-})
+// Simple title setting
+document.title = 'RaceDay - Static Display'
 
 export default router

@@ -24,27 +24,21 @@
       </div>
     </div>
 
-        <!-- Enhanced Training weeks with better spacing -->
+    <!-- Training weeks - all expanded -->
     <div class="space-y-8">
       <TrainingWeek
         v-for="week in plan?.weeks"
         :key="week.id"
         :week="week"
         :selected-date="selectedDate"
-        :is-expanded="props.expandedWeeks?.has(week.id) || false"
-        @toggle-expand="toggleWeekExpansion"
-        @date-select="emit('date-select', $event)"
-        @nutrition-click="emit('nutrition-click', $event)"
-        @grocery-click="emit('grocery-click', week.id)"
-        @weekly-meals-click="emit('weekly-meals-click', week)"
+        :is-expanded="true"
       />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, nextTick } from 'vue'
-import type { TrainingPlan, Week } from '@/types'
+import type { TrainingPlan } from '@/types'
 import TrainingWeek from './TrainingWeek.vue'
 
 interface Props {
@@ -53,29 +47,15 @@ interface Props {
   expandedWeeks?: Set<string>
 }
 
-interface Emits {
-  (e: 'date-select', date: string): void
-  (e: 'nutrition-click', date: string): void
-  (e: 'grocery-click', weekId: string): void
-  (e: 'weekly-meals-click', week: Week): void
-  (e: 'toggle-expand', weekId: string): void
-}
-
 const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
 
+// Static date formatting
 const formatDate = (dateString: string): string => {
   const date = new Date(dateString)
-  return date.toLocaleDateString('es-ES', { 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
+  return date.toLocaleDateString('es-ES', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
   })
 }
-
-const toggleWeekExpansion = (weekId: string) => {
-  emit('toggle-expand', weekId)
-}
-
-
 </script>

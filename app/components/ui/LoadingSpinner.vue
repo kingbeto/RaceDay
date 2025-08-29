@@ -1,8 +1,9 @@
 <template>
+  <!-- Static loading indicator - no animation -->
   <div :class="containerClasses">
     <div
       :class="[
-        'animate-spin rounded-full border-4 border-gray-300',
+        'rounded-full border-4 border-gray-300',
         sizeClasses,
         colorClasses
       ]"

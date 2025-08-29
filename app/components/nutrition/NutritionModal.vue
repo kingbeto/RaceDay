@@ -1,10 +1,6 @@
 <template>
-  <BaseModal
-    :show="show"
-    :title="`Plan Nutricional - ${formatDate(date)}`"
-    size="xl"
-    @update:show="$emit('update:show', $event)"
-  >
+  <!-- Static nutrition display - no interactions -->
+  <BaseCard class="w-full">
     <div v-if="nutritionData" class="space-y-8">
       <!-- Header with date and calorie target -->
       <div class="text-center bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-6">
@@ -46,16 +42,10 @@
 
       <!-- Four Meals Structure (specs requirement) -->
       <div class="space-y-6">
-        <div class="flex items-center justify-between">
+        <div>
           <h3 class="text-xl font-semibold text-gray-900">Comidas del Día</h3>
-          <button
-            @click="openPrintView"
-            class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            🖨️ Imprimir
-          </button>
         </div>
-        
+
         <!-- Four meals grid -->
         <div class="grid md:grid-cols-2 gap-6">
           <!-- Desayuno -->
@@ -157,111 +147,100 @@
         <p class="text-gray-600">No hay datos de nutrición para este día</p>
       </div>
     </div>
-
-    <template #footer>
-      <BaseButton variant="outline" @click="$emit('update:show', false)">
-        Cerrar
-      </BaseButton>
-    </template>
-  </BaseModal>
+  </BaseCard>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import type { DailyNutrition } from '@/types'
-import { useNutritionStore, useTrainingStore } from '@/stores'
-import BaseModal from '@/components/ui/BaseModal.vue'
-import BaseButton from '@/components/ui/BaseButton.vue'
+import BaseCard from '@/components/ui/BaseCard.vue'
 import MealCard from './MealCard.vue'
+import type { DailyNutrition } from '@/types'
 
 interface Props {
-  show: boolean
   date: string | null
 }
 
-interface Emits {
-  (e: 'update:show', value: boolean): void
+const props = defineProps<Props>()
+
+// Static nutrition data for demonstration
+const nutritionData: DailyNutrition = {
+  totalCalories: 2300,
+  totalProtein: 120,
+  totalCarbs: 250,
+  totalFats: 85,
+  meals: [
+    {
+      name: 'Desayuno',
+      calories: 600,
+      dishes: [
+        {
+          name: 'Avena con frutas',
+          ingredients: 'Avena, plátano, nueces, miel',
+          preparation: 'Cocinar avena, añadir frutas y nueces'
+        }
+      ]
+    },
+    {
+      name: 'Almuerzo',
+      calories: 800,
+      dishes: [
+        {
+          name: 'Pollo con vegetales',
+          ingredients: 'Pechuga de pollo, brócoli, quinoa, aceite de oliva',
+          preparation: 'Cocinar pollo a la plancha, hervir vegetales'
+        }
+      ]
+    },
+    {
+      name: 'Merienda',
+      calories: 400,
+      dishes: [
+        {
+          name: 'Yogur con frutos secos',
+          ingredients: 'Yogur griego, almendras, miel',
+          preparation: 'Mezclar todos los ingredientes'
+        }
+      ]
+    },
+    {
+      name: 'Cena',
+      calories: 500,
+      dishes: [
+        {
+          name: 'Pescado al horno',
+          ingredients: 'Salmón, verduras al vapor, limón',
+          preparation: 'Hornear pescado con verduras'
+        }
+      ]
+    }
+  ]
 }
 
-const props = defineProps<Props>()
-defineEmits<Emits>()
-
-const nutritionStore = useNutritionStore()
-const trainingStore = useTrainingStore()
-
-const nutritionData = computed((): DailyNutrition | null => {
-  if (!props.date) return null
-  
-  const day = trainingStore.getDayByDate(props.date)
-  return nutritionStore.getOrGenerateNutrition(props.date, day?.isExercise ?? true)
-})
-
-// Four meals structure (specs requirement)
-const desayuno = computed(() => {
-  return nutritionData.value?.meals?.find(meal => meal.name.toLowerCase().includes('desayuno')) || null
-})
-
-const almuerzo = computed(() => {
-  return nutritionData.value?.meals?.find(meal => meal.name.toLowerCase().includes('almuerzo')) || null
-})
-
-const merienda = computed(() => {
-  return nutritionData.value?.meals?.find(meal => meal.name.toLowerCase().includes('merienda')) || null
-})
-
-const cena = computed(() => {
-  return nutritionData.value?.meals?.find(meal => meal.name.toLowerCase().includes('cena')) || null
-})
+// Four meals structure
+const desayuno = nutritionData.meals.find(meal => meal.name.toLowerCase().includes('desayuno')) || null
+const almuerzo = nutritionData.meals.find(meal => meal.name.toLowerCase().includes('almuerzo')) || null
+const merienda = nutritionData.meals.find(meal => meal.name.toLowerCase().includes('merienda')) || null
+const cena = nutritionData.meals.find(meal => meal.name.toLowerCase().includes('cena')) || null
 
 // Macro percentages
-const proteinPercentage = computed(() => {
-  if (!nutritionData.value) return 0
-  const proteinCals = nutritionData.value.totalProtein * 4
-  return Math.round((proteinCals / nutritionData.value.totalCalories) * 100)
-})
+const proteinPercentage = Math.round((nutritionData.totalProtein * 4 / nutritionData.totalCalories) * 100)
+const carbsPercentage = Math.round((nutritionData.totalCarbs * 4 / nutritionData.totalCalories) * 100)
+const fatsPercentage = Math.round((nutritionData.totalFats * 9 / nutritionData.totalCalories) * 100)
 
-const carbsPercentage = computed(() => {
-  if (!nutritionData.value) return 0
-  const carbsCals = nutritionData.value.totalCarbs * 4
-  return Math.round((carbsCals / nutritionData.value.totalCalories) * 100)
-})
+// Static day type
+const dayType = 'Día de Entrenamiento'
 
-const fatsPercentage = computed(() => {
-  if (!nutritionData.value) return 0
-  const fatsCals = nutritionData.value.totalFats * 9
-  return Math.round((fatsCals / nutritionData.value.totalCalories) * 100)
-})
-
-// Day type identification
-const dayType = computed(() => {
-  if (!props.date) return ''
-  const day = trainingStore.getDayByDate(props.date)
-  return day?.isExercise ? 'Día de Entrenamiento' : 'Día de Descanso'
-})
-
-// Nutrition notes
-const nutritionNotes = computed(() => {
-  if (!props.date) return ''
-  const day = trainingStore.getDayByDate(props.date)
-  return day?.food || ''
-})
+// Static nutrition notes
+const nutritionNotes = 'Mantener hidratación y consumir carbohidratos complejos para el entrenamiento'
 
 const formatDate = (dateString: string | null): string => {
-  if (!dateString) return ''
-  
-  const date = new Date(dateString)
-  return date.toLocaleDateString('es-ES', { 
-    weekday: 'long',
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
-  })
-}
+  if (!dateString) return 'Fecha no especificada'
 
-const openPrintView = () => {
-  // Implementation for print functionality
-  if (typeof window !== 'undefined') {
-    window.print()
-  }
+  const date = new Date(dateString)
+  return date.toLocaleDateString('es-ES', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  })
 }
 </script>

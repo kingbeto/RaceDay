@@ -1,36 +1,31 @@
 <template>
-  <button
-    type="button"
+  <div
     :class="[
-      'relative p-2 text-sm rounded-md transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2',
-      dayClasses,
-      hoverClasses
+      'relative p-2 text-sm rounded-md',
+      dayClasses
     ]"
     :title="tooltipText"
-    @click="$emit('click', day.date)"
-    @mouseenter="$emit('mouseenter', day.date)"
-    @mouseleave="$emit('mouseleave')"
   >
     <!-- Day number -->
     <span :class="textClasses">{{ day.day }}</span>
-    
+
     <!-- Today indicator dot - spec compliant (8px amber circle in top-right) -->
-    <div 
-      v-if="day.isToday" 
+    <div
+      v-if="day.isToday"
       class="absolute right-1 top-1 w-2 h-2 bg-amber-400 rounded-full"
       title="Today"
     ></div>
-    
+
     <!-- Training indicator -->
     <div v-if="day.hasTraining" :class="indicatorClasses"></div>
-    
+
     <!-- Race day indicator - integrated with exercise/off states -->
     <div
       v-if="day.trainingDay?.isRaceDay"
       class="absolute -top-1 -left-1 w-2 h-2 bg-red-500 rounded-full"
       title="Race Day"
     ></div>
-  </button>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -40,19 +35,11 @@ import type { CalendarDay } from '@/types'
 interface Props {
   day: CalendarDay
   compact?: boolean
-  hoverDate?: string | null
   dateMap?: Record<string, any>
   getEntryForDate?: (date: string) => any
 }
 
-interface Emits {
-  (e: 'click', date: string): void
-  (e: 'mouseenter', date: string): void
-  (e: 'mouseleave'): void
-}
-
 const props = defineProps<Props>()
-defineEmits<Emits>()
 
 const dayClasses = computed(() => {
   const base = props.compact
@@ -132,18 +119,7 @@ const textClasses = computed(() => {
   return props.day.isCurrentMonth ? 'font-medium' : 'font-normal'
 })
 
-// Hover classes for enhanced interactions (specs requirement)
-const hoverClasses = computed(() => {
-  const isHovering = props.hoverDate === props.day.date
-  
-  if (!props.day.isCurrentMonth) return ''
-  
-  if (isHovering) {
-    return 'hover:border-slate-200 hover:shadow-sm'
-  }
-  
-  return 'hover:border-slate-200 hover:shadow-sm'
-})
+// No hover classes - static display only
 
 // Tooltip text with training preview (specs requirement)
 const tooltipText = computed(() => {
