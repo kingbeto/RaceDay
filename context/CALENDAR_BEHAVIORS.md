@@ -1,279 +1,360 @@
-# 📅 Calendar Component Behavior Specification
+# 📅 Calendar Component Behaviors
 
-## Overview
+## 🎯 **Component Overview**
 
-This document outlines the detailed behaviors and interactions of the calendar component in the RaceDay training application. The calendar serves as the primary navigation interface for a training plan application, providing sophisticated visual states and seamless integration with the main training plan.
+The **CalendarView** and **CalendarDay** components provide the visual training calendar that displays the complete 16-week training plan with color-coded days to distinguish between training and rest days.
 
-## Core Architecture
+### **Primary Functions**
+- Display all training weeks and months
+- Color-code days (green for training, gray for rest)
+- Show training information via tooltips
+- Provide month-by-month navigation
+- Highlight current date and race days
 
-### Component Structure
-```
-CalendarView.vue          # Main calendar container with month management
-├── CalendarDay.vue       # Individual date cells with visual states
-├── useCalendar.ts        # Composable for data management and utilities
-└── TrainingPlanView.vue  # Main training plan display (integrated)
-```
+---
 
-### Data Flow
-1. **Training Plan Data** → `useCalendar` composable → **CalendarView**
-2. **Date Selection** → CalendarView → **TrainingPlanView** (cross-component)
-3. **Hover Events** → CalendarDay → **TrainingPlanView** (highlighting)
+## 🟢 **Color-Coding System**
 
-## Visual States & Priority System
+### **Day Type Classification**
+```typescript
+type DayType = 'exercise' | 'rest' | 'race' | 'off';
 
-### 1. State Priority Order (Highest to Lowest)
-
-#### 🥇 **Selected State** (User Interaction)
-- **Visual**: `border-2 border-amber-400` (thick yellow border)
-- **Behavior**: Remains highlighted until different date is clicked
-- **Priority**: Overrides all other visual states
-- **Trigger**: Click event on any calendar date
-
-#### 🥈 **Today Marker** (Temporal Indicator)
-- **Visual**: `text-amber-900 font-semibold` + 8px amber dot (`bg-amber-400`)
-- **Position**: Dot positioned absolutely in top-right corner
-- **Behavior**: Automatically identified using `new Date().toISOString().slice(0,10)`
-- **Persistence**: Remains distinct regardless of selection state
-
-#### 🥉 **Exercise/Off States** (Data-Driven)
-- **Exercise Days**: `bg-emerald-50 text-emerald-800` (light green theme)
-- **Rest Days**: `bg-slate-50 text-slate-700` (light gray theme)
-- **Data Source**: `isExercise: true/false` flag in JSON data
-- **Behavior**: Color applied based on data lookup, not text parsing
-
-#### 🏅 **Past Dates** (Temporal Context)
-- **Visual**: `opacity-60` (40% transparency)
-- **Calculation**: `new Date(date) < new Date(new Date().toDateString())`
-- **Behavior**: Provides temporal context without affecting functionality
-- **Interaction**: Fully clickable and hoverable
-
-#### 🏅 **Hover State** (Immediate Feedback)
-- **Visual**: `hover:border-slate-200` (light gray border)
-- **Transition**: Smooth 150ms transition
-- **Trigger**: Mouse enter/leave events
-- **Behavior**: Temporary visual feedback
-
-### 2. Race Day Integration
-- **Special State**: Red theme (`bg-red-50 text-red-900`)
-- **Indicator**: Red dot in top-left corner
-- **Priority**: Integrated with exercise/off state system
-- **Data**: `isRaceDay: true` flag
-
-## Interactive Behaviors
-
-### Click Events
-
-#### Date Selection Flow
-```javascript
-1. User clicks calendar date
-2. Emit 'date-select' event with date string
-3. Auto-expand month if collapsed
-4. Wait 100ms for month expansion animation
-5. Scroll to training plan section
-6. Auto-expand week if collapsed
-7. Scroll to specific day row (smooth, center)
-8. Highlight selected date with yellow border
+// Color mapping
+const dayColors = {
+  exercise: 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100',
+  rest: 'bg-slate-50 text-slate-700 hover:bg-slate-100',
+  race: 'bg-red-50 text-red-900 hover:bg-red-100',
+  off: 'text-gray-900 hover:bg-gray-50'
+};
 ```
 
-#### Auto-Expansion Logic
-- **Month Expansion**: If target month is collapsed → expand it
-- **Week Expansion**: If target week is collapsed → expand it
-- **Timing**: 100ms delay for smooth animations
-- **Scope**: Works for any month/week combination
+### **Visual Indicators**
+- **Background Color**: Shows day type at a glance
+- **Dot Indicator**: Small colored circle showing activity type
+- **Today Highlight**: Amber border and text for current date
+- **Race Day**: Red styling for competition days
 
-### Hover Events
+---
 
-#### Cross-Component Highlighting
-```javascript
-// On mouse enter:
-1. Set hoverDate state to current date
-2. Call highlightPlanForDate(dateString)
-3. Find plan row: #d-{dateString}
-4. Add: bg-amber-50 transition-all duration-200
-5. Find containing week with data-week-start/end
-6. Add: ring-2 ring-amber-300 ring-opacity-50
+## 📊 **Data Flow**
 
-// On mouse leave:
-1. Reset hoverDate to null
-2. Call clearPlanHighlights()
-3. Remove all temporary highlighting classes
-4. Reset transform effects
-```
+### **Calendar Data Structure**
+```typescript
+interface CalendarMonth {
+  name: string;        // "septiembre 2025"
+  year: number;        // 2025
+  month: number;       // 8 (0-based)
+  days: CalendarDay[];
+}
 
-#### Tooltip System
-- **Content**: `getEntryForDate()?.training` or fallback messages
-- **Display**: Browser native `title` attribute
-- **Examples**:
-  - "Long Z2 75–90 min"
-  - "Off day - rest and recovery"
-  - "Gym: Upper body strength"
-  - "No entry"
-
-## Scroll Synchronization
-
-### Automatic Scrolling Behavior
-```javascript
-scrollToTrainingPlan(dateString) {
-  // Step 1: Find and expand containing week
-  const week = findWeekByDate(dateString)
-  if (week.collapsed) {
-    week.open = true
-    await delay(100) // Allow expansion animation
-  }
-
-  // Step 2: Scroll to specific day row
-  const dayRow = document.querySelector(#d-{dateString})
-  dayRow.scrollIntoView({
-    behavior: 'smooth',
-    block: 'center'
-  })
+interface CalendarDay {
+  date: string;        // "2025-09-15"
+  day: number;         // 15
+  isCurrentMonth: boolean;
+  isToday: boolean;
+  isSelected: boolean;
+  hasTraining: boolean;
+  trainingDay?: {
+    training: string;
+    isExercise: boolean;
+    isRaceDay: boolean;
+  };
 }
 ```
 
-### Week Detection Algorithm
-- **Selector**: `[data-week-start]` and `[data-week-end]`
-- **Comparison**: `dateString >= start && dateString <= end`
-- **Edge Cases**: Handles dates at week boundaries correctly
+### **Data Processing**
+```typescript
+// Build months from training plan
+const months = computed(() => {
+  const plan = trainingPlan.value;
+  const monthsArray = [];
 
-## State Management
-
-### Reactive State Variables
-```javascript
-{
-  todayStr: '2025-08-19',           // Current date (ISO format)
-  selectedDate: '2025-08-20',       // User-selected date
-  hoverDate: '2025-08-21',          // Currently hovered date
-  expandedMonths: Set([0, 1, 2]),  // Expanded month indices
-  dateMap: {                        // Fast lookup cache
-    '2025-08-19': {
-      training: 'Off day',
-      isExercise: false,
-      calories: 2100
-    }
+  // Generate all months from start to end date
+  for (let current = startDate; current <= endDate; current.setMonth(current.getMonth() + 1)) {
+    const month = buildMonth(current, plan);
+    monthsArray.push(month);
   }
+
+  return monthsArray;
+});
+
+// Create individual calendar days
+const createCalendarDay = (date, isCurrentMonth, today, plan) => {
+  const dateString = date.toISOString().split('T')[0];
+  const trainingDay = findTrainingDay(plan, dateString);
+
+  return {
+    date: dateString,
+    day: date.getDate(),
+    isCurrentMonth,
+    isToday: dateString === today.toDateString(),
+    hasTraining: !!trainingDay,
+    trainingDay
+  };
+};
+```
+
+---
+
+## 🎨 **Visual Layout**
+
+### **Month Display Structure**
+```
+┌─ September 2025 ──────────────────────────────┐
+│  Sun  Mon  Tue  Wed  Thu  Fri  Sat           │
+│                                               │
+│         1    2    3    4    5    6    7       │
+│   8    9   10   11   12   13   14   15       │
+│  16   17   18   19   20   21   22   23       │
+│  24   25   26   27   28   29   30   31       │
+│                                               │
+│  [Legend] [Training Days] [Rest Days]        │
+└───────────────────────────────────────────────┘
+```
+
+### **Day Cell Structure**
+```
+┌─────────┐
+│   15    │ ← Day number
+│   ●     │ ← Activity indicator (green/gray dot)
+│  [Today]│ ← Today indicator (amber)
+└─────────┘
+```
+
+---
+
+## 🔄 **Component Interactions**
+
+### **CalendarView Props**
+```typescript
+interface CalendarViewProps {
+  trainingPlan: TrainingPlan | null;
+  selectedDate: string | null;
+  compact?: boolean;
 }
 ```
 
-### Data Lookup Performance
-- **Primary**: `dateMap[dateString]` (O(1) lookup)
-- **Fallback**: `getEntryForDate(dateString)` function
-- **Cache Strategy**: Computed property with reactive updates
-
-## Responsive Behavior
-
-### Mobile Adaptations
-- **Touch Targets**: Minimum 44px tap targets maintained
-- **Hover States**: Disabled on touch devices via CSS media queries
-- **Scrolling**: Native touch scrolling for month containers
-- **Layout**: Calendar moves below main content on narrow screens
-
-### Tablet Considerations
-- **Spacing**: Increased padding for finger navigation
-- **Font Sizes**: Slightly larger text for readability
-- **Interaction**: Hybrid mouse/touch support with proper event handling
-
-## Performance Optimizations
-
-### Efficient Rendering
-- **Template Loops**: Alpine.js `x-for` with proper `:key` attributes
-- **Conditional Classes**: `:class` bindings for dynamic styling
-- **Event Delegation**: Minimal event listeners through Vue directives
-- **Virtual Scrolling**: Not needed (reasonable dataset size)
-
-### Memory Management
-- **State Cleanup**: Proper null assignment on component destruction
-- **Event Cleanup**: Automatic cleanup through Vue lifecycle
-- **DOM References**: No direct DOM manipulation, all through reactive state
-- **Debouncing**: Rapid interactions handled gracefully
-
-## Accessibility Features
-
-### Keyboard Navigation
-- **Tab Order**: Logical tab sequence through calendar dates
-- **Focus Indicators**: Clear visual focus states with `focus:ring-2`
-- **Enter/Space**: Activate date selection
-- **Arrow Keys**: Month navigation (future enhancement)
-
-### Screen Reader Support
-- **ARIA Labels**: Descriptive labels for date buttons
-- **Live Regions**: Dynamic content announcements
-- **Semantic HTML**: Proper `<button>` elements for interactions
-- **Alt Text**: Meaningful descriptions for visual indicators
-
-### Color Accessibility
-- **Contrast Ratios**: All color combinations meet WCAG AA standards
-- **Pattern Support**: Visual indicators beyond color (dots, borders)
-- **High Contrast**: Compatible with system high contrast modes
-- **Color Blindness**: Multiple visual cues for state indication
-
-## Error Handling & Edge Cases
-
-### Missing Data Scenarios
-- **Empty Training Data**: Shows "No entry" in tooltips
-- **Missing Dates**: Graceful fallback to default styling
-- **Invalid Dates**: Proper date validation and error boundaries
-- **Network Errors**: Cached data with offline capability
-
-### Boundary Conditions
-- **Month Transitions**: Proper handling of month-end dates
-- **Leap Years**: Correct day calculations for February 29
-- **Timezone Issues**: UTC-based calculations prevent shifts
-- **Date Range Limits**: Proper handling of plan start/end boundaries
-
-### User Interaction Conflicts
-- **Rapid Clicking**: Debounced to prevent multiple rapid selections
-- **Simultaneous Hover/Click**: Click takes precedence over hover states
-- **Touch vs Mouse**: Proper event handling for hybrid devices
-- **Multi-Touch**: Single-touch interaction model maintained
-
-## Integration Patterns
-
-### Training Plan Synchronization
-```javascript
-// When calendar date is selected:
-1. Update selectedDate in training store
-2. Find corresponding week and expand if needed
-3. Scroll to specific training day row
-4. Apply visual selection indicators
-5. Update URL/state for bookmarking
+### **CalendarDay Props**
+```typescript
+interface CalendarDayProps {
+  day: CalendarDay;
+  compact?: boolean;
+  dateMap?: Record<string, any>;
+  getEntryForDate?: (date: string) => any;
+}
 ```
 
-### Nutrition Modal Integration
-```javascript
-// When training day is clicked:
-1. Extract date from clicked element
-2. Load nutrition data for that date
-3. Open nutrition modal with pre-populated data
-4. Handle loading states and error conditions
+### **Data Lookup Methods**
+```typescript
+// Fast lookup for training data
+const dateMap = computed(() => {
+  const map = {};
+  trainingPlan.value.weeks.forEach(week => {
+    week.rows.forEach(day => {
+      map[day.date] = {
+        training: day.training,
+        isExercise: day.isExercise,
+        isRaceDay: day.isRaceDay
+      };
+    });
+  });
+  return map;
+});
+
+// Get entry for specific date
+const getEntryForDate = (dateString) => {
+  return dateMap.value[dateString] || null;
+};
 ```
 
-### Grocery List Coordination
-```javascript
-// When week is selected for groceries:
-1. Identify week boundaries from training plan
-2. Load corresponding grocery data
-3. Filter items by training intensity
-4. Display organized shopping list
+---
+
+## 🎯 **Behavior Logic**
+
+### **Day Classification Logic**
+```typescript
+const getDayClassification = (day: CalendarDay) => {
+  // Priority 1: Race days
+  if (day.trainingDay?.isRaceDay) {
+    return 'race';
+  }
+
+  // Priority 2: Exercise vs rest
+  if (day.hasTraining && day.trainingDay?.isExercise) {
+    return 'exercise';
+  }
+
+  if (day.hasTraining && !day.trainingDay?.isExercise) {
+    return 'rest';
+  }
+
+  // Priority 3: Non-training days
+  return 'off';
+};
 ```
 
-## Future Enhancement Considerations
+### **Color Application Logic**
+```typescript
+const applyDayStyling = (day: CalendarDay) => {
+  const classification = getDayClassification(day);
+  const baseStyles = 'relative p-2 text-sm rounded-md border border-transparent';
 
-### Advanced Features
-- **Date Range Selection**: Multi-date selection for planning
-- **Recurring Events**: Pattern-based training schedules
-- **Calendar Sharing**: Export/import functionality
-- **Offline Synchronization**: PWA capabilities
+  // Apply classification-specific colors
+  switch (classification) {
+    case 'exercise':
+      return `${baseStyles} bg-emerald-50 text-emerald-800 hover:bg-emerald-100`;
+    case 'rest':
+      return `${baseStyles} bg-slate-50 text-slate-700 hover:bg-slate-100`;
+    case 'race':
+      return `${baseStyles} bg-red-50 text-red-900 hover:bg-red-100`;
+    default:
+      return `${baseStyles} text-gray-900 hover:bg-gray-50`;
+  }
+};
+```
 
-### Performance Improvements
-- **Virtual Scrolling**: For very large training plans
-- **Lazy Loading**: On-demand data fetching
-- **Web Workers**: Heavy computation off main thread
-- **Service Workers**: Advanced caching strategies
+---
 
-### Accessibility Enhancements
-- **Voice Commands**: Speech-to-text navigation
-- **Gesture Support**: Advanced touch interactions
-- **Screen Reader Optimization**: Custom ARIA implementations
-- **Keyboard Shortcuts**: Power user functionality
+## 📱 **Responsive Behavior**
 
-This specification ensures consistent, predictable, and accessible behavior across all calendar interactions while maintaining high performance and usability standards.
+### **Mobile Layout**
+- Compact 7-column grid
+- Smaller day cells
+- Essential information only
+- Touch-friendly sizing
+
+### **Tablet Layout**
+- Medium-sized grid
+- More spacing
+- Better readability
+- Balanced information density
+
+### **Desktop Layout**
+- Full-sized grid
+- Maximum information display
+- Enhanced visual hierarchy
+- Optimized for reference use
+
+---
+
+## 🎨 **Visual States**
+
+### **Current Month Days**
+- Full opacity and color
+- Interactive hover states
+- Complete information display
+- Training indicators visible
+
+### **Adjacent Month Days**
+- Reduced opacity (60%)
+- Muted colors
+- Limited interactivity
+- Contextual information only
+
+### **Today Highlight**
+- Amber border (`border-amber-400`)
+- Bold text (`font-semibold`)
+- Special today indicator dot
+- Enhanced visibility
+
+### **Selected Day**
+- Yellow border (`border-amber-400`)
+- Maintained day color background
+- Visual selection feedback
+- Current focus indication
+
+---
+
+## 🔍 **Information Display**
+
+### **Tooltip Information**
+```typescript
+const getTooltipText = (day: CalendarDay) => {
+  if (!day.isCurrentMonth) return '';
+
+  const entry = getEntryForDate(day.date);
+
+  if (entry) {
+    return entry.training || 'Training scheduled';
+  }
+
+  if (day.trainingDay?.isExercise === false) {
+    return 'Rest day - recovery and preparation';
+  }
+
+  if (day.hasTraining) {
+    return 'Training day scheduled';
+  }
+
+  return 'No training scheduled';
+};
+```
+
+### **Legend Information**
+- **🟢 Green**: Exercise/Training Days
+- **⚫ Gray**: Rest/Recovery Days
+- **🔴 Red**: Race Days
+- **🟡 Amber**: Today
+- **🔵 Blue**: Selected Day
+
+---
+
+## ✅ **Quality Assurance**
+
+### **Data Integrity Checks**
+- [ ] All months display correctly
+- [ ] Training days have complete information
+- [ ] Color-coding matches training data
+- [ ] Date ranges cover complete plan
+- [ ] No missing or duplicate days
+
+### **Visual Consistency**
+- [ ] Color scheme applied uniformly
+- [ ] Typography hierarchy maintained
+- [ ] Responsive layout works across devices
+- [ ] Legend information accurate
+- [ ] Today/selected states visible
+
+### **Performance Verification**
+- [ ] Fast rendering of all months
+- [ ] Efficient data lookup
+- [ ] Smooth scrolling between months
+- [ ] No memory leaks
+- [ ] Optimized re-renders
+
+---
+
+## 📝 **Usage Guidelines**
+
+### **Standard Usage**
+```vue
+<CalendarView
+  :training-plan="currentTrainingPlan"
+  :selected-date="selectedDate"
+  :compact="false"
+/>
+```
+
+### **Compact Display**
+```vue
+<CalendarView
+  :training-plan="currentTrainingPlan"
+  :selected-date="selectedDate"
+  :compact="true"
+/>
+```
+
+### **Custom Styling**
+```vue
+<CalendarView
+  :training-plan="currentTrainingPlan"
+  :selected-date="selectedDate"
+  class="custom-calendar"
+/>
+```
+
+---
+
+**Component Version**: 1.0
+**Last Updated**: December 2024
+**Author**: RaceDay Development Team

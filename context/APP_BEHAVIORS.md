@@ -1,348 +1,343 @@
-# 🏃‍♂️ RaceDay Application Behavior Specification
+# 🧭 Main Application Behaviors
 
-## Overview
+## 🎯 **Application Overview**
 
-This document outlines the comprehensive behaviors and interactions of the RaceDay training and nutrition planning application. RaceDay is designed for managing multi-day race training programs with integrated nutrition planning and grocery management.
+**RaceDay** is a comprehensive static web application designed for ultra-endurance athletes preparing for events like El Cruce de los Andes. The application provides a complete visual training and nutrition planning experience with no interactive elements, serving as a static reference throughout an athlete's training cycle.
 
-## Application Architecture
+### **Core Architecture**
+- **Static Data Display**: No dynamic state changes or API calls
+- **Component-Based**: Modular Vue 3 Composition API architecture
+- **Responsive Design**: Mobile-first approach with Tailwind CSS
+- **Type-Safe**: Full TypeScript implementation
+- **Performance Optimized**: Fast loading and efficient rendering
 
-### Core Components Structure
+---
+
+## 🔒 **Static Behavior Requirements**
+
+### **Application State Management**
+- **Zero Reactivity**: No reactive data updates
+- **Pre-configured Data**: All information embedded in application
+- **No User Input**: Read-only interface throughout
+- **Static Navigation**: Single-page application structure
+- **No API Dependencies**: Self-contained data and functionality
+
+### **User Experience Guidelines**
+- **Information Density**: Optimized for reference and planning
+- **Visual Hierarchy**: Clear information organization
+- **Accessibility**: Screen reader friendly and keyboard navigation ready
+- **Performance**: Fast initial load and smooth scrolling
+- **Mobile Optimization**: Touch-friendly on all devices
+
+---
+
+## 🏗️ **Application Structure**
+
+### **Main Layout Components**
 ```
-RaceDay App
-├── HomePage.vue              # Main dashboard with 3-column layout
-│   ├── CalendarView.vue      # Left sidebar: Training calendar
-│   ├── TrainingPlanView.vue  # Main content: Weekly training schedule
-│   └── Shopping/Grocery      # Right sidebar: Smart grocery lists
-│
-├── NutritionModal.vue        # Detailed meal planning modal
-├── WeeklyMealsModal.vue      # Print-ready weekly meal tables
-└── GlobalTooltip.vue         # System-wide tooltip management
-```
-
-### State Management Architecture
-```javascript
-// Pinia Stores (Reactive State)
-TrainingStore    // Training plan data, selections, expansions
-NutritionStore   // Meal planning, macros, recipes
-GroceryStore     // Shopping lists, ingredients, categories
-
-// Composables (Business Logic)
-useCalendar      // Calendar data, date utilities, navigation
-useWeeklyMeals   // Meal table management, printing
-useTooltips      // Training explanations, UI feedback
-useTrainingData  // Training plan processing, validation
-```
-
-## User Interaction Flows
-
-### 1. Primary User Journey
-
-#### Initial Load Flow
-```javascript
-1. App loads → Load training plan data
-2. Auto-select today's date (if within plan range)
-3. Auto-expand current week containing today
-4. Scroll to today's training row
-5. Load nutrition and grocery data
-6. Display dashboard with calendar, training, and shopping
-```
-
-#### Calendar-Driven Navigation
-```javascript
-User clicks calendar date:
-1. Visual feedback (yellow border, amber background)
-2. Auto-expand containing month (if collapsed)
-3. Auto-expand containing week (if collapsed)
-4. Smooth scroll to training day row
-5. Update URL/state for bookmarking
-6. Load nutrition data for selected date
-7. Update "Today's Focus" sidebar
-```
-
-### 2. Training Plan Interactions
-
-#### Week Expansion/Collapse
-```javascript
-Click week summary:
-1. Toggle details.open state
-2. Animate height transition (300ms)
-3. Update expandedWeeks Set in store
-4. Maintain scroll position if possible
-5. Update visual indicators (arrow rotation)
+┌─────────────────────────────────────────────────────┐
+│  🏔️ RaceDay - Training & Nutrition Planner          │
+│  Dec 1, 2025 • 16-Week Plan • El Cruce de los Andes │
+├─────────────────────────────────────────────────────┤
+│                                                     │
+│  ┌─ Calendar ──────────┐  ┌─ Training Details ──┐   │
+│  │  Aug Sep Oct Nov Dec │  │  Week 5 (Sep 22)    │   │
+│  │  🟢🟢⚫🟢⚫🟢🟢⚫     │  │  Mon: Gym Lower       │   │
+│  │  🟢⚫🟢⚫⚫🟢🟢⚫     │  │  Tue: Stairs + Gym    │   │
+│  │  🟢🟢⚫🟢🟢🟢⚫🟢     │  │  Wed: Z2 Run          │   │
+│  │  [Months continue]   │  │  [Days continue]    │   │
+│  └─────────────────────┘  └─────────────────────┘   │
+│                                                     │
+│  ┌─ Nutrition Guide ───┐  ┌─ Grocery List ──────┐   │
+│  │  🍽️ Daily Nutrition │  │  🛒 Week 5 Shopping │   │
+│  │  2,300 calories     │  │  🥬 Produce          │   │
+│  │  Protein: 130g      │  │  🍖 Proteins         │   │
+│  │  Carbs: 320g        │  │  🌾 Grains           │   │
+│  │  Fats: 80g          │  │  [Categories...]     │   │
+│  └─────────────────────┘  └─────────────────────┘   │
+│                                                     │
+│  📊 Progress: 31% • Build Phase • 11 weeks to race  │
+└─────────────────────────────────────────────────────┘
 ```
 
-#### Training Day Selection
-```javascript
-Click training day row:
-1. Update selectedDate in training store
-2. Apply row highlighting (amber background)
-3. Load nutrition modal data
-4. Update calendar selection indicator
-5. Maintain week expansion state
+### **Component Hierarchy**
+```
+App.vue
+├── Header (RaceDay branding, race date)
+├── Main Layout (Grid system)
+│   ├── Sidebar (Left side)
+│   │   ├── Today's Focus (Top priority - dynamic daily focus with top-right intensity badges)
+│   │   ├── CalendarView (All months)
+│   │   └── GroceryList (Weekly shopping)
+│   └── Main Content (Right side)
+│       └── TrainingPlanView (All weeks visible - no scroll, single header)
+└── Footer (Progress indicators)
 ```
 
-#### Nutrition Modal Flow
-```javascript
-Click nutrition button:
-1. Extract date from clicked element
-2. Load nutrition data for date
-3. Show loading spinner during fetch
-4. Display modal with meal details
-5. Handle modal close (ESC, overlay click)
-6. Reset modal state on close
+---
+
+## 📊 **Data Flow Architecture**
+
+### **Static Data Sources**
+```typescript
+// Training plan data (16 weeks)
+const trainingPlan = {
+  id: 'el-cruce-2025',
+  title: 'El Cruce — Minimal Day-by-Day Plan',
+  weeks: [/* W0 through W14 + Race */],
+  startDate: '2025-08-19',
+  endDate: '2025-12-03'
+};
+
+// Nutrition profiles
+const nutritionProfiles = {
+  exercise: { calories: 2300, protein: 130, carbs: 320, fats: 80 },
+  rest: { calories: 2100, protein: 140, carbs: 240, fats: 70 }
+};
+
+// Grocery categories
+const groceryCategories = [
+  'produce', 'proteins', 'grains', 'dairy', 'pantry', 'beverages', 'snacks'
+];
 ```
 
-### 3. Grocery Management Flow
-
-#### Week Selection for Shopping
-```javascript
-Select training week:
-1. Identify week boundaries
-2. Load grocery data for week
-3. Filter by training intensity
-4. Display categorized shopping list
-5. Enable print functionality
-6. Update shopping cart state
+### **Component Communication**
+```typescript
+// Props-based data flow (no emits/events)
+<CalendarView :training-plan="plan" :selected-date="'2025-09-15'" />
+<TrainingPlanView :plan="plan" :is-expanded="true" />
+<GroceryList :week-id="'W5'" :training-plan="plan" />
 ```
 
-### 4. Print Functionality
+### **Data Processing Pipeline**
+1. **Raw Training Data** → Weeks W0-W14 + Race
+2. **Calendar Processing** → Month-by-month display
+3. **Nutrition Calculation** → Per-day requirements
+4. **Grocery Alignment** → Weekly shopping lists
+5. **Visual Rendering** → Color-coded display
 
-#### Weekly Meal Table Print
-```javascript
-Click "📋 Meals" button:
-1. Generate weekly meal table
-2. Open print-optimized modal
-3. Apply print-specific CSS
-4. Handle browser print dialog
-5. Maintain table formatting in print
+---
+
+## 🎨 **Visual Design System**
+
+### **Color Palette Application**
+- **Brand Colors**: Blue to purple gradient for RaceDay branding
+- **Training States**: Green for exercise, gray for rest, red for race
+- **Phase Indicators**: Different colors for each training phase
+- **Status Colors**: Amber for today, blue for selected, gray for past
+
+### **Typography Scale**
+- **Headers**: 18px-32px, Bold, Gradient text for branding
+- **Subheaders**: 16px-18px, Semibold for section titles
+- **Body Text**: 14px-16px, Regular for content
+- **Labels/Captions**: 12px-14px, Medium for metadata
+- **Small Text**: 11px-13px, Regular for notes
+
+### **Spacing System**
+- **Component Padding**: 16px-24px internal spacing
+- **Section Margins**: 24px-32px between sections
+- **Grid Gaps**: 12px-16px between grid items
+- **Card Spacing**: 20px-32px card content padding
+
+---
+
+## 📱 **Responsive Breakpoints**
+
+### **Mobile (320px - 767px)**
+- Single column layout
+- Compact calendar (7 columns)
+- Stacked training cards
+- Touch-friendly sizing
+- Vertical scrolling
+
+### **Tablet (768px - 1023px)**
+- Two-column layout
+- Medium calendar display
+- Side-by-side elements
+- Enhanced readability
+- Balanced information density
+
+### **Desktop (1024px+)**
+- Full three-section layout
+- Large calendar display
+- Multi-column training view
+- Maximum information display
+- Optimal visual hierarchy
+
+---
+
+## 🔄 **Component Lifecycle**
+
+### **Application Initialization**
+```typescript
+// 1. Load static training data
+const trainingPlan = loadTrainingPlan();
+
+// 2. Initialize calendar data
+const calendarData = processCalendarData(trainingPlan);
+
+// 3. Set up nutrition profiles
+const nutritionData = calculateNutritionProfiles(trainingPlan);
+
+// 4. Generate grocery lists
+const groceryData = generateGroceryLists(trainingPlan);
+
+// 5. Render application
+renderApp({
+  trainingPlan,
+  calendarData,
+  nutritionData,
+  groceryData
+});
 ```
 
-#### Grocery List Print
-```javascript
-Click "View Shopping List":
-1. Format grocery data for printing
-2. Apply print-optimized layout
-3. Include week information
-4. Handle print dialog
-5. Reset to web view after printing
+### **Component Mounting Sequence**
+1. **App.vue** - Main application container
+2. **Header** - Branding and navigation
+3. **CalendarView** - Month-by-month calendar
+4. **TrainingPlanView** - Weekly training details
+5. **GroceryList** - Shopping organization
+6. **NutritionCard** - Daily nutrition display
+
+### **Data Binding Strategy**
+- **One-way Data Flow**: Props from parent to child components
+- **Computed Properties**: Efficient data transformations
+- **Static Computations**: Pre-calculated values
+- **Memoization**: Cached expensive operations
+
+---
+
+## 🎯 **Performance Optimization**
+
+### **Bundle Optimization**
+- **Tree Shaking**: Unused code elimination
+- **Code Splitting**: Component-based loading
+- **Asset Optimization**: Compressed images and fonts
+- **CSS Optimization**: Tailwind purging and minification
+
+### **Runtime Performance**
+- **Virtual Scrolling**: Efficient large list rendering
+- **Lazy Loading**: On-demand component loading
+- **Memoization**: Cached computations
+- **Efficient Re-renders**: Minimal DOM updates
+
+### **Loading Strategy**
+- **Initial Load**: Fast first contentful paint
+- **Progressive Enhancement**: Layered content loading
+- **Caching Strategy**: Browser caching for assets
+- **Offline Capability**: Service worker for caching
+
+---
+
+## ✅ **Quality Assurance Standards**
+
+### **Code Quality**
+- [ ] TypeScript strict mode enabled
+- [ ] ESLint rules enforced
+- [ ] Component prop validation
+- [ ] Error boundary implementation
+- [ ] Accessibility compliance (WCAG 2.1)
+
+### **Performance Benchmarks**
+- [ ] First Contentful Paint < 1.5s
+- [ ] Largest Contentful Paint < 2.5s
+- [ ] Cumulative Layout Shift < 0.1
+- [ ] First Input Delay: N/A (static)
+- [ ] Bundle size < 500KB gzipped
+
+### **Cross-browser Compatibility**
+- [ ] Chrome 90+ support
+- [ ] Firefox 88+ support
+- [ ] Safari 14+ support
+- [ ] Edge 90+ support
+- [ ] Mobile Safari support
+
+---
+
+## 📝 **Development Workflow**
+
+### **Build Process**
+```bash
+# Development
+npm run dev        # Vite dev server with HMR
+npm run build      # Production build
+npm run preview    # Preview production build
+npm run type-check # TypeScript validation
 ```
 
-## Data Management Behaviors
-
-### Training Plan Data Flow
-```javascript
-// Data Loading Sequence
-1. Load el-cruce-plan.json
-2. Parse training weeks and days
-3. Build dateMap for fast lookups
-4. Initialize calendar months
-5. Set up week expansions
-6. Load nutrition data
-7. Load grocery data
-8. Initialize UI state
+### **Code Organization**
+```
+src/
+├── components/     # Vue components
+│   ├── calendar/   # Calendar components
+│   ├── training/   # Training display
+│   ├── nutrition/  # Nutrition components
+│   └── ui/         # Reusable UI components
+├── composables/    # Vue composables
+├── data/          # Static data files
+├── types/         # TypeScript definitions
+└── styles/        # Global styles
 ```
 
-### Nutrition Data Integration
-```javascript
-// Meal Planning Logic
-For each training day:
-- Exercise day: ~2300 calories (higher protein/carb)
-- Rest day: ~2100 calories (balanced macros)
-- Race day: Special fueling strategy
-- Load authentic Argentine recipes
-- Calculate macro breakdowns
-- Handle meal timing (Desayuno, Almuerzo, Merienda, Cena)
-```
+### **Version Control**
+- **Conventional Commits**: Structured commit messages
+- **Semantic Versioning**: Version numbering scheme
+- **Branch Strategy**: Feature branches with PR reviews
+- **Documentation**: Updated with each release
 
-### Grocery List Generation
-```javascript
-// Shopping List Logic
-Based on training intensity:
-- Light weeks: Standard grocery items
-- Build weeks: Increased protein/carb items
-- Peak weeks: Race fuel items
-- Taper weeks: Recovery nutrition
-- Race week: Specialized provisions
-```
+---
 
-## Responsive Design Behaviors
+## 🔧 **Maintenance Procedures**
 
-### Desktop Layout (≥1024px)
-```
-┌─────────────────┬──────────────────────┬─────────────────┐
-│                 │                      │                 │
-│   Calendar      │   Training Plan      │   Shopping      │
-│   Sidebar       │   Main Content       │   Sidebar       │
-│   (4 columns)   │   (8 columns)        │   (4 columns)   │
-│                 │                      │                 │
-└─────────────────┴──────────────────────┴─────────────────┘
-```
+### **Data Updates**
+1. Update training plan JSON files
+2. Regenerate computed data structures
+3. Update component prop interfaces
+4. Test visual consistency
+5. Update documentation
 
-### Tablet Layout (768px - 1023px)
-```
-┌─────────────────┬──────────────────────┐
-│                 │                      │
-│   Calendar      │   Training Plan      │
-│   (5 columns)   │   (11 columns)       │
-│                 │                      │
-├─────────────────┴──────────────────────┤
-│   Shopping Sidebar (full width)        │
-└────────────────────────────────────────┘
-```
+### **Component Changes**
+1. Update component interfaces
+2. Maintain backward compatibility
+3. Update visual design system
+4. Test responsive behavior
+5. Update documentation
 
-### Mobile Layout (<768px)
-```
-┌────────────────────────────────────────┐
-│   Header with Race Date Badge          │
-├────────────────────────────────────────┤
-│   Calendar (full width, collapsible)   │
-├────────────────────────────────────────┤
-│   Training Plan (full width)           │
-├────────────────────────────────────────┤
-│   Shopping (full width, collapsible)   │
-└────────────────────────────────────────┘
-```
+### **Performance Monitoring**
+1. Monitor bundle size changes
+2. Track loading performance
+3. Analyze component render times
+4. Optimize based on metrics
+5. Update performance budgets
 
-## Performance Optimization Behaviors
+---
 
-### Lazy Loading Strategy
-```javascript
-// Component Loading
-- Calendar: Load immediately (critical)
-- Training weeks: Load on demand
-- Nutrition modals: Load when opened
-- Grocery lists: Load when week selected
-- Print views: Load when print requested
-```
+## 📚 **Integration Guidelines**
 
-### Caching Strategy
-```javascript
-// Data Persistence
-- Training plan: Cache in memory + localStorage
-- Nutrition data: Cache per date
-- Grocery data: Cache per week
-- User preferences: Persist across sessions
-- Print settings: Remember user choices
-```
+### **Third-party Dependencies**
+- **Vue 3**: Core framework (Composition API)
+- **Vite**: Build tool and dev server
+- **Tailwind CSS**: Utility-first styling
+- **TypeScript**: Type safety and developer experience
+- **ESLint**: Code quality and consistency
 
-### Memory Management
-```javascript
-// Cleanup Behaviors
-- Close modals: Clear modal data
-- Navigate away: Clear unused data
-- Week collapse: Remove expanded content
-- Component unmount: Clear event listeners
-- Memory warnings: Aggressive cleanup
-```
+### **Browser Support Matrix**
+| Browser | Version | Support Level |
+|---------|---------|---------------|
+| Chrome  | 90+    | Full          |
+| Firefox | 88+    | Full          |
+| Safari  | 14+    | Full          |
+| Edge    | 90+    | Full          |
+| Mobile Safari | 14+ | Full      |
 
-## Error Handling Behaviors
+### **Device Compatibility**
+- **iOS**: Safari 14+ on iPhone/iPad
+- **Android**: Chrome 90+ on Android devices
+- **Desktop**: All modern desktop browsers
+- **Tablet**: iPad and Android tablets
 
-### Network Error Recovery
-```javascript
-// Graceful Degradation
-1. Network fails → Show cached data
-2. Cache empty → Show skeleton loading
-3. Partial data → Show available content
-4. Complete failure → Show error page with retry
-5. Recovery → Refresh data automatically
-```
+---
 
-### Data Validation
-```javascript
-// Input Validation
-- Date ranges: Validate within plan bounds
-- Nutrition data: Check macro calculations
-- Grocery items: Validate quantities
-- Training data: Verify exercise flags
-- Print data: Ensure formatting integrity
-```
-
-### User Input Handling
-```javascript
-// Form Validation
-- Required fields: Prevent submission
-- Date inputs: Validate format and range
-- Number inputs: Check min/max values
-- Text inputs: Sanitize and validate length
-- File uploads: Check size and type
-```
-
-## Accessibility Behaviors
-
-### Keyboard Navigation
-```javascript
-// Focus Management
-- Tab order: Logical progression through UI
-- Enter/Space: Activate interactive elements
-- Escape: Close modals and menus
-- Arrow keys: Navigate calendars and lists
-- Focus indicators: High-contrast visual feedback
-```
-
-### Screen Reader Support
-```javascript
-// ARIA Implementation
-- Labels: Descriptive aria-labels for buttons
-- Live regions: Announce dynamic content
-- Roles: Proper semantic roles for components
-- Descriptions: Detailed aria-describedby
-- States: Dynamic aria-expanded/aria-selected
-```
-
-### Touch Interface
-```javascript
-// Mobile Interactions
-- Touch targets: Minimum 44px size
-- Swipe gestures: Navigate between weeks
-- Long press: Context menus
-- Pinch zoom: Scale calendar view
-- Drag and drop: Reorder grocery items
-```
-
-## Print Optimization Behaviors
-
-### Print Media Queries
-```css
-/* Print Styles */
-@media print {
-  .no-print { display: none; }
-  .print-break { page-break-before: always; }
-  .print-table { font-size: 12pt; }
-  .print-header { background: white !important; }
-}
-```
-
-### Print Content Preparation
-```javascript
-// Print Data Formatting
-1. Extract relevant data for printing
-2. Format tables for print layout
-3. Add page headers/footers
-4. Optimize font sizes and spacing
-5. Handle page breaks intelligently
-6. Include print-specific instructions
-```
-
-## Future Enhancement Behaviors
-
-### Advanced Features
-```javascript
-// Planned Behaviors
-- Offline mode: Service worker caching
-- Push notifications: Training reminders
-- GPS tracking: Route logging
-- Social features: Plan sharing
-- AI recommendations: Smart suggestions
-```
-
-### Scalability Considerations
-```javascript
-// Performance Scaling
-- Large plans: Virtual scrolling
-- Many users: Database integration
-- Complex data: Optimized queries
-- Mobile users: Progressive Web App
-- Global users: Internationalization
-```
-
-This comprehensive behavior specification ensures consistent, predictable, and accessible user experiences across all RaceDay application interactions while maintaining high performance and scalability standards.
+**Application Version**: 1.0
+**Last Updated**: December 2024
+**Author**: RaceDay Development Team

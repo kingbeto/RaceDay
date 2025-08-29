@@ -87,20 +87,38 @@ const dayClasses = computed(() => {
     classes += ' text-amber-900 font-semibold'
   }
 
-  // Priority 3: Exercise/Off Color (data-driven background)
-  if (props.day.hasTraining) {
-    if (props.day.trainingDay?.isRaceDay) {
+  // Priority 3: Exercise/Off Color (data-driven background) - Apply to ALL days in training plan
+  if (props.day.hasTraining && props.day.trainingDay) {
+    if (props.day.trainingDay.isRaceDay) {
       // Race days - red theme
       classes += ' bg-red-50 text-red-900 hover:bg-red-100'
-    } else if (props.day.trainingDay?.isExercise) {
+    } else if (props.day.trainingDay.isExercise) {
       // Exercise days - emerald/green theme
       classes += ' bg-emerald-50 text-emerald-800 hover:bg-emerald-100'
     } else {
       // Off days - slate/gray theme
       classes += ' bg-slate-50 text-slate-700 hover:bg-slate-100'
     }
+  } else if (props.day.hasTraining) {
+    // Days with training data but no detailed trainingDay info - check via dateMap
+    const entry = props.getEntryForDate ? props.getEntryForDate(props.day.date) : null
+    if (entry) {
+      if (entry.isRaceDay) {
+        // Race days - red theme
+        classes += ' bg-red-50 text-red-900 hover:bg-red-100'
+      } else if (entry.isExercise) {
+        // Exercise days - emerald/green theme
+        classes += ' bg-emerald-50 text-emerald-800 hover:bg-emerald-100'
+      } else {
+        // Off days - slate/gray theme
+        classes += ' bg-slate-50 text-slate-700 hover:bg-slate-100'
+      }
+    } else {
+      // Default for days with training but no data
+      classes += ' text-gray-900 hover:bg-gray-50'
+    }
   } else {
-    // Default empty days
+    // Default empty days (not in training plan)
     classes += ' text-gray-900 hover:bg-gray-50'
   }
 
@@ -152,19 +170,32 @@ const tooltipText = computed(() => {
 
 const indicatorClasses = computed(() => {
   const base = 'absolute bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 rounded-full'
-  
+
   if (!props.day.hasTraining || !props.day.isCurrentMonth) {
     return `${base} opacity-0`
   }
-  
+
+  // Check trainingDay first, then fallback to dateMap
   if (props.day.trainingDay?.isRaceDay) {
     return `${base} bg-red-500`
   }
-  
+
   if (props.day.trainingDay?.isExercise) {
     return `${base} bg-primary-500`
   }
-  
+
+  // Fallback to dateMap for days without detailed trainingDay info
+  const entry = props.getEntryForDate ? props.getEntryForDate(props.day.date) : null
+  if (entry) {
+    if (entry.isRaceDay) {
+      return `${base} bg-red-500`
+    }
+
+    if (entry.isExercise) {
+      return `${base} bg-primary-500`
+    }
+  }
+
   return `${base} bg-gray-500`
 })
 </script>

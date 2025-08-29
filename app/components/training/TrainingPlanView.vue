@@ -17,27 +17,30 @@
           <span class="font-bold text-red-700">Race:</span>
           <span class="text-red-900 font-bold">{{ formatDate(plan.raceDate) }}</span>
         </div>
-        <div class="flex items-center gap-2 px-4 py-2 bg-slate-100 rounded-xl">
-          <span class="font-bold text-slate-700">End:</span>
-          <span class="text-slate-900 font-medium">{{ formatDate(plan.endDate) }}</span>
-        </div>
       </div>
     </div>
 
-    <!-- Training weeks - all expanded -->
+    <!-- Weekly Schedule and Progression Title -->
+    <div class="mb-8">
+      <h2 class="text-2xl font-bold text-slate-800 mb-2">Weekly Schedule and Progression</h2>
+      <p class="text-slate-600 text-sm">18-week comprehensive training program with structured progression</p>
+    </div>
+
+    <!-- Training weeks - current week expanded, others collapsed -->
     <div class="space-y-8">
       <TrainingWeek
         v-for="week in plan?.weeks"
         :key="week.id"
         :week="week"
         :selected-date="selectedDate"
-        :is-expanded="true"
+        :is-expanded="isWeekExpanded(week.id)"
       />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, computed, onMounted } from 'vue'
 import type { TrainingPlan } from '@/types'
 import TrainingWeek from './TrainingWeek.vue'
 
@@ -48,6 +51,44 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+
+// Track which week is expanded
+const expandedWeekId = ref<string | null>(null)
+
+// Get today's date in YYYY-MM-DD format
+const todayDate = computed(() => {
+  const today = new Date()
+  return today.toISOString().split('T')[0]
+})
+
+// Find the current week based on today's date
+const currentWeekId = computed(() => {
+  if (!props.plan?.weeks) return null
+
+  for (const week of props.plan.weeks) {
+    const weekStart = new Date(week.start)
+    const weekEnd = new Date(week.end)
+    const today = new Date(todayDate.value)
+
+    if (today >= weekStart && today <= weekEnd) {
+      return week.id
+    }
+  }
+
+  return null
+})
+
+// Determine if a week should be expanded
+const isWeekExpanded = (weekId: string) => {
+  return expandedWeekId.value === weekId
+}
+
+// Expand the current week after component mounts
+onMounted(() => {
+  if (currentWeekId.value) {
+    expandedWeekId.value = currentWeekId.value
+  }
+})
 
 // Static date formatting
 const formatDate = (dateString: string): string => {

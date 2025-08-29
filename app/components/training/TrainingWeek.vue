@@ -37,10 +37,18 @@
       </div>
     </div>
 
-    <!-- Always visible content -->
-    <!-- Enhanced training table -->
-    <div class="overflow-x-auto p-8 pt-0">
-      <table class="w-full border-separate border-spacing-0 bg-slate-50/30 rounded-xl overflow-hidden">
+    <!-- Collapsible training content -->
+    <Transition
+      name="week-content"
+      enter-active-class="transition-all duration-300 ease-out"
+      leave-active-class="transition-all duration-200 ease-in"
+      enter-from-class="max-h-0 opacity-0"
+      enter-to-class="max-h-screen opacity-100"
+      leave-from-class="max-h-screen opacity-100"
+      leave-to-class="max-h-0 opacity-0"
+    >
+      <div v-if="props.isExpanded" class="overflow-x-auto p-8 pt-0">
+        <table class="w-full border-separate border-spacing-0 bg-slate-50/30 rounded-xl overflow-hidden">
         <!-- Enhanced table header -->
         <thead>
           <tr class="bg-gradient-to-r from-slate-100 via-white to-blue-50/40">
@@ -117,7 +125,8 @@
           </tr>
         </tbody>
       </table>
-    </div>
+      </div>
+    </Transition>
   </div>
 </template>
 
@@ -324,5 +333,13 @@ const getTrainingExplanation = (training: string | undefined): string => {
 </script>
 
 <style scoped>
-/* No special styles needed - static display only */
+.week-content-enter-active,
+.week-content-leave-active {
+  overflow: hidden;
+}
+
+.week-content-enter-from,
+.week-content-leave-to {
+  transform: translateY(-10px);
+}
 </style>
