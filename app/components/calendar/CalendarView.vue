@@ -177,9 +177,8 @@ const handleDateClick = async (date: string) => {
     newExpanded.add(monthIndex)
     expandedMonths.value = newExpanded
     
-    // Wait for month expansion animation before scrolling (spec: 100ms delay)
+    // Ensure DOM update before scroll, without timeout
     await nextTick()
-    await new Promise(resolve => setTimeout(resolve, 100))
   }
   
   // Scroll to training plan section and highlight row
@@ -265,10 +264,9 @@ const scrollToTrainingPlan = async (dateString: string) => {
     // Check if week is collapsed (details element is not open)
     const detailsElement = targetWeek as HTMLDetailsElement
     if (!detailsElement.open) {
-      // Open the week by setting the open attribute (specs requirement)
+      // Open the week by setting the open attribute (no timeout)
       detailsElement.open = true
-      // Wait for week expansion animation (spec: 100ms delay)
-      await new Promise(resolve => setTimeout(resolve, 100))
+      await nextTick()
     }
   }
 

@@ -411,9 +411,6 @@ const onDateSelect = async (date: string) => {
       newExpanded.add(containingWeek.id)
       expandedWeeks.value = newExpanded
       
-      // Wait for the week to expand (spec: 100ms delay)
-      await new Promise(resolve => setTimeout(resolve, 100))
-      
       // Scroll to the selected date in the training plan
       await scrollToSelectedDate(date)
     }
@@ -422,8 +419,7 @@ const onDateSelect = async (date: string) => {
 
 // Enhanced scroll function with spec-compliant behavior
 const scrollToSelectedDate = async (dateString: string) => {
-  // Wait for week expansion to complete (spec: 100ms)
-  await new Promise(resolve => setTimeout(resolve, 100))
+  // Directly attempt scroll without delay
   
   const dayRow = document.querySelector(`#d-${dateString}`)
   if (dayRow) {
@@ -482,9 +478,8 @@ const loadPlan = async () => {
   // Initialize auto-expanded weeks after plan loads (specs requirement)
   initializeExpandedWeeks()
 
-  // Ensure the containing week is opened and selected after initialization
-  setTimeout(() => {
-    if (!currentPlan.value) return
+  // Ensure the containing week is opened and selected after initialization (no timing effects)
+  if (currentPlan.value) {
     const today = new Date().toISOString().slice(0, 10)
     const candidateDate = selectedDate.value || today
     // If selected date not yet set and today not in plan, fallback to first day
@@ -494,20 +489,15 @@ const loadPlan = async () => {
     if (dateToOpen) {
       autoOpenCurrentWeek(dateToOpen, currentPlan.value)
     }
-  }, 100)
+  }
 
-  // Load nutrition and grocery data in background (non-blocking)
-  setTimeout(async () => {
-    try {
-      await Promise.all([
-        nutritionStore.loadNutritionData(),
-        groceryStore.loadGroceryData()
-      ])
-    } catch (error) {
-      console.warn('Failed to load secondary data:', error)
-      // Don't show error for secondary data loading failures
-    }
-  }, 100)
+  // Load nutrition and grocery data (non-blocking, no timeout)
+  Promise.all([
+    nutritionStore.loadNutritionData(),
+    groceryStore.loadGroceryData()
+  ]).catch((error) => {
+    console.warn('Failed to load secondary data:', error)
+  })
 }
 
 onMounted(() => {
@@ -545,24 +535,16 @@ watch(currentPlan, (newPlan, oldPlan) => {
   }
 }, { immediate: true })
 
-// Optimized watcher for selected date changes with debouncing
-let dateChangeTimeout: NodeJS.Timeout | null = null
 watch(selectedDate, (newDate, oldDate) => {
   // Skip if date hasn't actually changed
   if (!newDate || newDate === oldDate || !currentPlan.value) return
 
-  // Debounce rapid date changes
-  if (dateChangeTimeout) clearTimeout(dateChangeTimeout)
-
-  dateChangeTimeout = setTimeout(() => {
-    const today = new Date().toISOString().slice(0, 10)
-
-    if (newDate === today) {
-      initializeExpandedWeeks()
-    } else {
-      autoOpenCurrentWeek(newDate, currentPlan.value)
-    }
-  }, 50) // Small debounce to handle rapid clicks
+  const today = new Date().toISOString().slice(0, 10)
+  if (newDate === today) {
+    initializeExpandedWeeks()
+  } else {
+    autoOpenCurrentWeek(newDate, currentPlan.value)
+  }
 })
 
 // Auto-open the week containing the selected date
@@ -576,10 +558,8 @@ const autoOpenCurrentWeek = (dateString: string, plan: any) => {
     newExpanded.add(containingWeek.id)
     expandedWeeks.value = newExpanded
     
-    // Scroll to the selected date after a brief delay
-    setTimeout(() => {
-      scrollToSelectedDate(dateString)
-    }, 500)
+    // Immediately scroll to the selected date
+    scrollToSelectedDate(dateString)
   }
 }
 </script>

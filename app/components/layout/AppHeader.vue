@@ -144,15 +144,13 @@ const resetToToday = async () => {
     await router.push('/')
   }
 
-  // Scroll to today's date in the training plan after navigation
-  setTimeout(() => {
-    const todayRow = document.querySelector(`#d-${today}`)
-    if (todayRow) {
-      todayRow.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center'
-      })
-    }
-  }, 100)
+  // Scroll to today's date in the training plan after navigation (no timeout)
+  const todayRow = document.querySelector(`#d-${today}`)
+  if (todayRow) {
+    todayRow.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center'
+    })
+  }
 }
 </script>

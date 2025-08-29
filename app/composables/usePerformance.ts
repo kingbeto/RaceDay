@@ -74,8 +74,8 @@ export const usePerformance = () => {
     measureInitialLoad()
     observePaintMetrics()
 
-    // Log metrics after a short delay to capture all paint events
-    setTimeout(logMetrics, 1000)
+    // Log metrics once after mount (no timeout)
+    logMetrics()
   })
 
   return {
