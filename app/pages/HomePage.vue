@@ -333,20 +333,31 @@ const expandedWeeks = ref<Set<string>>(new Set())
 // Auto-expand current week on load (specs requirement)
 const initializeExpandedWeeks = () => {
   if (!currentPlan.value) return
-  
+
   const today = new Date().toISOString().slice(0, 10)
-  
+
   // Find the week containing today's date
   const currentWeek = currentPlan.value.weeks.find(week => {
     return today >= week.start && today <= week.end
   })
-  
+
   if (currentWeek) {
+    // Select today if present, otherwise first day of the current week
+    const todayInWeek = currentWeek.rows?.find(row => row.date === today)?.date
+    const firstDayOfWeek = currentWeek.rows?.[0]?.date
+    if (!selectedDate.value) {
+      trainingStore.setSelectedDate(todayInWeek || firstDayOfWeek || null)
+    }
     expandedWeeks.value = new Set([currentWeek.id])
   } else {
     // Fallback to first week if today is not within plan dates
     if (currentPlan.value.weeks.length > 0) {
-      expandedWeeks.value = new Set([currentPlan.value.weeks[0].id])
+      const firstWeek = currentPlan.value.weeks[0]
+      const firstDay = firstWeek.rows?.[0]?.date
+      if (!selectedDate.value) {
+        trainingStore.setSelectedDate(firstDay || null)
+      }
+      expandedWeeks.value = new Set([firstWeek.id])
     }
   }
 }
@@ -443,23 +454,25 @@ const onWeeklyMealsClick = (week: Week) => {
 }
 
 const toggleWeekExpansion = (weekId: string) => {
-  if (expandedWeeks.value.has(weekId)) {
-    expandedWeeks.value.delete(weekId)
+  const next = new Set(expandedWeeks.value)
+  if (next.has(weekId)) {
+    next.delete(weekId)
   } else {
-    expandedWeeks.value.add(weekId)
+    next.add(weekId)
   }
+  expandedWeeks.value = next
 }
 
 const expandAll = () => {
   if (currentPlan.value) {
-    currentPlan.value.weeks.forEach(week => {
-      expandedWeeks.value.add(week.id)
-    })
+    const next = new Set<string>()
+    currentPlan.value.weeks.forEach(week => next.add(week.id))
+    expandedWeeks.value = next
   }
 }
 
 const collapseAll = () => {
-  expandedWeeks.value.clear()
+  expandedWeeks.value = new Set()
 }
 
 const loadPlan = async () => {
@@ -468,6 +481,20 @@ const loadPlan = async () => {
 
   // Initialize auto-expanded weeks after plan loads (specs requirement)
   initializeExpandedWeeks()
+
+  // Ensure the containing week is opened and selected after initialization
+  setTimeout(() => {
+    if (!currentPlan.value) return
+    const today = new Date().toISOString().slice(0, 10)
+    const candidateDate = selectedDate.value || today
+    // If selected date not yet set and today not in plan, fallback to first day
+    const isTodayInPlan = currentPlan.value.weeks.some(w => w.rows?.some(r => r.date === today))
+    const fallbackFirst = currentPlan.value.weeks[0]?.rows?.[0]?.date || null
+    const dateToOpen = candidateDate && (candidateDate === today ? (isTodayInPlan ? today : fallbackFirst) : candidateDate)
+    if (dateToOpen) {
+      autoOpenCurrentWeek(dateToOpen, currentPlan.value)
+    }
+  }, 100)
 
   // Load nutrition and grocery data in background (non-blocking)
   setTimeout(async () => {
