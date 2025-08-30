@@ -1,10 +1,12 @@
 <template>
   <div
     :class="[
-      'relative p-2 text-sm rounded-md',
+      'relative p-2 text-sm rounded-md cursor-pointer',
       dayClasses
     ]"
     :title="tooltipText"
+    @mouseenter="emit('hover')"
+    @mouseleave="emit('leave')"
   >
     <!-- Day number -->
     <span :class="textClasses">{{ day.day }}</span>
@@ -37,9 +39,16 @@ interface Props {
   compact?: boolean
   dateMap?: Record<string, any>
   getEntryForDate?: (date: string) => any
+  isHovered?: boolean
+}
+
+interface Emits {
+  hover: []
+  leave: []
 }
 
 const props = defineProps<Props>()
+const emit = defineEmits<Emits>()
 
 const dayClasses = computed(() => {
   const base = props.compact
@@ -129,6 +138,11 @@ const dayClasses = computed(() => {
 
   // Priority 5: Hover State (border highlight)
   classes += ' hover:border-slate-200'
+
+  // Priority 6: Calendar-Training Plan Hover Interaction (highest priority)
+  if (props.isHovered) {
+    classes += ' ring-2 ring-blue-400 ring-opacity-60 shadow-lg shadow-blue-200/50'
+  }
 
   return classes
 })

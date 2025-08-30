@@ -2,20 +2,20 @@
   <!-- Static week display - no interactions -->
   <div
     :id="`week-${week.id}`"
-    class="rounded-2xl border border-slate-200/60 bg-white shadow-lg shadow-slate-100/50"
-    :class="{ 'ring-2 ring-amber-400/60 shadow-xl shadow-amber-100/40': hasSelectedDate }"
+    class="rounded-xl border border-slate-200/60 bg-white shadow-md shadow-slate-100/40"
+    :class="{ 'ring-2 ring-amber-400/60 shadow-lg shadow-amber-100/40': hasSelectedDate }"
   >
     <!-- Week header - static -->
-    <div class="p-8 bg-gradient-to-r from-slate-50 via-white to-blue-50/30 rounded-t-2xl border-b border-slate-200/60">
+    <div class="p-4 bg-gradient-to-r from-slate-50 via-white to-blue-50/30 rounded-t-xl border-b border-slate-200/60">
       <div class="flex items-center justify-between">
         <!-- Week identifier with dot indicator -->
-        <div class="flex items-center gap-4">
-          <div class="flex items-center gap-3">
+        <div class="flex items-center gap-3">
+          <div class="flex items-center gap-2">
             <!-- Static gradient dot indicator -->
-            <div class="w-4 h-4 rounded-full bg-gradient-to-r from-emerald-500 via-blue-500 to-indigo-500 shadow-lg"></div>
+            <div class="w-3 h-3 rounded-full bg-gradient-to-r from-emerald-500 via-blue-500 to-indigo-500 shadow"></div>
             <div>
-              <h3 class="text-xl font-bold text-slate-900">{{ week.label }}</h3>
-              <p class="text-sm text-slate-600 font-medium leading-relaxed">{{ week.summary }}</p>
+              <h3 class="text-lg font-semibold text-slate-900 leading-tight">{{ week.label }}</h3>
+              <p class="text-xs text-slate-600 font-medium leading-snug">{{ week.summary }}</p>
             </div>
           </div>
 
@@ -23,24 +23,24 @@
         </div>
 
         <!-- Static info display with toggle button -->
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2">
           <!-- Day counter badge -->
-          <span class="hidden sm:inline text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-full">
+          <span class="hidden sm:inline text-[10px] text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
             {{ week.rows?.length || 7 }} days
           </span>
           <!-- Toggle button -->
           <button
             @click="toggleWeek"
-            class="flex items-center justify-center w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 transition-colors duration-200 group"
+            class="flex items-center justify-center w-7 h-7 rounded-md bg-slate-100 hover:bg-slate-200 transition-colors duration-200 group"
             :aria-label="props.isExpanded ? 'Collapse week' : 'Expand week'"
           >
             <ChevronDownIcon
               v-if="!props.isExpanded"
-              class="w-5 h-5 text-slate-600 group-hover:text-slate-800 transition-colors duration-200"
+              class="w-4 h-4 text-slate-600 group-hover:text-slate-800 transition-colors duration-200"
             />
             <ChevronUpIcon
               v-else
-              class="w-5 h-5 text-slate-600 group-hover:text-slate-800 transition-colors duration-200"
+              class="w-4 h-4 text-slate-600 group-hover:text-slate-800 transition-colors duration-200"
             />
           </button>
         </div>
@@ -59,17 +59,17 @@
       leave-from-class="max-h-screen opacity-100"
       leave-to-class="max-h-0 opacity-0"
     >
-      <div v-if="props.isExpanded" class="overflow-x-auto p-8 pt-0">
-        <table class="w-full border-separate border-spacing-0 bg-slate-50/30 rounded-xl overflow-hidden border border-slate-200/50">
+      <div v-if="props.isExpanded" class="p-4 pt-0">
+        <table class="w-full border-separate border-spacing-0 bg-slate-50/30 rounded-lg overflow-hidden border border-slate-200/50">
         <!-- Enhanced table header -->
         <thead>
           <tr class="bg-gradient-to-r from-slate-100 via-white to-blue-50/40">
-            <th class="px-4 py-4 text-center text-sm font-bold text-slate-800 first:rounded-tl-xl w-12">Type</th>
-            <th class="px-6 py-4 text-left text-sm font-bold text-slate-800">Date</th>
-            <th class="px-6 py-4 text-left text-sm font-bold text-slate-800 hidden sm:table-cell">Day</th>
-            <th class="px-6 py-4 text-left text-sm font-bold text-slate-800">Training</th>
-            <th class="px-6 py-4 text-left text-sm font-bold text-slate-800 hidden lg:table-cell">Focus</th>
-            <th class="px-6 py-4 text-center text-sm font-bold text-slate-800 last:rounded-tr-xl">Nutrition</th>
+            <th class="px-3 py-3 text-center text-xs font-semibold text-slate-800 first:rounded-tl-lg w-10">Type</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-800">Date</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-800 hidden sm:table-cell">Day</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-800">Training</th>
+            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-800 hidden lg:table-cell">Focus</th>
+            <th class="px-4 py-3 text-center text-xs font-semibold text-slate-800 last:rounded-tr-lg">Nutrition</th>
           </tr>
         </thead>
         <tbody class="bg-white">
@@ -81,12 +81,12 @@
             class="border-b border-slate-200/80 hover:bg-slate-50/50 transition-colors duration-150 last:border-b-0"
           >
             <!-- Type Column - Training Intensity Indicator -->
-            <td class="px-4 py-6 text-center w-12">
+            <td class="px-3 py-3 text-center w-10">
               <div class="flex justify-center">
-                <div :class="getTypeIconClasses(day)" class="w-8 h-6 rounded-full flex items-center justify-center">
+                <div :class="getTypeIconClasses(day)" class="w-7 h-5 rounded-full flex items-center justify-center">
                   <component
                     :is="getTrainingIntensity(day).icon"
-                    class="w-4 h-4"
+                    class="w-3.5 h-3.5"
                     :title="getTrainingIntensity(day).description"
                   />
                 </div>
@@ -94,33 +94,33 @@
             </td>
 
             <!-- Date Column -->
-            <td class="px-6 py-6 w-24">
+            <td class="px-4 py-3 w-24">
               <div class="flex flex-col">
-                <span :class="getDateTextClasses(day)" class="font-bold text-sm">
+                <span :class="getDateTextClasses(day)" class="font-semibold text-xs">
                   {{ formatDayDate(day.date) }}
                 </span>
-                <span class="text-xs text-slate-500 font-medium">
+                <span class="text-[10px] text-slate-500 font-medium">
                   {{ getDayName(day.date) }}
                 </span>
               </div>
             </td>
 
             <!-- Day Badge -->
-            <td class="px-6 py-6 hidden sm:table-cell w-20">
-              <span :class="getDayBadgeClasses(day)" class="px-3 py-1 rounded-lg text-xs font-bold">
+            <td class="px-4 py-3 hidden sm:table-cell w-20">
+              <span :class="getDayBadgeClasses(day)" class="px-2.5 py-0.5 rounded-md text-[10px] font-bold">
                 {{ getDayAbbr(day.date) }}
               </span>
             </td>
 
             <!-- Training Column -->
-            <td class="px-6 py-6">
-              <div class="flex items-start space-x-3">
+            <td class="px-4 py-3">
+              <div class="flex items-start space-x-2">
                 <!-- Activity dot indicator -->
-                <div :class="getActivityDotClasses(day)" class="w-3 h-3 rounded-full mt-1 shadow-sm"></div>
+                <div :class="getActivityDotClasses(day)" class="w-2.5 h-2.5 rounded-full mt-1 shadow-sm"></div>
                 <div class="flex-1">
                   <div
                     :class="getTrainingTextClasses(day)"
-                    class="leading-relaxed font-medium"
+                    class="leading-snug font-medium text-sm"
                     :title="getTrainingExplanation(day.training)"
                   >
                     {{ day.training || 'Off day' }}
@@ -130,21 +130,21 @@
             </td>
 
             <!-- Focus Column -->
-            <td class="px-6 py-6 hidden lg:table-cell">
-              <div class="text-sm text-slate-600 leading-relaxed font-medium">
+            <td class="px-4 py-3 hidden lg:table-cell">
+              <div class="text-xs text-slate-600 leading-snug font-medium">
                 {{ day.food || '-' }}
               </div>
             </td>
 
             <!-- Nutrition Column -->
-            <td class="px-6 py-6 w-36">
-              <div class="flex flex-col items-center space-y-2">
+            <td class="px-4 py-3 w-32">
+              <div class="flex flex-col items-center space-y-1.5">
                 <!-- Static nutrition display -->
-                <div class="inline-flex items-center justify-center w-8 h-8 text-blue-600 bg-blue-50 rounded-md border border-blue-200">
-                  <span class="text-sm">📋</span>
+                <div class="inline-flex items-center justify-center w-7 h-7 text-blue-600 bg-blue-50 rounded-md border border-blue-200">
+                  <span class="text-[13px]">📋</span>
                 </div>
                 <!-- Calorie display -->
-                <span class="text-xs text-slate-600 font-bold bg-slate-100 px-2 py-1 rounded-md">
+                <span class="text-[10px] text-slate-600 font-bold bg-slate-100 px-1.5 py-0.5 rounded">
                   ~{{ getCaloriesForDay(day) }} kcal
                 </span>
               </div>
@@ -171,6 +171,7 @@ interface Props {
   week: Week
   selectedDate: string | null
   isExpanded: boolean
+  hoveredDate?: string | null
 }
 
 interface Emits {
@@ -252,28 +253,37 @@ const getDayAbbr = (dateString: string): string => {
   return dayNames[date.getDay()]
 }
 
-// Simplified row styling - only yellow for today's row
+// Enhanced row styling with hover highlighting
 const getRowClasses = (day: any) => {
   const isToday = day.date === today.value
+  const isHovered = day.date === props.hoveredDate
 
   const classes = [
     {
-      // Only today's row gets yellow highlighting
-      'bg-amber-50 border-l-4 border-amber-400': isToday
+      // Today's row gets yellow highlighting
+      'bg-amber-50 border-l-4 border-amber-400': isToday,
+      // Hovered row gets blue highlighting (only when week is expanded)
+      'bg-blue-50 border-l-4 border-blue-400 ring-1 ring-blue-300 ring-opacity-50': isHovered && props.isExpanded && !isToday
     }
   ]
 
   return classes
 }
 
-// Date text styling
+// Date text styling with hover highlighting
 const getDateTextClasses = (day: any) => {
   const isToday = day.date === today.value
   const isSelected = day.date === props.selectedDate
+  const isHovered = day.date === props.hoveredDate
 
   if (isToday || isSelected) {
     return 'text-amber-900'
   }
+
+  if (isHovered && props.isExpanded) {
+    return 'text-blue-900 font-semibold'
+  }
+
   return 'text-slate-900'
 }
 
@@ -295,9 +305,14 @@ const getActivityDotClasses = (day: any) => {
   return 'bg-slate-400 opacity-60'
 }
 
-// Training text styling - green for training days, default for rest
+// Training text styling with hover highlighting
 const getTrainingTextClasses = (day: any) => {
   const baseClasses = 'text-sm font-medium'
+  const isHovered = day.date === props.hoveredDate
+
+  if (isHovered && props.isExpanded) {
+    return `${baseClasses} text-blue-700 font-semibold`
+  }
 
   if (day.isExercise) {
     return `${baseClasses} text-green-700`

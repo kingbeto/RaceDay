@@ -96,6 +96,13 @@ The **TrainingPlanView** and **TrainingWeek** components provide the detailed tr
 - **Visual States**: Clear up/down chevron indicators for expand/collapse
 - **Event Handling**: Proper Vue event system for state management
 
+#### **Scrollable Training Container**
+- **Unified Scrolling**: All training weeks scroll together in one container
+- **Viewport-Based Height**: 70% of viewport height (70vh) for optimal viewing
+- **Vertical Scrolling**: Smooth vertical scrolling through all training weeks
+- **Preserved Layout**: Header and controls remain fixed while content scrolls
+- **Responsive Design**: Adapts to different screen sizes automatically
+
 #### **Collapsible Week Behavior**
 - **Default State**: Only current week expanded, others collapsed
 - **Auto-Expansion**: Current week automatically expands on page load
@@ -107,6 +114,13 @@ The **TrainingPlanView** and **TrainingWeek** components provide the detailed tr
 - **Collapse All**: Gray button with up arrow - collapses all weeks
 - **Smart States**: Buttons disable when action is inappropriate
 - **Visual Feedback**: Hover effects and proper button states
+
+#### **Calendar-Training Plan Hover Interaction**
+- **Cross-Component Communication**: Hover events flow from calendar to training plan
+- **Smart Highlighting**: Different highlighting based on expanded/collapsed state
+- **Visual Feedback**: Blue ring and shadow effects for calendar days
+- **Row-Level Precision**: Specific training rows highlighted when week is expanded
+- **Container Highlighting**: Entire training plan highlighted when collapsed
 
 #### **Dynamic Data Loading**
 - **Real-time Fetching**: JSON data loaded from `/data/el-cruce-plan.json`

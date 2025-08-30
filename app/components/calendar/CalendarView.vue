@@ -41,6 +41,9 @@
               :compact="true"
               :date-map="dateMap"
               :get-entry-for-date="getEntryForDate"
+              :is-hovered="day.date === hoveredDate"
+              @hover="emit('dateHover', day.date)"
+              @leave="emit('dateLeave')"
             />
           </div>
         </div>
@@ -86,9 +89,16 @@ interface Props {
   trainingPlan: TrainingPlan | null
   selectedDate: string | null
   compact?: boolean
+  hoveredDate?: string | null
+}
+
+interface Emits {
+  dateHover: [date: string]
+  dateLeave: []
 }
 
 const props = defineProps<Props>()
+const emit = defineEmits<Emits>()
 
 // Static data for today
 const todayStr = ref<string>(new Date().toISOString().slice(0, 10))

@@ -131,6 +131,9 @@
                   :training-plan="sampleTrainingPlan"
                   :selected-date="'2025-01-15'"
                   :compact="true"
+                  :hovered-date="hoveredDate"
+                  @date-hover="handleCalendarHover"
+                  @date-leave="handleCalendarLeave"
                 />
               </div>
             </div>
@@ -198,6 +201,7 @@
                   :plan="sampleTrainingPlan"
                   :selected-date="'2025-01-15'"
                   :is-expanded="true"
+                  :hovered-date="hoveredDate"
                 />
               </div>
 
@@ -237,6 +241,18 @@ const logoSrc = '/assets/images/raceday.svg'
 const trainingPlan = ref<TrainingPlan | null>(null)
 const isLoading = ref(true)
 const error = ref<string | null>(null)
+
+// Shared reactive state for hover interactions between calendar and training plan
+const hoveredDate = ref<string | null>(null)
+
+// Hover event handlers for calendar-training plan interaction
+const handleCalendarHover = (date: string) => {
+  hoveredDate.value = date
+}
+
+const handleCalendarLeave = () => {
+  hoveredDate.value = null
+}
 
 // Load training plan from JSON
 const loadTrainingPlan = async () => {
