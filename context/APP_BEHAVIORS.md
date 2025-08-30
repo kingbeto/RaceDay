@@ -2,32 +2,33 @@
 
 ## 🎯 **Application Overview**
 
-**RaceDay** is a comprehensive static web application designed for ultra-endurance athletes preparing for events like El Cruce de los Andes. The application provides a complete visual training and nutrition planning experience with no interactive elements, serving as a static reference throughout an athlete's training cycle.
+**RaceDay** is a comprehensive interactive web application designed for ultra-endurance athletes preparing for events like El Cruce de los Andes. The application provides a complete training and nutrition planning experience with enhanced interactivity, dynamic data loading, and intuitive user controls throughout an athlete's training cycle.
 
-### **Core Architecture**
-- **Static Data Display**: No dynamic state changes or API calls
+### **Enhanced Architecture**
+- **Dynamic Data Loading**: Real-time JSON fetching with error handling
 - **Component-Based**: Modular Vue 3 Composition API architecture
-- **Responsive Design**: Mobile-first approach with Tailwind CSS
-- **Type-Safe**: Full TypeScript implementation
-- **Performance Optimized**: Fast loading and efficient rendering
+- **Interactive Elements**: Individual week toggles + bulk controls
+- **Type-Safe**: Full TypeScript implementation with updated interfaces
+- **Performance Optimized**: Fast loading with reactive data management
 
 ---
 
-## 🔒 **Static Behavior Requirements**
+## 🎮 **Enhanced Interactive Behavior Requirements**
 
 ### **Application State Management**
-- **Zero Reactivity**: No reactive data updates
-- **Pre-configured Data**: All information embedded in application
-- **No User Input**: Read-only interface throughout
-- **Static Navigation**: Single-page application structure
-- **No API Dependencies**: Self-contained data and functionality
+- **Dynamic Data Loading**: Real-time JSON fetching with reactive updates
+- **Interactive Controls**: Week toggles, expand/collapse functionality
+- **Smart State Management**: Intelligent handling of individual vs bulk operations
+- **Error Recovery**: Comprehensive error handling with retry mechanisms
+- **Reactive Architecture**: Proper Vue reactivity for all state changes
 
-### **User Experience Guidelines**
-- **Information Density**: Optimized for reference and planning
-- **Visual Hierarchy**: Clear information organization
-- **Accessibility**: Screen reader friendly and keyboard navigation ready
-- **Performance**: Fast initial load and smooth scrolling
-- **Mobile Optimization**: Touch-friendly on all devices
+### **Enhanced User Experience Guidelines**
+- **Intuitive Interactions**: Clear visual feedback for all clickable elements
+- **Information Density**: Optimized for both reference and active planning
+- **Visual Hierarchy**: Clean design with strategic green accents
+- **Accessibility**: Screen reader friendly with proper ARIA labels
+- **Performance**: Fast initial load with smooth animations and transitions
+- **Mobile Optimization**: Touch-friendly with responsive design
 
 ---
 
@@ -60,17 +61,22 @@
 └─────────────────────────────────────────────────────┘
 ```
 
-### **Component Hierarchy**
+### **Enhanced Component Hierarchy**
 ```
 App.vue
-├── Header (RaceDay branding, race date)
+├── Header (RaceDay SVG logo, race date, nutrition info)
 ├── Main Layout (Grid system)
 │   ├── Sidebar (Left side)
-│   │   ├── Today's Focus (Top priority - dynamic daily focus with top-right intensity badges)
-│   │   ├── CalendarView (All months)
-│   │   └── GroceryList (Weekly shopping)
+│   │   ├── Today's Focus (Dynamic daily focus with green training indicators)
+│   │   ├── CalendarView (All months with training day highlighting)
+│   │   └── GroceryList (Weekly shopping with category organization)
 │   └── Main Content (Right side)
-│       └── TrainingPlanView (All weeks visible - no scroll, single header)
+│       ├── Expand/Collapse All Buttons (Bulk week control)
+│       └── TrainingPlanView (Interactive weeks with individual toggles)
+│           ├── 16 weeks (W0-W14 + RACE) with enhanced visual design
+│           ├── Individual toggle icons, enhanced borders, and green indicators
+│           ├── Dynamic JSON loading with error handling and retry
+│           └── Auto-scroll to current week on load
 └── Footer (Progress indicators)
 ```
 
@@ -78,16 +84,19 @@ App.vue
 
 ## 📊 **Data Flow Architecture**
 
-### **Static Data Sources**
+### **Dynamic Data Sources**
 ```typescript
-// Training plan data (16 weeks)
-const trainingPlan = {
-  id: 'el-cruce-2025',
-  title: 'El Cruce — Minimal Day-by-Day Plan',
-  weeks: [/* W0 through W14 + Race */],
-  startDate: '2025-08-19',
-  endDate: '2025-12-03'
+// Dynamic training plan loading
+const loadTrainingPlan = async () => {
+  const response = await fetch('/data/el-cruce-plan.json');
+  if (!response.ok) throw new Error('Failed to load training plan');
+  return response.json();
 };
+
+// Enhanced training plan data (16 weeks with intensity field)
+const trainingPlan = await loadTrainingPlan();
+// Structure: id, title, subtitle, weeks[], startDate, endDate, description
+// Each day includes: date, training, food, isExercise, intensity, isRaceDay
 
 // Nutrition profiles
 const nutritionProfiles = {
@@ -109,12 +118,15 @@ const groceryCategories = [
 <GroceryList :week-id="'W5'" :training-plan="plan" />
 ```
 
-### **Data Processing Pipeline**
-1. **Raw Training Data** → Weeks W0-W14 + Race
-2. **Calendar Processing** → Month-by-month display
-3. **Nutrition Calculation** → Per-day requirements
-4. **Grocery Alignment** → Weekly shopping lists
-5. **Visual Rendering** → Color-coded display
+### **Enhanced Data Processing Pipeline**
+1. **Dynamic JSON Loading** → Fetch from `/data/el-cruce-plan.json`
+2. **Error Handling** → Retry mechanisms and user feedback
+3. **Data Validation** → TypeScript interface validation
+4. **Raw Training Data** → Weeks W0-W14 + Race with intensity fields
+5. **Calendar Processing** → Month-by-month display with simplified colors
+6. **Nutrition Calculation** → Per-day requirements with intensity consideration
+7. **Grocery Alignment** → Weekly shopping lists with enhanced categorization
+8. **Visual Rendering** → Green indicators, enhanced borders, hover effects
 
 ---
 
@@ -338,6 +350,7 @@ src/
 
 ---
 
-**Application Version**: 1.0
-**Last Updated**: December 2024
+**Application Version**: 2.0
+**Last Updated**: January 2025
 **Author**: RaceDay Development Team
+**Key Enhancements**: Dynamic loading, individual toggles, enhanced borders, simplified color scheme, green training indicators

@@ -23,5 +23,7 @@ This folder contains all behavioral and feature documentation for the RaceDay tr
 
 ---
 
-**Last Updated**: December 2024
+**Last Updated**: January 2025
+**Current Version**: 16-week enhanced plan with dynamic loading and improved UI
+**Key Features**: Dynamic JSON loading, individual week toggles, enhanced borders, green training indicators, simplified color scheme
 **Maintained by**: RaceDay Development Team

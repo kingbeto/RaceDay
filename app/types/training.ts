@@ -28,6 +28,7 @@ export interface TrainingDay {
   calories?: number
   isExercise: boolean
   isRaceDay?: boolean
+  intensity: 'high' | 'moderate' | 'off'
 }
 
 export interface CalendarMonth {

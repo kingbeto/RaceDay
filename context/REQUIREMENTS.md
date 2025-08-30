@@ -2,53 +2,62 @@
 
 ## 🎯 **Application Overview**
 
-**RaceDay** is a comprehensive static training and nutrition planning application for ultra-endurance athletes preparing for events like El Cruce de los Andes. The application provides athletes with a complete visual overview of their 16-week training plan, including detailed daily schedules, nutrition guidance, and grocery planning.
+**RaceDay** is a comprehensive training and nutrition planning application for ultra-endurance athletes preparing for events like El Cruce de los Andes. The application provides athletes with a complete interactive overview of their 18-week training plan, including detailed daily schedules, nutrition guidance, and grocery planning.
 
 ### **Core Purpose**
-- Display complete 16-week training plan with daily details
-- Provide visual calendar with color-coded training vs rest days
-- Show nutrition requirements and grocery lists
-- Serve as a static reference for athletes throughout their training cycle
+- Display complete 18-week training plan with collapsible weekly details
+- Provide visual calendar with color-coded training intensity levels
+- Show nutrition requirements with chevron-based intensity indicators
+- Enable bulk expand/collapse of all training weeks
+- Serve as an interactive reference for athletes throughout their training cycle
 
 ---
 
-## 🔒 **Static Behavior Requirements**
+## 🎮 **Interactive Behavior Requirements**
 
 ### **Application State**
-- **NO INTERACTIVE BEHAVIORS** - All user interactions removed
-- **STATIC DATA DISPLAY ONLY** - No dynamic state changes
-- **NO FORM INPUTS** - All data is pre-configured
-- **NO NAVIGATION** - Single-page application
-- **NO API CALLS** - All data embedded in application
+- **ENHANCED INTERACTIVITY** - Individual week toggle buttons + bulk controls
+- **BULK CONTROLS** - Expand All / Collapse All buttons for convenience
+- **INDIVIDUAL TOGGLES** - Clickable chevron icons on each week header
+- **AUTO-EXPANSION** - Current week automatically expands on page load
+- **AUTO-SCROLL** - Smooth scroll to current week position
+- **DYNAMIC DATA LOADING** - Real-time JSON data fetching with error handling
 
 ### **User Experience**
-- **Read-Only Interface** - Pure information display
-- **No Click Handlers** - All buttons and links removed
-- **No Hover Effects** - Static visual presentation
-- **No Modals/Dialogs** - All content visible on page
-- **No State Management** - No reactive data updates
+- **Enhanced Interactivity** - Individual week toggles + bulk controls + dynamic loading
+- **Smart Defaults** - Current week expanded, others collapsed
+- **Visual Feedback** - Smooth transitions, hover effects, loading states
+- **Dynamic Data** - Real-time JSON loading with error handling and retry
+- **Simplified UI** - Clean color scheme with strategic green accents
+- **Responsive Design** - Optimized for all screen sizes
 
 ---
 
-## 📅 **Calendar Color-Coding System**
+## 📅 **Calendar & Training Intensity System**
 
-### **Color Scheme**
-- **🟢 Green (emerald-50)** - Exercise/Training Days (`isExercise: true`)
-- **⚫ Gray (slate-50)** - Rest/Off Days (`isExercise: false`)
-- **🔴 Red (red-50)** - Race Days (`isRaceDay: true`)
+### **Heroicon-Based Intensity Indicators**
+- **🔴 ⬆️⬆️ (ChevronDoubleUp)** - Race Days & High intensity - Maximum effort
+- **🟠 ⬆️⬆️ (ChevronDoubleUp)** - High intensity (Tempo, Threshold, Hard)
+- **🔵 ⬆️ (ChevronUp)** - Moderate intensity (Z2, Gym, Endurance)
+- **🟢 ⬆️ (ChevronUp)** - Easy intensity (Light, Recovery)
+- **⚫ ➖ (Minus)** - Off/Recovery days
+
+### **Color-Coding System**
+- **🔴 Red Theme** - Race Days (`isRaceDay: true`) - Maximum intensity
+- **🟠 Orange Theme** - High Intensity - Tempo, threshold training
+- **🔵 Blue Theme** - Moderate Intensity - Z2, endurance training
+- **🟢 Green Theme** - Easy Intensity - Light, recovery sessions
+- **⚫ Gray Theme** - Off Days - Rest, mobility, complete recovery
 - **🟡 Amber** - Today indicator (current date highlight)
 
 ### **Application Scope**
-- **ALL MONTHS** - Color-coding applies to every month in the training plan
-- **ALL WEEKS** - Every training week displays proper color-coding
-- **FUTURE MONTHS** - September, October, November, December all properly colored
-- **HISTORICAL DATA** - Past months maintain color-coding for reference
-
-### **Visual Indicators**
-- **Background Colors** - Day backgrounds show training type
-- **Dot Indicators** - Small colored dots show activity type
-- **Legend** - Color legend explains the coding system
-- **Tooltips** - Hover information (if hover enabled) shows training details
+- **ALL MONTHS** - Color-coding applies to every month in the 16-week plan
+- **ALL WEEKS** - Every training week displays proper chevron indicators
+- **COLLAPSIBLE WEEKS** - Weeks can expand/collapse individually or all at once
+- **INDIVIDUAL TOGGLES** - Clickable chevron icons on each week header
+- **AUTO-EXPANSION** - Current week automatically expands on page load
+- **BULK CONTROLS** - Expand All / Collapse All buttons for convenience
+- **DYNAMIC LOADING** - Real-time JSON data fetching with error handling
 
 ---
 
@@ -58,11 +67,13 @@
 - **16-Week Program** - W0 through W14 plus Race week
 - **Ultra-Endurance Focus** - El Cruce de los Andes preparation
 - **Progressive Phases**:
-  - **Base Phase** (W0-W3) - Foundation building
-  - **Build Phase** (W4-W10) - Volume increase
-  - **Peak Phase** (W11-W13) - Maximum training
-  - **Taper Phase** (W14) - Race preparation
+  - **Base Phase** (W0-W3) - Foundation building and assessment
+  - **Build Phase** (W4-W10) - Volume increase and intensity development
+  - **Peak Phase** (W11-W13) - Maximum performance development
+  - **Taper Phase** (W14) - Race preparation and recovery
   - **Race Phase** (RACE) - Competition execution
+- **Enhanced Data Structure** - Added `intensity` field for all training days
+- **Dynamic Loading** - Real-time JSON data fetching with error handling
 
 ### **Weekly Structure**
 - **7-Day Weeks** - Monday through Sunday format
@@ -223,6 +234,58 @@ interface Day {
 
 ---
 
+## 🎨 **UI/UX Enhancements - Comprehensive Update**
+
+### **Enhanced Table Design**
+- **Row Borders** - Clear visual separation between all training table rows
+- **Border Styling** - Subtle outer border + visible row separators
+- **Hover Effects** - Smooth background color changes on row hover
+- **Clean Layout** - Improved spacing and visual hierarchy
+
+### **Simplified Color Scheme**
+- **Removed Intensity Colors** - Eliminated complex row background colorings
+- **Strategic Green Accents** - Green for training days, badges, and text
+- **Current Date Highlighting** - Only today's row highlighted in yellow
+- **Default UI Colors** - Rest of interface uses clean default styling
+
+### **Interactive Elements**
+- **Individual Week Toggles** - Clickable chevron icons on each week header
+- **Right-Aligned Toggle** - Toggle button positioned on the right side
+- **Smooth Transitions** - Animated expand/collapse with proper timing
+- **Smart Toggle Logic** - Intelligent handling of individual vs bulk operations
+
+### **Enhanced Data Management**
+- **Dynamic JSON Loading** - Real-time data fetching from `/data/el-cruce-plan.json`
+- **Loading States** - Professional loading spinner during data fetch
+- **Error Handling** - Comprehensive error display with retry functionality
+- **Reactive Updates** - Proper Vue reactivity for all data changes
+
+### **Training Day Indicators**
+- **Green Badges** - Training days display green badges instead of emerald
+- **Green Training Text** - Training column text is green for exercise days
+- **Green Activity Dots** - Green dots for training day indicators
+- **Simplified Rest Days** - Rest days use default gray styling
+
+### **Improved Information Display**
+- **Removed Duplicate Dates** - Eliminated redundant date ranges below week titles
+- **Clean Week Headers** - Streamlined week title and phase information
+- **Better Visual Balance** - Improved layout with toggle button positioning
+- **Enhanced Readability** - Cleaner typography and spacing
+
+### **Component Architecture Updates**
+- **Event-Driven Communication** - Proper Vue event system for toggle functionality
+- **Type Safety** - Updated TypeScript interfaces for new data structure
+- **Performance Optimized** - Efficient rendering and state management
+- **Maintainable Code** - Clean separation of concerns and reusable logic
+
+### **Data Structure Enhancements**
+- **Intensity Field** - Added `intensity` classification to all training days
+- **Consistent Classification** - High/Moderate/Off intensity levels applied
+- **Backward Compatibility** - Maintains compatibility with existing functionality
+- **Future-Proof** - Extensible structure for additional enhancements
+
+---
+
 ## 🔧 **Technical Implementation**
 
 ### **Framework & Libraries**
@@ -292,6 +355,7 @@ interface Day {
 
 ---
 
-**Document Version**: 1.0
-**Last Updated**: December 2024
+**Document Version**: 2.0
+**Last Updated**: January 2025
 **Author**: RaceDay Development Team
+**Major Updates**: Dynamic JSON loading, individual week toggles, enhanced table borders, simplified color scheme, comprehensive UI/UX improvements

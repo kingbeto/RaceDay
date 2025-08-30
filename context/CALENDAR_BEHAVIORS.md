@@ -2,29 +2,45 @@
 
 ## 🎯 **Component Overview**
 
-The **CalendarView** and **CalendarDay** components provide the visual training calendar that displays the complete 16-week training plan with color-coded days to distinguish between training and rest days.
+The **CalendarView** and **CalendarDay** components provide the visual training calendar that displays the complete 18-week training plan with intensity-based color-coding and chevron indicators.
 
 ### **Primary Functions**
-- Display all training weeks and months
-- Color-code days (green for training, gray for rest)
-- Show training information via tooltips
-- Provide month-by-month navigation
-- Highlight current date and race days
+- Display all training weeks and months with intensity highlighting
+- Color-code days by training intensity (red→orange→blue→green→gray scale)
+- Show chevron intensity indicators (»»» → »» → » → ZZZ)
+- Display training information with detailed intensity classification
+- Highlight current date and provide comprehensive training overview
 
 ---
 
 ## 🟢 **Color-Coding System**
 
-### **Day Type Classification**
+### **Heroicon-Based Intensity Classification**
 ```typescript
-type DayType = 'exercise' | 'rest' | 'race' | 'off';
+import {
+  ChevronDoubleUpIcon,
+  ChevronUpIcon,
+  MinusIcon
+} from '@heroicons/vue/24/outline'
 
-// Color mapping
-const dayColors = {
-  exercise: 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100',
-  rest: 'bg-slate-50 text-slate-700 hover:bg-slate-100',
-  race: 'bg-red-50 text-red-900 hover:bg-red-100',
-  off: 'text-gray-900 hover:bg-gray-50'
+type TrainingIntensity = 'maximum' | 'high' | 'moderate' | 'easy' | 'off';
+
+// Heroicon indicators
+const intensityIndicators = {
+  maximum: ChevronDoubleUpIcon,  // Race days - double chevron
+  high: ChevronDoubleUpIcon,     // Tempo, threshold - double chevron
+  moderate: ChevronUpIcon,       // Z2, endurance - single chevron
+  easy: ChevronUpIcon,           // Light, recovery - single chevron
+  off: MinusIcon                 // Rest days - minus icon
+};
+
+// Color mapping by intensity
+const intensityColors = {
+  maximum: 'bg-red-50 text-red-900 border-l-4 border-red-300',
+  high: 'bg-orange-50 text-orange-900 border-l-4 border-orange-300',
+  moderate: 'bg-blue-50 text-blue-900 border-l-4 border-blue-300',
+  easy: 'bg-green-50 text-green-900 border-l-4 border-green-300',
+  off: 'bg-slate-50 text-slate-900 border-l-4 border-slate-300'
 };
 ```
 

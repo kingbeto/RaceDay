@@ -26,6 +26,33 @@
       <p class="text-slate-600 text-sm">18-week comprehensive training program with structured progression</p>
     </div>
 
+    <!-- Expand/Collapse All Buttons -->
+    <div class="mb-6 flex items-center justify-center gap-4">
+      <button
+        @click="expandAllWeeks"
+        class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2"
+        :class="{ 'opacity-50 cursor-not-allowed': allExpanded }"
+        :disabled="allExpanded"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+        </svg>
+        Expand All
+      </button>
+
+      <button
+        @click="collapseAllWeeks"
+        class="px-4 py-2 bg-slate-500 hover:bg-slate-600 text-white text-sm font-medium rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2"
+        :class="{ 'opacity-50 cursor-not-allowed': !allExpanded && !expandedWeekId }"
+        :disabled="!allExpanded && !expandedWeekId"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
+        </svg>
+        Collapse All
+      </button>
+    </div>
+
     <!-- Training weeks - current week expanded, others collapsed -->
     <div class="space-y-8">
       <TrainingWeek
@@ -34,13 +61,14 @@
         :week="week"
         :selected-date="selectedDate"
         :is-expanded="isWeekExpanded(week.id)"
+        @toggle="toggleWeek(week.id)"
       />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
 import type { TrainingPlan } from '@/types'
 import TrainingWeek from './TrainingWeek.vue'
 
@@ -52,8 +80,9 @@ interface Props {
 
 const props = defineProps<Props>()
 
-// Track which week is expanded
+// Track expansion state
 const expandedWeekId = ref<string | null>(null)
+const allExpanded = ref(false) // Start with all weeks collapsed by default
 
 // Get today's date in YYYY-MM-DD format
 const todayDate = computed(() => {
@@ -80,13 +109,53 @@ const currentWeekId = computed(() => {
 
 // Determine if a week should be expanded
 const isWeekExpanded = (weekId: string) => {
-  return expandedWeekId.value === weekId
+  return allExpanded.value || expandedWeekId.value === weekId
 }
 
-// Expand the current week after component mounts
-onMounted(() => {
-  if (currentWeekId.value) {
+// Expand all weeks
+const expandAllWeeks = () => {
+  allExpanded.value = true
+  expandedWeekId.value = null
+}
+
+// Collapse all weeks
+const collapseAllWeeks = () => {
+  allExpanded.value = false
+  expandedWeekId.value = null
+}
+
+// Toggle individual week
+const toggleWeek = (weekId: string) => {
+  if (allExpanded.value) {
+    // If all are expanded, collapse all and expand only this week
+    allExpanded.value = false
+    expandedWeekId.value = weekId
+  } else if (expandedWeekId.value === weekId) {
+    // If this week is expanded, collapse it
+    expandedWeekId.value = null
+  } else {
+    // Expand this week
+    expandedWeekId.value = weekId
+  }
+}
+
+// Expand the current week after component mounts and scroll to it
+onMounted(async () => {
+  if (currentWeekId.value && !allExpanded.value) {
     expandedWeekId.value = currentWeekId.value
+
+    // Wait for the DOM to update after expansion
+    await nextTick()
+
+    // Scroll to the current week
+    const currentWeekElement = document.getElementById(`week-${currentWeekId.value}`)
+    if (currentWeekElement) {
+      currentWeekElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+        inline: 'nearest'
+      })
+    }
   }
 })
 

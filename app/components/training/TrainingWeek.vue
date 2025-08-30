@@ -22,19 +22,31 @@
           <span :class="phaseClasses">{{ phaseText }}</span>
         </div>
 
-        <!-- Static info display -->
+        <!-- Static info display with toggle button -->
         <div class="flex items-center gap-3">
           <!-- Day counter badge -->
           <span class="hidden sm:inline text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-full">
             {{ week.rows?.length || 7 }} days
           </span>
+          <!-- Toggle button -->
+          <button
+            @click="toggleWeek"
+            class="flex items-center justify-center w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 transition-colors duration-200 group"
+            :aria-label="props.isExpanded ? 'Collapse week' : 'Expand week'"
+          >
+            <ChevronDownIcon
+              v-if="!props.isExpanded"
+              class="w-5 h-5 text-slate-600 group-hover:text-slate-800 transition-colors duration-200"
+            />
+            <ChevronUpIcon
+              v-else
+              class="w-5 h-5 text-slate-600 group-hover:text-slate-800 transition-colors duration-200"
+            />
+          </button>
         </div>
       </div>
 
-      <!-- Date range display -->
-      <div class="mt-3 text-sm text-slate-600">
-        <p>{{ formatDateRange(week.start, week.end) }}</p>
-      </div>
+
     </div>
 
     <!-- Collapsible training content -->
@@ -48,24 +60,39 @@
       leave-to-class="max-h-0 opacity-0"
     >
       <div v-if="props.isExpanded" class="overflow-x-auto p-8 pt-0">
-        <table class="w-full border-separate border-spacing-0 bg-slate-50/30 rounded-xl overflow-hidden">
+        <table class="w-full border-separate border-spacing-0 bg-slate-50/30 rounded-xl overflow-hidden border border-slate-200/50">
         <!-- Enhanced table header -->
         <thead>
           <tr class="bg-gradient-to-r from-slate-100 via-white to-blue-50/40">
-            <th class="px-6 py-4 text-left text-sm font-bold text-slate-800 first:rounded-tl-xl">Date</th>
+            <th class="px-4 py-4 text-center text-sm font-bold text-slate-800 first:rounded-tl-xl w-12">Type</th>
+            <th class="px-6 py-4 text-left text-sm font-bold text-slate-800">Date</th>
             <th class="px-6 py-4 text-left text-sm font-bold text-slate-800 hidden sm:table-cell">Day</th>
             <th class="px-6 py-4 text-left text-sm font-bold text-slate-800">Training</th>
             <th class="px-6 py-4 text-left text-sm font-bold text-slate-800 hidden lg:table-cell">Focus</th>
             <th class="px-6 py-4 text-center text-sm font-bold text-slate-800 last:rounded-tr-xl">Nutrition</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-slate-200/60 bg-white">
+        <tbody class="bg-white">
           <tr
             v-for="day in week.rows"
             :key="day.date"
             :id="`d-${day.date}`"
             :class="getRowClasses(day)"
+            class="border-b border-slate-200/80 hover:bg-slate-50/50 transition-colors duration-150 last:border-b-0"
           >
+            <!-- Type Column - Training Intensity Indicator -->
+            <td class="px-4 py-6 text-center w-12">
+              <div class="flex justify-center">
+                <div :class="getTypeIconClasses(day)" class="w-8 h-6 rounded-full flex items-center justify-center">
+                  <component
+                    :is="getTrainingIntensity(day).icon"
+                    class="w-4 h-4"
+                    :title="getTrainingIntensity(day).description"
+                  />
+                </div>
+              </div>
+            </td>
+
             <!-- Date Column -->
             <td class="px-6 py-6 w-24">
               <div class="flex flex-col">
@@ -133,6 +160,12 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import type { Week } from '@/types'
+import {
+  ChevronDoubleUpIcon,
+  ChevronUpIcon,
+  ChevronDownIcon,
+  MinusIcon
+} from '@heroicons/vue/24/outline'
 
 interface Props {
   week: Week
@@ -140,7 +173,17 @@ interface Props {
   isExpanded: boolean
 }
 
+interface Emits {
+  toggle: []
+}
+
 const props = defineProps<Props>()
+const emit = defineEmits<Emits>()
+
+// Toggle week expansion
+const toggleWeek = () => {
+  emit('toggle')
+}
 
 // Static data for styling
 const today = ref(new Date().toISOString().slice(0, 10))
@@ -186,21 +229,7 @@ const phaseText = computed(() => {
   }
 })
 
-const formatDateRange = (start: string, end: string): string => {
-  const startDate = new Date(start)
-  const endDate = new Date(end)
 
-  const options: Intl.DateTimeFormatOptions = {
-    month: 'short',
-    day: 'numeric'
-  }
-
-  if (startDate.getFullYear() !== endDate.getFullYear()) {
-    return `${startDate.toLocaleDateString('es-ES', { ...options, year: 'numeric' })} - ${endDate.toLocaleDateString('es-ES', { ...options, year: 'numeric' })}`
-  }
-
-  return `${startDate.toLocaleDateString('es-ES', options)} - ${endDate.toLocaleDateString('es-ES', options)}`
-}
 
 // Date formatting functions
 const dateFormatter = new Intl.DateTimeFormat('en-US', {
@@ -223,22 +252,18 @@ const getDayAbbr = (dateString: string): string => {
   return dayNames[date.getDay()]
 }
 
-// Static row styling
+// Simplified row styling - only yellow for today's row
 const getRowClasses = (day: any) => {
   const isToday = day.date === today.value
-  const isSelected = day.date === props.selectedDate
 
-  return [
+  const classes = [
     {
-      // Today's row
-      'bg-amber-50': isToday,
-      // Selected row
-      'border-l-4 border-amber-400': isSelected,
-      'border-l-4 border-transparent': !isSelected,
-      // Default state
-      'bg-white': !isToday && !isSelected
+      // Only today's row gets yellow highlighting
+      'bg-amber-50 border-l-4 border-amber-400': isToday
     }
   ]
+
+  return classes
 }
 
 // Date text styling
@@ -252,32 +277,109 @@ const getDateTextClasses = (day: any) => {
   return 'text-slate-900'
 }
 
-// Day badge styling
+// Day badge styling - green for training days
 const getDayBadgeClasses = (day: any) => {
-  const baseClasses = 'px-2.5 py-0.5 text-xs font-medium rounded-full'
+  const baseClasses = 'px-3 py-1 text-xs font-semibold rounded-full shadow-sm'
 
   if (day.isExercise) {
-    return `${baseClasses} bg-emerald-100 text-emerald-800`
+    return `${baseClasses} bg-green-500 text-white`
   }
-  return `${baseClasses} bg-slate-100 text-slate-800`
+  return `${baseClasses} bg-slate-400 text-white`
 }
 
-// Activity dot indicator styling
+// Activity dot indicator styling - green for training days
 const getActivityDotClasses = (day: any) => {
   if (day.isExercise) {
-    return 'bg-emerald-500'
+    return 'bg-green-500 shadow-lg shadow-green-200'
   }
-  return 'bg-slate-400'
+  return 'bg-slate-400 opacity-60'
 }
 
-// Training text styling
+// Training text styling - green for training days, default for rest
 const getTrainingTextClasses = (day: any) => {
   const baseClasses = 'text-sm font-medium'
 
   if (day.isExercise) {
-    return `${baseClasses} text-emerald-700`
+    return `${baseClasses} text-green-700`
   }
   return `${baseClasses} text-slate-900`
+}
+
+// Classify training intensity for icon display
+const getTrainingIntensity = (day: any) => {
+  if (!day.isExercise) {
+    return {
+      level: 'off',
+      icon: MinusIcon,
+      color: 'slate',
+      description: 'Rest day'
+    }
+  }
+
+  const training = day.training?.toLowerCase() || ''
+
+  // Race days are always maximum intensity (double chevron up)
+  if (day.isRaceDay) {
+    return {
+      level: 'maximum',
+      icon: ChevronDoubleUpIcon,
+      color: 'red',
+      description: 'Race day - maximum intensity'
+    }
+  }
+
+  // Check for high-intensity indicators (double chevron up)
+  if (training.includes('tempo') || training.includes('threshold') ||
+      training.includes('hard') || training.includes('intensive') ||
+      training.includes('maximum') || training.includes('peak')) {
+    return {
+      level: 'high',
+      icon: ChevronDoubleUpIcon,
+      color: 'orange',
+      description: 'High intensity training'
+    }
+  }
+
+  // Check for moderate-intensity indicators (single chevron up)
+  if (training.includes('long z2') || training.includes('endurance') ||
+      training.includes('moderate') || training.includes('sustained') ||
+      training.includes('stair tempo') || training.includes('gym')) {
+    return {
+      level: 'moderate',
+      icon: ChevronUpIcon,
+      color: 'blue',
+      description: 'Moderate intensity training'
+    }
+  }
+
+  // Check for easy/recovery indicators (single chevron up)
+  if (training.includes('easy') || training.includes('recovery') ||
+      training.includes('light') || training.includes('mobility')) {
+    return {
+      level: 'easy',
+      icon: ChevronUpIcon,
+      color: 'green',
+      description: 'Easy/recovery training'
+    }
+  }
+
+  // Default to moderate for unknown patterns
+  return {
+    level: 'moderate',
+    icon: ChevronUpIcon,
+    color: 'blue',
+    description: 'Moderate intensity training'
+  }
+}
+
+// Type icon container styling - green for training days
+const getTypeIconClasses = (day: any) => {
+  const baseClasses = 'transition-all duration-200 flex items-center justify-center'
+
+  if (day.isExercise) {
+    return `${baseClasses} bg-green-100 text-green-600`
+  }
+  return `${baseClasses} bg-slate-100 text-slate-600`
 }
 
 // Calorie calculation

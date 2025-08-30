@@ -72,14 +72,7 @@ const dayClasses = computed(() => {
     return `${base} border-blue-500 bg-blue-50 shadow-lg`
   }
 
-  if (props.day.isRaceDay) {
-    return `${base} border-red-300 bg-red-50`
-  }
-
-  if (props.day.isExercise) {
-    return `${base} border-primary-200 bg-primary-25`
-  }
-
+  // Simplified styling - default UI colors
   return `${base} border-gray-200 bg-gray-50`
 })
 
@@ -89,7 +82,7 @@ const trainingTextClasses = computed(() => {
   }
 
   if (props.day.isExercise) {
-    return 'text-sm text-primary-700 font-medium'
+    return 'text-sm text-green-700 font-medium'
   }
 
   return 'text-sm text-gray-600'

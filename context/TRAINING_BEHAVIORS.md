@@ -2,55 +2,70 @@
 
 ## 🎯 **Component Overview**
 
-The **TrainingPlanView** and **TrainingWeek** components provide the detailed training schedule display, showing day-by-day training activities, nutrition guidance, and weekly progression through the 16-week training plan.
+The **TrainingPlanView** and **TrainingWeek** components provide the detailed training schedule display with advanced interactivity, showing day-by-day training activities, nutrition guidance, and weekly progression through the 18-week training plan.
 
 ### **Primary Functions**
-- Display complete weekly training schedules
-- Show daily training activities and intensity
-- Provide nutrition guidance for each day
-- Track training phase progression
-- Display rest and recovery days clearly
+- Display complete weekly training schedules with collapsible weeks
+- Show daily training activities with chevron intensity indicators
+- Provide nutrition guidance for each day with visual highlighting
+- Track training phase progression with color-coded phases
+- Display rest and recovery days with distinct visual styling
+- Bulk expand/collapse all training weeks with control buttons
 
 ---
 
 ## 📊 **Weekly Structure Display**
 
-### **Week Display Layout**
+### **Week Display Layout (Collapsible)**
 ```
-┌─ Week 5 (Sep 22–28) - Continued build ──────────────┐
-│  Build Phase • Week 5 of 16                          │
-│                                                     │
-│  Mon Sep 22 │ Off + mobility                         │
-│             │ Protein focus                         │
-│             │ 2100 kcal                             │
-│                                                     │
-│  Tue Sep 23 │ Stairs 40–45 min + Gym Lower          │
-│             │ Carbs pre/post gym                    │
-│             │ 2300 kcal                             │
-│                                                     │
-│  Wed Sep 24 │ Easy 35–45 min Z2 run-walk + Gym      │
-│             │ Balanced                              │
-│             │ 2300 kcal                             │
-│                                                     │
-│  [Daily training cards continue...]                 │
-│                                                     │
-│  Progress: 31% complete • Race: Dec 1, 2025        │
-└─────────────────────────────────────────────────────┘
+┌─ ▼ Expand All     ▲ Collapse All ──────────────────┐
+│                                                         │
+│  ┌─ W5 (Sep 22–28) - Continued build ──────────────┐   │
+│  │  Build Phase • Week 5 of 18                      │   │
+│  │                                                 │   │
+│  │  Type │ Date │ Day │ Training │ Focus │ Nutrition│   │
+│  │  ─────┼──────┼─────┼─────────┼───────┼──────────│   │
+│  │   »»  │ Sep 22│ Mon │ Tempo   │ Pre...│ 📋 2300 │   │
+│  │   »   │ Sep 23│ Tue │ Stairs  │ Carbs │ 📋 2300 │   │
+│  │   ZZZ │ Sep 24│ Wed │ Off     │ Rest  │ 📋 2100 │   │
+│  │                                                 │   │
+│  │  Progress: 28% complete • Race: Dec 1, 2025     │   │
+│  └─────────────────────────────────────────────────┘   │
+│                                                         │
+│  ┌─ W6 (Sep 29–Oct 5) - Peak Phase ─────────────────┐   │
+│  │  [Collapsed - click to expand]                   │   │
+│  └─────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────┘
 ```
+
+**Heroicon Legend:**
+- **⬆️⬆️** Race Day & High intensity (ChevronDoubleUp)
+- **⬆️** Moderate & Easy intensity (ChevronUp)
+- **➖** Off/Recovery days (Minus)
 
 ### **Daily Training Card Structure**
 ```
-┌─ Monday, September 22 ──────────────────────────────┐
-│  🏃 Off + mobility                                  │
+┌─ Monday, September 22 (Off Day) ────────────────────┐
+│  Type: ➖ │ Date: Sep 22 │ Day: Mon               │
+│  ─────────────────────────────────────────────────  │
+│  🏃 Training: Off + mobility                        │
+│  📝 Focus: Protein focus                           │
+│  📋 Nutrition: ~2100 kcal                          │
 │                                                     │
-│  📝 Protein focus                                   │
-│  🔥 2100 kcal                                       │
+│  [Background: Light gray • Left border: Gray]      │
+└─────────────────────────────────────────────────────┘
+```
+
+### **High Intensity Training Example**
+```
+┌─ Tuesday, September 23 (High Intensity) ────────────┐
+│  Type: ⬆️⬆️ │ Date: Sep 23 │ Day: Tue            │
+│  ─────────────────────────────────────────────────  │
+│  🏃 Training: Tempo - 45 min sustained effort      │
+│  📝 Focus: Pre-workout fueling                     │
+│  📋 Nutrition: ~2300 kcal                          │
 │                                                     │
-│  💧 Hydration: 2.5L fluids, 1500mg sodium          │
-│                                                     │
-│  ✅ Recovery nutrition                              │
-│     Maintain adequate protein intake                │
-│     Support overall health and wellness             │
+│  [Background: Light orange • Left border: Orange]  │
 └─────────────────────────────────────────────────────┘
 ```
 
@@ -58,17 +73,64 @@ The **TrainingPlanView** and **TrainingWeek** components provide the detailed tr
 
 ## 🎨 **Visual Design System**
 
-### **Color Coding by Training Type**
-- **Exercise Days**: Green accents (`emerald-500`, `emerald-50`)
-- **Rest Days**: Gray accents (`slate-500`, `slate-50`)
-- **Race Days**: Red accents (`red-500`, `red-50`)
-- **Today**: Amber highlights (`amber-500`)
+### **Simplified Color Coding System**
+- **Training Days**: Green accents (`green-500`, `green-100`) - All exercise days
+- **Current Date**: Amber highlight (`amber-500`, `amber-50`) - Today's row only
+- **Rest Days**: Default UI colors (`slate-500`, `slate-100`) - Clean, minimal styling
+- **Default Theme**: Consistent gray/blue theme for all non-training elements
+- **Today**: Amber highlights (`amber-500`) - Current day indicator
 
-### **Training Intensity Indicators**
-- **High Intensity**: Bold text, enhanced colors
-- **Moderate Intensity**: Standard text, normal colors
-- **Low Intensity**: Light text, muted colors
-- **Recovery**: Soft colors, recovery-focused messaging
+### **Enhanced Visual Design System**
+- **Table Borders**: Clear row separation with subtle outer borders and hover effects
+- **Training Indicators**: Green badges, dots, and text for all exercise days
+- **Current Date**: Exclusive yellow highlighting for today's row only
+- **Simplified Colors**: Clean, minimal color scheme with strategic green accents
+- **Responsive Design**: Optimized layout for all screen sizes
+- **Interactive Elements**: Smooth transitions and hover states
+
+### **Enhanced Interactive Features**
+
+#### **Individual Week Toggles**
+- **Toggle Icons**: Clickable chevron icons on each week header (right side)
+- **Smart Positioning**: Toggle buttons positioned for optimal usability
+- **Visual States**: Clear up/down chevron indicators for expand/collapse
+- **Event Handling**: Proper Vue event system for state management
+
+#### **Collapsible Week Behavior**
+- **Default State**: Only current week expanded, others collapsed
+- **Auto-Expansion**: Current week automatically expands on page load
+- **Auto-Scroll**: Smooth scroll to current week position
+- **Transition Effects**: Smooth expand/collapse animations (300ms)
+
+#### **Bulk Control Buttons**
+- **Expand All**: Blue button with down arrow - expands all 16 weeks
+- **Collapse All**: Gray button with up arrow - collapses all weeks
+- **Smart States**: Buttons disable when action is inappropriate
+- **Visual Feedback**: Hover effects and proper button states
+
+#### **Dynamic Data Loading**
+- **Real-time Fetching**: JSON data loaded from `/data/el-cruce-plan.json`
+- **Loading States**: Professional spinner during data fetch
+- **Error Handling**: Comprehensive error display with retry functionality
+- **Reactive Updates**: Proper Vue reactivity for all data changes
+
+### **Component Interaction Logic**
+```typescript
+// Expand/collapse logic
+const isWeekExpanded = (weekId: string) => {
+  return allExpanded.value || expandedWeekId.value === weekId
+}
+
+const expandAllWeeks = () => {
+  allExpanded.value = true
+  expandedWeekId.value = null
+}
+
+const collapseAllWeeks = () => {
+  allExpanded.value = false
+  expandedWeekId.value = null
+}
+```
 
 ### **Phase Progression Visuals**
 - **Base Phase**: Blue theme (`blue-500`)
@@ -391,6 +453,7 @@ const getPhaseStyling = (phase: TrainingPhase) => {
 
 ---
 
-**Component Version**: 1.0
-**Last Updated**: December 2024
+**Component Version**: 2.0
+**Last Updated**: January 2025
 **Author**: RaceDay Development Team
+**Key Updates**: Dynamic loading, individual toggles, enhanced borders, simplified color scheme

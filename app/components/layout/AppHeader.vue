@@ -121,7 +121,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useTrainingStore } from '@/stores'
-import logoSrc from '../../assets/images/logo.webp'
+import logoSrc from '../../assets/images/raceday.svg'
 
 const router = useRouter()
 const trainingStore = useTrainingStore()
