@@ -1,63 +1,53 @@
-const fs = require('fs')
-const path = require('path')
+import express from 'express'
+import fs from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
 
-export default async function handler(req, res) {
-  // Set CORS headers
-  res.setHeader('Access-Control-Allow-Origin', '*')
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+const router = express.Router()
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
-  if (req.method === 'OPTIONS') {
-    res.status(200).end()
-    return
-  }
-
+// GET /api/nutrition
+router.get('/nutrition', async (req, res) => {
   try {
-    if (req.method === 'GET') {
-      const { date } = req.query
-      
-      // Load nutrition data from JSON file
-      const dataPath = path.join(process.cwd(), 'app', 'data', 'nutrition-plan.json')
-      
-      if (!fs.existsSync(dataPath)) {
-        return res.status(404).json({
-          success: false,
-          error: 'Nutrition data not found'
-        })
-      }
-      
-      const rawData = fs.readFileSync(dataPath, 'utf8')
-      const nutritionData = JSON.parse(rawData)
-      
-      if (date) {
-        // Return nutrition for specific date
-        const dailyNutrition = nutritionData[date]
-        
-        if (dailyNutrition) {
-          res.status(200).json({
-            success: true,
-            data: dailyNutrition
-          })
-        } else {
-          // Generate fallback nutrition if not found
-          const fallbackNutrition = generateFallbackNutrition(date)
-          res.status(200).json({
-            success: true,
-            data: fallbackNutrition,
-            generated: true
-          })
-        }
-      } else {
-        // Return all nutrition data
+    const { date } = req.query
+
+    // Load nutrition data from JSON file
+    const dataPath = path.join(process.cwd(), 'app', 'data', 'nutrition-plan.json')
+
+    if (!fs.existsSync(dataPath)) {
+      return res.status(404).json({
+        success: false,
+        error: 'Nutrition data not found'
+      })
+    }
+
+    const rawData = fs.readFileSync(dataPath, 'utf8')
+    const nutritionData = JSON.parse(rawData)
+
+    if (date) {
+      // Return nutrition for specific date
+      const dailyNutrition = nutritionData[date]
+
+      if (dailyNutrition) {
         res.status(200).json({
           success: true,
-          data: nutritionData
+          data: dailyNutrition
+        })
+      } else {
+        // Generate fallback nutrition if not found
+        const fallbackNutrition = generateFallbackNutrition(date)
+        res.status(200).json({
+          success: true,
+          data: fallbackNutrition,
+          generated: true
         })
       }
     } else {
-      res.status(405).json({
-        success: false,
-        error: 'Method not allowed'
+      // Return all nutrition data
+      res.status(200).json({
+        success: true,
+        data: nutritionData
       })
     }
   } catch (error) {
@@ -67,7 +57,7 @@ export default async function handler(req, res) {
       error: 'Internal server error'
     })
   }
-}
+})
 
 function generateFallbackNutrition(date) {
   // Simple fallback nutrition generation
@@ -129,3 +119,5 @@ function generateFallbackNutrition(date) {
     ]
   }
 }
+
+export default router

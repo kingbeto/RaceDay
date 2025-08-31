@@ -6,11 +6,19 @@
   "scripts": {
     "dev": "cd app && vite",
     "build": "cd app && vite build",
-    "preview": "cd app && vite preview"
+    "preview": "cd app && vite preview",
+    "server": "node server.js",
+    "server:dev": "nodemon server.js",
+    "server:prod": "NODE_ENV=production node server.js",
+    "start": "npm run server:prod"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.55.0",
     "@vueuse/core": "^11.1.0",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "helmet": "^8.1.0",
+    "morgan": "^1.10.1",
     "pinia": "^2.2.6",
     "vue": "^3.5.18",
     "vue-router": "^4.4.5"
@@ -21,6 +29,7 @@
     "@types/node": "^22.10.5",
     "@vitejs/plugin-vue": "^6.0.1",
     "autoprefixer": "^10.4.20",
+    "nodemon": "^3.1.10",
     "postcss": "^8.5.1",
     "tailwindcss": "^3.4.17",
     "terser": "^5.43.1",

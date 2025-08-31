@@ -8,6 +8,7 @@ This folder contains all behavioral and feature documentation for the RaceDay tr
 
 ### 🎯 **Primary Documentation**
 
+- **[🔌 API.md](API.md)** - Express.js API server documentation and endpoints
 - **[📋 REQUIREMENTS.md](REQUIREMENTS.md)** - Complete consolidated behavior requirements and specifications
 - **[🍽️ MEALCARD.md](MEALCARD.md)** - MealCard component specifications and behavior
 - **[📅 CALENDAR_BEHAVIORS.md](CALENDAR_BEHAVIORS.md)** - Calendar component behaviors and color-coding
@@ -23,7 +24,7 @@ This folder contains all behavioral and feature documentation for the RaceDay tr
 
 ---
 
-**Last Updated**: January 2025
-**Current Version**: 16-week enhanced plan with dynamic loading and improved UI
-**Key Features**: Dynamic JSON loading, individual week toggles, enhanced borders, green training indicators, simplified color scheme
+**Last Updated**: December 2024
+**Current Version**: Express.js backend migration with enhanced API
+**Key Features**: Express.js server, RESTful API, individual week toggles, enhanced borders, green training indicators, simplified color scheme
 **Maintained by**: RaceDay Development Team

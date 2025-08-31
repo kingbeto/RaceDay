@@ -26,8 +26,8 @@ A modern, comprehensive Single Page Application (SPA) designed for managing mult
 - **VueUse** for powerful composables and utilities
 
 ### **Backend** (`/api` folder)
-- **Vercel Serverless Functions** (Node.js)
-- **Database-ready API endpoints** (ready for Supabase integration)
+- **Express.js Server** (Node.js)
+- **RESTful API endpoints** (ready for Supabase integration)
 - **JSON-based data storage** for initial development
 - **CORS-enabled** for cross-origin requests
 
@@ -64,11 +64,17 @@ raceday/
 │   ├── postcss.config.cjs    # PostCSS configuration
 │   └── index.html            # Entry HTML file
 │
-├── api/                      # Vercel serverless API endpoints
-│   ├── training-plans.js     # Training plan API
-│   ├── nutrition.js          # Nutrition data API
-│   └── groceries.js          # Grocery lists API
-│
+├── api/                      # Express.js API server
+│   ├── routes/               # Express route handlers
+│   │   ├── training-plans.js # Training plan API routes
+│   │   ├── nutrition.js      # Nutrition data API routes
+│   │   ├── groceries.js      # Grocery lists API routes
+│   │   └── hello.js          # API info and health check routes
+│   └── server.js             # Main Express server file
+├── context/                  # Project documentation
+│   ├── API.md                # API documentation
+│   ├── REQUIREMENTS.md       # Application requirements
+│   └── [other docs...]       # Behavioral specifications
 ├── public/                   # Static public assets
 ├── vercel.json               # Vercel deployment configuration
 ├── tsconfig.json             # TypeScript configuration
@@ -117,9 +123,16 @@ raceday/
 ### **Available Scripts**
 
 ```bash
-npm run dev      # Start development server
+# Frontend
+npm run dev      # Start Vue.js development server
 npm run build    # Build for production
 npm run preview  # Preview production build locally
+
+# Backend API
+npm run server:dev   # Start Express server with auto-reload
+npm run server:prod  # Start Express server in production mode
+npm run server       # Start Express server (production)
+npm start            # Start Express server (production)
 ```
 
 ## 🏗️ **Architecture Overview**
@@ -180,28 +193,61 @@ interface DailyNutrition {
 
 ## 🌐 **Deployment**
 
-### **Vercel Deployment**
+### **Deployment Options**
+
+#### **Option 1: Vercel (Recommended)**
+Deploy the complete application to Vercel with static API responses:
 
 1. **Connect to Vercel:**
    ```bash
    npx vercel
    ```
 
-2. **Configure build settings:**
+2. **Automatic Configuration:**
+   - Vercel will automatically detect and use the `vercel.json` configuration
    - Build Command: `cd app && npm run build`
    - Output Directory: `app/dist`
    - Node.js Version: 18.x
 
-3. **Environment Variables (Production):**
+3. **API Endpoints:**
+   - API routes are served as static JSON files from `/public/api/`
+   - Health endpoint available at `/health`
+   - All endpoints return the same data as the Express server
+
+#### **Option 2: Full-Stack Deployment**
+For deploying both frontend and Express.js backend:
+
+**Recommended platforms:**
+- **Railway** - Simple Node.js deployment
+- **Render** - Free tier available
+- **Heroku** - Traditional Node.js hosting
+- **DigitalOcean App Platform** - Scalable cloud deployment
+
+**Deployment steps:**
+```bash
+# 1. Build the frontend
+npm run build
+
+# 2. Start the production server
+npm start
+```
+
+3. **Environment Variables:**
    ```
+   NODE_ENV=production
+   PORT=3001
+   FRONTEND_URL=https://your-frontend-domain.com
    VITE_SUPABASE_URL=your_production_supabase_url
    VITE_SUPABASE_ANON_KEY=your_production_supabase_key
-   VITE_APP_TITLE=RaceDay
    ```
 
 ### **API Endpoints**
-- `GET /api/training-plans` - Retrieve training plan data
+- `GET /health` - Server health check and status
+- `GET /api/hello` - API information and available endpoints
+- `GET /api/training-plans` - Retrieve complete training plan data
+- `GET /api/nutrition` - Get all nutrition data
 - `GET /api/nutrition?date=YYYY-MM-DD` - Get nutrition for specific date
+- `GET /api/groceries` - Get all grocery lists
 - `GET /api/groceries?weekId=W1` - Get grocery list for specific week
 
 ## 🎨 **Customization**
@@ -282,4 +328,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 **Built with ❤️ for endurance athletes and training enthusiasts**
+
+---
+
+*Last updated: December 2024 - Express.js backend migration complete*
 
