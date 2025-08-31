@@ -122,6 +122,14 @@ The **TrainingPlanView** and **TrainingWeek** components provide the detailed tr
 - **Row-Level Precision**: Specific training rows highlighted when week is expanded
 - **Container Highlighting**: Entire training plan highlighted when collapsed
 
+#### **Calendar Month Navigation**
+- **Default State**: Only current month visible by default
+- **Month Navigation**: Previous/Next buttons for easy month browsing
+- **Today Button**: Quick navigation to current month
+- **Single Month View**: Always shows one month at a time for focused view
+- **Smooth Transitions**: Animated month changes
+- **Boundary Handling**: Smart button disabling at start/end of plan
+
 #### **Dynamic Data Loading**
 - **Real-time Fetching**: JSON data loaded from `/data/el-cruce-plan.json`
 - **Loading States**: Professional spinner during data fetch

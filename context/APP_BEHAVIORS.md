@@ -68,7 +68,11 @@ App.vue
 ├── Main Layout (Grid system)
 │   ├── Sidebar (Left side)
 │   │   ├── Today's Focus (Dynamic daily focus with green training indicators)
-│   │   ├── CalendarView (All months with training day highlighting)
+│   │   ├── CalendarView (Month-by-month navigation)
+│   │   │   ├── Previous/Next month buttons
+│   │   │   ├── "Today" button for current month
+│   │   │   ├── Single month view for focused browsing
+│   │   │   └── Smooth animated month transitions
 │   │   └── GroceryList (Weekly shopping with category organization)
 │   └── Main Content (Right side)
 │       ├── Expand/Collapse All Buttons (Bulk week control)

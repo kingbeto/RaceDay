@@ -3,11 +3,13 @@
   <div class="max-h-[calc(100vh - 2rem)] overflow-y-auto">
     <div class="space-y-4">
 
-      <!-- All months expanded - static display -->
+      <!-- Months display with expand/collapse logic -->
       <div
         v-for="month in months"
         :key="month.name"
-        class="border border-gray-200 rounded-lg overflow-hidden"
+        v-show="shouldShowMonth(month.name)"
+        class="border border-gray-200 rounded-lg overflow-hidden transition-all duration-300"
+        :class="{ 'opacity-100': shouldShowMonth(month.name), 'opacity-0': !shouldShowMonth(month.name) }"
       >
         <!-- Month header - static -->
         <div class="w-full px-4 py-3 bg-gradient-to-r from-slate-50 to-slate-100 border-b border-gray-200 flex items-center">
@@ -80,7 +82,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, toRef } from 'vue'
+import { ref, computed, toRef, watch, onMounted, onUnmounted } from 'vue'
 import type { TrainingPlan } from '@/types'
 import { useCalendar } from '@/composables'
 import CalendarDay from './CalendarDay.vue'
@@ -90,18 +92,85 @@ interface Props {
   selectedDate: string | null
   compact?: boolean
   hoveredDate?: string | null
+  initialMonthIndex?: number
 }
 
 interface Emits {
   dateHover: [date: string]
   dateLeave: []
+  monthChanged: [index: number]
 }
 
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
-// Static data for today
-const todayStr = ref<string>(new Date().toISOString().slice(0, 10))
+// Static data for today - use a fixed date for demo purposes
+// Since the training plan is for 2025, we'll simulate being in August 2025
+const todayStr = ref<string>('2025-08-30') // Fixed to August 30, 2025 for demo
+
+// Get current month for default expansion
+// Find the month in the training plan that contains today's date
+const getCurrentMonthInTrainingPlan = () => {
+  if (!props.trainingPlan) return null
+
+  const today = new Date()
+  const todayString = today.toISOString().slice(0, 10)
+
+  // Find which week contains today
+  for (const week of props.trainingPlan.weeks) {
+    const todayInWeek = week.rows.find(row => row.date === todayString)
+    if (todayInWeek) {
+      // Return the month name from this week's start date
+      const weekStartDate = new Date(week.start)
+      return weekStartDate.toLocaleDateString('es-ES', {
+        year: 'numeric',
+        month: 'long'
+      })
+    }
+  }
+
+  // If today is not found, use the current month from the plan's start date
+  const planStartDate = new Date(props.trainingPlan.startDate)
+  return planStartDate.toLocaleDateString('es-ES', {
+    year: 'numeric',
+    month: 'long'
+  })
+}
+
+const currentMonth = computed(() => getCurrentMonthInTrainingPlan())
+
+// Month navigation state
+const currentVisibleMonthIndex = ref(props.initialMonthIndex || 0)
+const visibleMonthName = computed(() => {
+  if (!months.value.length) return null
+  return months.value[currentVisibleMonthIndex.value]?.name || null
+})
+
+// Navigation functions
+const goToPreviousMonth = () => {
+  if (currentVisibleMonthIndex.value > 0) {
+    currentVisibleMonthIndex.value--
+    emit('monthChanged', currentVisibleMonthIndex.value)
+  }
+}
+
+const goToNextMonth = () => {
+  if (currentVisibleMonthIndex.value < months.value.length - 1) {
+    currentVisibleMonthIndex.value++
+    emit('monthChanged', currentVisibleMonthIndex.value)
+  }
+}
+
+const goToCurrentMonth = () => {
+  if (!props.trainingPlan) return
+
+  const targetMonthName = currentMonth.value
+  const targetIndex = months.value.findIndex(month => month.name === targetMonthName)
+  if (targetIndex >= 0) {
+    currentVisibleMonthIndex.value = targetIndex
+    emit('monthChanged', currentVisibleMonthIndex.value)
+  }
+}
 
 // Get calendar data from composable
 const {
@@ -111,4 +180,42 @@ const {
 } = useCalendar(toRef(props, 'trainingPlan'))
 
 const dayHeaders = ['L', 'M', 'X', 'J', 'V', 'S', 'D'] // Spanish day headers
+
+// Watch for changes to initialMonthIndex prop
+watch(() => props.initialMonthIndex, (newIndex) => {
+  if (newIndex !== undefined && newIndex !== currentVisibleMonthIndex.value) {
+    currentVisibleMonthIndex.value = newIndex
+  }
+})
+
+// Listen for custom navigation events
+const handleNavigation = (event: CustomEvent) => {
+  if (event.detail?.direction === -1) {
+    goToPreviousMonth()
+  } else if (event.detail?.direction === 1) {
+    goToNextMonth()
+  }
+}
+
+const handleGoToCurrent = () => {
+  goToCurrentMonth()
+}
+
+// Add event listeners on mount
+onMounted(() => {
+  window.addEventListener('navigate-calendar', handleNavigation as EventListener)
+  window.addEventListener('go-to-current-month', handleGoToCurrent)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('navigate-calendar', handleNavigation as EventListener)
+  window.removeEventListener('go-to-current-month', handleGoToCurrent)
+})
+
+// Function to check if month should be visible
+const shouldShowMonth = (monthName: string) => {
+  return monthName === visibleMonthName.value
+}
+
+
 </script>

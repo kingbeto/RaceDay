@@ -109,20 +109,57 @@
               </div>
             </div>
 
-            <!-- Static Calendar Section -->
+            <!-- Calendar Section with Controls -->
             <div class="bg-white rounded-2xl border border-slate-200/60 overflow-hidden shadow-lg shadow-slate-100/50">
-              <div class="p-6 border-b border-slate-200/60 bg-gradient-to-r from-slate-50 via-white to-blue-50/30">
+              <div class="p-4 border-b border-slate-200/60 bg-gradient-to-r from-slate-50 via-white to-blue-50/30">
+                <div class="flex items-center justify-between">
+                  <!-- Left side: Title and info -->
                 <div class="flex items-center space-x-3">
-                  <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center">
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="w-7 h-7 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-md flex items-center justify-center">
+                      <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                     </svg>
                   </div>
                   <div>
-                    <h2 class="text-lg font-bold text-slate-900">Training Calendar</h2>
-                    <p class="text-sm text-slate-600 font-medium">
+                      <h2 class="text-base font-semibold text-slate-900">Training Calendar</h2>
+                      <p class="text-xs text-slate-600 font-medium">
                       Aug 18 → Dec 1, 2025 (Race)
                     </p>
+                    </div>
+                  </div>
+
+                  <!-- Right side: Month Navigation -->
+                  <div class="flex items-center gap-2">
+                    <!-- Previous Month -->
+                    <button
+                      @click="navigateCalendar(-1)"
+                      class="p-1 bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-800 rounded-md transition-colors duration-200"
+                      title="Previous Month"
+                    >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                      </svg>
+                    </button>
+
+                    <!-- Current Month Button -->
+                    <button
+                      @click="goToCurrentMonth"
+                      class="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-md shadow-sm transition-all duration-200"
+                      title="Go to Current Month"
+                    >
+                      Today
+                    </button>
+
+                    <!-- Next Month -->
+                    <button
+                      @click="navigateCalendar(1)"
+                      class="p-1 bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-800 rounded-md transition-colors duration-200"
+                      title="Next Month"
+                    >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                      </svg>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -132,8 +169,10 @@
                   :selected-date="'2025-01-15'"
                   :compact="true"
                   :hovered-date="hoveredDate"
+                  :initial-month-index="calendarMonthIndex"
                   @date-hover="handleCalendarHover"
                   @date-leave="handleCalendarLeave"
+                  @month-changed="handleMonthChanged"
                 />
               </div>
             </div>
@@ -197,10 +236,10 @@
 
               <!-- Training Plan Content -->
               <div v-else-if="sampleTrainingPlan">
-                <TrainingPlanView
-                  :plan="sampleTrainingPlan"
-                  :selected-date="'2025-01-15'"
-                  :is-expanded="true"
+              <TrainingPlanView
+                :plan="sampleTrainingPlan"
+                :selected-date="'2025-01-15'"
+                :is-expanded="true"
                   :hovered-date="hoveredDate"
                 />
               </div>
@@ -245,6 +284,9 @@ const error = ref<string | null>(null)
 // Shared reactive state for hover interactions between calendar and training plan
 const hoveredDate = ref<string | null>(null)
 
+// Calendar navigation state
+const calendarMonthIndex = ref(0)
+
 // Hover event handlers for calendar-training plan interaction
 const handleCalendarHover = (date: string) => {
   hoveredDate.value = date
@@ -252,6 +294,24 @@ const handleCalendarHover = (date: string) => {
 
 const handleCalendarLeave = () => {
   hoveredDate.value = null
+}
+
+// Calendar navigation handlers
+const navigateCalendar = (direction: number) => {
+  if (direction === -1 && calendarMonthIndex.value > 0) {
+    calendarMonthIndex.value--
+  } else if (direction === 1 && calendarMonthIndex.value < (sampleTrainingPlan.value?.weeks.length || 0) - 1) {
+    calendarMonthIndex.value++
+  }
+}
+
+const goToCurrentMonth = () => {
+  // Reset to first month (current month logic is handled in CalendarView)
+  calendarMonthIndex.value = 0
+}
+
+const handleMonthChanged = (newIndex: number) => {
+  calendarMonthIndex.value = newIndex
 }
 
 // Load training plan from JSON
@@ -337,7 +397,7 @@ const trainingIntensity = computed(() => {
     case 'high':
       return { level: 'high', label: 'HIGH', color: 'orange' }
     case 'moderate':
-      return { level: 'moderate', label: 'MODERATE', color: 'blue' }
+    return { level: 'moderate', label: 'MODERATE', color: 'blue' }
     case 'off':
       return { level: 'off', label: 'OFF', color: 'green' }
     default:
