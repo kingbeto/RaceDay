@@ -207,7 +207,8 @@ import {
   HomeIcon,
   ChevronDownIcon
 } from '@heroicons/vue/20/solid'
-import logoSrc from '../../assets/images/raceday.svg'
+// Using public asset for better Vercel compatibility
+const logoSrc = '/raceday-logo.svg'
 
 const router = useRouter()
 const route = useRoute()

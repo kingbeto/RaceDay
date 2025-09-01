@@ -23,7 +23,7 @@
       "destination": "/$1"
     },
     {
-      "source": "/((?!api|data|health).*)",
+      "source": "/((?!api|data|health|assets).*)",
       "destination": "/index.html"
     }
   ],
