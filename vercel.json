@@ -8,7 +8,7 @@
   "rewrites": [
     {
       "source": "/data/(.*)",
-      "destination": "/app/data/$1"
+      "destination": "/data/$1"
     },
     {
       "source": "/api/(.*)",
@@ -23,7 +23,7 @@
       "destination": "/$1"
     },
     {
-      "source": "/(.*)",
+      "source": "/((?!api|data|health).*)",
       "destination": "/index.html"
     }
   ],

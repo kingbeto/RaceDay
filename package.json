@@ -5,8 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "cd app && vite",
-    "build": "cd app && vite build",
+    "build": "npm run prebuild && cd app && vite build",
     "preview": "cd app && vite preview",
+    "prebuild": "cp public/api/*.json app/public/api/ && cp public/health.json app/public/",
     "server": "node server.js",
     "server:dev": "nodemon server.js",
     "server:prod": "NODE_ENV=production node server.js",
