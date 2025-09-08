@@ -1,38 +1,23 @@
 import express from 'express'
-import fs from 'fs'
-import path from 'path'
-import { fileURLToPath } from 'url'
+import prisma from '../prisma/client.js'
 
 const router = express.Router()
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
 
 // GET /api/nutrition
 router.get('/nutrition', async (req, res) => {
   try {
     const { date } = req.query
 
-    // Load nutrition data from JSON file
-    const dataPath = path.join(process.cwd(), 'app', 'data', 'nutrition-plan.json')
-
-    if (!fs.existsSync(dataPath)) {
-      return res.status(404).json({
-        success: false,
-        error: 'Nutrition data not found'
-      })
-    }
-
-    const rawData = fs.readFileSync(dataPath, 'utf8')
-    const nutritionData = JSON.parse(rawData)
-
     if (date) {
       // Return nutrition for specific date
-      const dailyNutrition = nutritionData[date]
+      const nutritionRecord = await prisma.nutritionData.findUnique({
+        where: { dateKey: date }
+      })
 
-      if (dailyNutrition) {
+      if (nutritionRecord) {
         res.status(200).json({
           success: true,
-          data: dailyNutrition
+          data: nutritionRecord.meals
         })
       } else {
         // Generate fallback nutrition if not found
@@ -45,6 +30,17 @@ router.get('/nutrition', async (req, res) => {
       }
     } else {
       // Return all nutrition data
+      const nutritionRecords = await prisma.nutritionData.findMany({
+        orderBy: {
+          dateKey: 'asc'
+        }
+      })
+
+      const nutritionData = {}
+      nutritionRecords.forEach(record => {
+        nutritionData[record.dateKey] = record.meals
+      })
+
       res.status(200).json({
         success: true,
         data: nutritionData

@@ -1,0 +1,19 @@
+{
+  "success": true,
+  "data": {
+    "W0": [
+      {
+        "name": "🥩 Proteínas",
+        "items": "Huevos (24u), queso fresco (600g), merluza (1kg), yogur natural descremado (1L)"
+      },
+      {
+        "name": "🌾 Carbohidratos",
+        "items": "Pan francés (2 paquetes), arroz integral (500g), avena (500g)"
+      },
+      {
+        "name": "🥬 Verduras",
+        "items": "Zapallo (1u), espinaca (2 atados), lechuga (2u), cebolla (3u), ajo, brócoli, zanahoria (1kg)"
+      }
+    ]
+  }
+}

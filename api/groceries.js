@@ -1,10 +1,22 @@
-import express from 'express'
-import prisma from '../prisma/client.js'
+import { PrismaClient } from '@prisma/client'
 
-const router = express.Router()
+const prisma = new PrismaClient()
 
-// GET /api/groceries
-router.get('/groceries', async (req, res) => {
+export default async function handler(req, res) {
+  // Enable CORS
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+
+  if (req.method === 'OPTIONS') {
+    res.status(200).end()
+    return
+  }
+
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Method not allowed' })
+  }
+
   try {
     const { weekId } = req.query
 
@@ -49,7 +61,7 @@ router.get('/groceries', async (req, res) => {
       success: false,
       error: 'Internal server error'
     })
+  } finally {
+    await prisma.$disconnect()
   }
-})
-
-export default router
+}

@@ -3,17 +3,39 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
     "dev": "cd app && vite",
-    "build": "npm run prebuild && cd app && vite build",
+    "build": "npm run prebuild && npm run build:frontend && npm run build:api",
+    "build:frontend": "cd app && vite build",
+    "build:api": "npm run db:generate && cp -r api dist/ && cp public/health.json dist/",
     "preview": "cd app && vite preview",
-    "prebuild": "cp public/api/*.json app/public/api/ && cp public/health.json app/public/ && cp public/raceday-logo.svg app/public/",
+    "prebuild": "mkdir -p dist/data dist/public && cp -r app/data/* dist/data/ && [ -f public/raceday-logo.svg ] && cp public/raceday-logo.svg dist/public/ || echo 'Logo file not found, skipping'",
     "server": "node server.js",
     "server:dev": "nodemon server.js",
     "server:prod": "NODE_ENV=production node server.js",
-    "start": "npm run server:prod"
+    "start": "npm run server:prod",
+
+    "db:generate": "cd api/prisma && npx prisma generate",
+    "db:migrate": "cd api/prisma && npx prisma migrate dev",
+    "db:migrate:prod": "cd api/prisma && npx prisma migrate deploy",
+    "db:push": "cd api/prisma && npx prisma db push",
+    "db:seed": "cd api/prisma && node seed.js",
+    "db:studio": "cd api/prisma && npx prisma studio",
+    "db:reset": "cd api/prisma && npx prisma migrate reset --force",
+    "db:init": "npm run db:migrate && npm run db:seed",
+    "db:setup:dev": "cp api/prisma/schema.dev.prisma api/prisma/schema.prisma && npm run db:init",
+    "db:setup:prod": "cp api/prisma/schema.postgres.prisma api/prisma/schema.prisma",
+    "deploy:prepare": "node scripts/prepare-deployment.js",
+
+    "prisma:dev": "cd api/prisma && npx prisma migrate dev",
+    "prisma:studio": "cd api/prisma && npx prisma studio",
+    "prisma:generate": "cd api/prisma && npx prisma generate"
   },
   "dependencies": {
+    "@prisma/client": "^6.15.0",
     "@supabase/supabase-js": "^2.55.0",
     "@vueuse/core": "^11.1.0",
     "cors": "^2.8.5",
@@ -32,6 +54,7 @@
     "autoprefixer": "^10.4.20",
     "nodemon": "^3.1.10",
     "postcss": "^8.5.1",
+    "prisma": "^6.15.0",
     "tailwindcss": "^3.4.17",
     "terser": "^5.43.1",
     "typescript": "^5.6.0",

@@ -1,0 +1,57 @@
+{
+  "success": true,
+  "data": {
+    "2025-08-19": {
+      "totalCalories": 2100,
+      "totalProtein": 185,
+      "totalCarbs": 180,
+      "totalFats": 68,
+      "meals": [
+        {
+          "name": "Desayuno",
+          "calories": 525,
+          "dishes": [
+            {
+              "name": "Desayuno balanceado",
+              "ingredients": "Avena, frutas, proteína",
+              "preparation": "Combinación equilibrada de macronutrientes"
+            }
+          ]
+        },
+        {
+          "name": "Almuerzo",
+          "calories": 735,
+          "dishes": [
+            {
+              "name": "Almuerzo completo",
+              "ingredients": "Proteína magra, carbohidratos complejos, vegetales",
+              "preparation": "Comida principal balanceada"
+            }
+          ]
+        },
+        {
+          "name": "Merienda",
+          "calories": 315,
+          "dishes": [
+            {
+              "name": "Snack saludable",
+              "ingredients": "Fruta, yogur o frutos secos",
+              "preparation": "Merienda nutritiva"
+            }
+          ]
+        },
+        {
+          "name": "Cena",
+          "calories": 525,
+          "dishes": [
+            {
+              "name": "Cena ligera",
+              "ingredients": "Proteína ligera, vegetales",
+              "preparation": "Cena fácil de digerir"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
