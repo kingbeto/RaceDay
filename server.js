@@ -18,16 +18,24 @@ const app = express()
 const PORT = process.env.PORT || 3001
 
 // Middleware
-app.use(helmet({
-  crossOriginResourcePolicy: { policy: "cross-origin" }
-}))
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' }
+  })
+)
 
-app.use(cors({
-  origin: process.env.NODE_ENV === 'production' ? process.env.FRONTEND_URL : '*',
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}))
+app.use(
+  cors({
+    origin:
+      process.env.NODE_ENV === 'production'
+        ? [process.env.FRONTEND_URL, 'http://localhost:5173', 'http://127.0.0.1:5173']
+        : ['http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:3000', '*'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
+    optionsSuccessStatus: 200
+  })
+)
 
 app.use(morgan('combined'))
 
@@ -36,6 +44,9 @@ app.use(express.urlencoded({ extended: true }))
 
 // Serve static files from the app directory
 app.use(express.static(path.join(__dirname, 'app')))
+
+// Handle preflight OPTIONS requests
+app.options('*', cors())
 
 // API Routes
 app.use('/api', trainingPlansRoutes)

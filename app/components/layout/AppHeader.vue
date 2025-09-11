@@ -20,18 +20,33 @@
                 />
               </div>
               <div>
-                <h1 class="text-xl font-bold text-foreground group-hover:text-primary transition-colors duration-200">RaceDay</h1>
-                <p class="text-xs text-muted-foreground group-hover:text-foreground transition-colors duration-200">Training & Nutrition Planner</p>
+                <h1
+                  class="text-xl font-bold text-foreground group-hover:text-primary transition-colors duration-200"
+                >
+                  RaceDay
+                </h1>
+                <p
+                  class="text-xs text-muted-foreground group-hover:text-foreground transition-colors duration-200"
+                >
+                  Training & Nutrition Planner
+                </p>
               </div>
             </button>
           </div>
 
           <!-- Page Title and Metadata -->
-          <h2 class="text-2xl/7 font-bold text-foreground sm:truncate sm:text-3xl sm:tracking-tight">{{ currentPageTitle }}</h2>
+          <h2
+            class="text-2xl/7 font-bold text-foreground sm:truncate sm:text-3xl sm:tracking-tight"
+          >
+            {{ currentPageTitle }}
+          </h2>
 
           <div class="mt-1 flex flex-col sm:mt-0 sm:flex-row sm:flex-wrap sm:space-x-6">
             <div class="mt-2 flex items-center text-sm text-muted-foreground">
-              <CalendarDaysIcon class="mr-1.5 size-5 shrink-0 text-muted-foreground" aria-hidden="true" />
+              <CalendarDaysIcon
+                class="mr-1.5 size-5 shrink-0 text-muted-foreground"
+                aria-hidden="true"
+              />
               {{ formatDate(today) }}
             </div>
             <div class="mt-2 flex items-center text-sm text-muted-foreground">
@@ -54,7 +69,10 @@
               type="button"
               class="inline-flex items-center rounded-md bg-background px-3 py-2 text-sm font-semibold text-foreground shadow-sm ring-1 ring-inset ring-border hover:bg-muted transition-colors"
             >
-              <CalendarIcon class="mr-1.5 -ml-0.5 size-5 text-muted-foreground" aria-hidden="true" />
+              <CalendarIcon
+                class="mr-1.5 -ml-0.5 size-5 text-muted-foreground"
+                aria-hidden="true"
+              />
               Calendario
             </button>
           </span>
@@ -65,7 +83,10 @@
               type="button"
               class="inline-flex items-center rounded-md bg-background px-3 py-2 text-sm font-semibold text-foreground shadow-sm ring-1 ring-inset ring-border hover:bg-muted transition-colors"
             >
-              <UtensilsIcon class="mr-1.5 -ml-0.5 size-5 text-muted-foreground" aria-hidden="true" />
+              <UtensilsIcon
+                class="mr-1.5 -ml-0.5 size-5 text-muted-foreground"
+                aria-hidden="true"
+              />
               Nutrición
             </button>
           </span>
@@ -83,9 +104,14 @@
 
           <!-- Mobile Dropdown Menu -->
           <Menu as="div" class="relative ml-3 sm:hidden">
-            <MenuButton class="inline-flex items-center rounded-md bg-background px-3 py-2 text-sm font-semibold text-foreground shadow-sm ring-1 ring-inset ring-border hover:bg-muted transition-colors">
+            <MenuButton
+              class="inline-flex items-center rounded-md bg-background px-3 py-2 text-sm font-semibold text-foreground shadow-sm ring-1 ring-inset ring-border hover:bg-muted transition-colors"
+            >
               Más
-              <ChevronDownIcon class="-mr-1 ml-1.5 size-5 text-muted-foreground" aria-hidden="true" />
+              <ChevronDownIcon
+                class="-mr-1 ml-1.5 size-5 text-muted-foreground"
+                aria-hidden="true"
+              />
             </MenuButton>
 
             <transition
@@ -96,7 +122,9 @@
               leave-from-class="transform scale-100"
               leave-to-class="transform opacity-0 scale-95"
             >
-              <MenuItems class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-background py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+              <MenuItems
+                class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-background py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+              >
                 <MenuItem v-slot="{ active }">
                   <button
                     @click="navigateToCalendar"

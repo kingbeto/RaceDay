@@ -1,11 +1,13 @@
 import express from 'express'
 import prisma from '../prisma/client.js'
+import { asyncHandler, sendSuccess, sendError } from '../utils/response.js'
 
 const router = express.Router()
 
 // GET /api/training-plans
-router.get('/training-plans', async (req, res) => {
-  try {
+router.get(
+  '/training-plans',
+  asyncHandler(async (req, res) => {
     const trainingPlans = await prisma.trainingPlan.findMany({
       orderBy: {
         updatedAt: 'desc'
@@ -13,17 +15,13 @@ router.get('/training-plans', async (req, res) => {
     })
 
     if (!trainingPlans || trainingPlans.length === 0) {
-      return res.status(404).json({
-        success: false,
-        error: 'No training plans found'
-      })
+      return sendError(res, 'No training plans found', 404, 'TRAINING_PLANS_NOT_FOUND')
     }
 
     // Return the first (and currently only) training plan
-    // In the future, this could support multiple plans
+    // TODO: In the future, this could support multiple plans or plan selection
     const trainingPlan = trainingPlans[0]
 
-    // Reconstruct the full training plan object as expected by the frontend
     const fullPlan = {
       id: trainingPlan.id,
       title: trainingPlan.title,
@@ -35,17 +33,8 @@ router.get('/training-plans', async (req, res) => {
       weeks: trainingPlan.weeks
     }
 
-    res.status(200).json({
-      success: true,
-      data: fullPlan
-    })
-  } catch (error) {
-    console.error('Error in training-plans API:', error)
-    res.status(500).json({
-      success: false,
-      error: 'Internal server error'
-    })
-  }
-})
+    sendSuccess(res, fullPlan, 'Training plan retrieved successfully')
+  })
+)
 
 export default router

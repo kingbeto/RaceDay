@@ -6,13 +6,17 @@
     :class="{ 'ring-2 ring-amber-400/60 shadow-lg shadow-amber-100/40': hasSelectedDate }"
   >
     <!-- Week header - static -->
-    <div class="p-4 bg-gradient-to-r from-slate-50 via-white to-blue-50/30 rounded-t-xl border-b border-slate-200/60">
+    <div
+      class="p-4 bg-gradient-to-r from-slate-50 via-white to-blue-50/30 rounded-t-xl border-b border-slate-200/60"
+    >
       <div class="flex items-center justify-between">
         <!-- Week identifier with dot indicator -->
         <div class="flex items-center gap-3">
           <div class="flex items-center gap-2">
             <!-- Static gradient dot indicator -->
-            <div class="w-3 h-3 rounded-full bg-gradient-to-r from-emerald-500 via-blue-500 to-indigo-500 shadow"></div>
+            <div
+              class="w-3 h-3 rounded-full bg-gradient-to-r from-emerald-500 via-blue-500 to-indigo-500 shadow"
+            ></div>
             <div>
               <h3 class="text-lg font-semibold text-slate-900 leading-tight">{{ week.label }}</h3>
               <p class="text-xs text-slate-600 font-medium leading-snug">{{ week.summary }}</p>
@@ -25,7 +29,9 @@
         <!-- Static info display with toggle button -->
         <div class="flex items-center gap-2">
           <!-- Day counter badge -->
-          <span class="hidden sm:inline text-[10px] text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
+          <span
+            class="hidden sm:inline text-[10px] text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full"
+          >
             {{ week.rows?.length || 7 }} days
           </span>
           <!-- Toggle button -->
@@ -45,8 +51,6 @@
           </button>
         </div>
       </div>
-
-
     </div>
 
     <!-- Collapsible training content -->
@@ -60,98 +64,129 @@
       leave-to-class="max-h-0 opacity-0"
     >
       <div v-if="props.isExpanded" class="p-4 pt-0">
-        <table class="w-full border-separate border-spacing-0 bg-slate-50/30 rounded-lg overflow-hidden border border-slate-200/50">
-        <!-- Enhanced table header -->
-        <thead>
-          <tr class="bg-gradient-to-r from-slate-100 via-white to-blue-50/40">
-            <th class="px-3 py-3 text-center text-xs font-semibold text-slate-800 first:rounded-tl-lg w-10">Type</th>
-            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-800">Date</th>
-            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-800 hidden sm:table-cell">Day</th>
-            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-800">Training</th>
-            <th class="px-4 py-3 text-left text-xs font-semibold text-slate-800 hidden lg:table-cell">Focus</th>
-            <th class="px-4 py-3 text-center text-xs font-semibold text-slate-800 last:rounded-tr-lg">Nutrition</th>
-          </tr>
-        </thead>
-        <tbody class="bg-white">
-          <tr
-            v-for="day in week.rows"
-            :key="day.date"
-            :id="`d-${day.date}`"
-            :class="getRowClasses(day)"
-            class="border-b border-slate-200/80 hover:bg-slate-50/50 transition-colors duration-150 last:border-b-0"
-          >
-            <!-- Type Column - Training Intensity Indicator -->
-            <td class="px-3 py-3 text-center w-10">
-              <div class="flex justify-center">
-                <div :class="getTypeIconClasses(day)" class="w-7 h-5 rounded-full flex items-center justify-center">
-                  <component
-                    :is="getTrainingIntensity(day).icon"
-                    class="w-3.5 h-3.5"
-                    :title="getTrainingIntensity(day).description"
-                  />
-                </div>
-              </div>
-            </td>
-
-            <!-- Date Column -->
-            <td class="px-4 py-3 w-24">
-              <div class="flex flex-col">
-                <span :class="getDateTextClasses(day)" class="font-semibold text-xs">
-                  {{ formatDayDate(day.date) }}
-                </span>
-                <span class="text-[10px] text-slate-500 font-medium">
-                  {{ getDayName(day.date) }}
-                </span>
-              </div>
-            </td>
-
-            <!-- Day Badge -->
-            <td class="px-4 py-3 hidden sm:table-cell w-20">
-              <span :class="getDayBadgeClasses(day)" class="px-2.5 py-0.5 rounded-md text-[10px] font-bold">
-                {{ getDayAbbr(day.date) }}
-              </span>
-            </td>
-
-            <!-- Training Column -->
-            <td class="px-4 py-3">
-              <div class="flex items-start space-x-2">
-                <!-- Activity dot indicator -->
-                <div :class="getActivityDotClasses(day)" class="w-2.5 h-2.5 rounded-full mt-1 shadow-sm"></div>
-                <div class="flex-1">
+        <table
+          class="w-full border-separate border-spacing-0 bg-slate-50/30 rounded-lg overflow-hidden border border-slate-200/50"
+        >
+          <!-- Enhanced table header -->
+          <thead>
+            <tr class="bg-gradient-to-r from-slate-100 via-white to-blue-50/40">
+              <th
+                class="px-3 py-3 text-center text-xs font-semibold text-slate-800 first:rounded-tl-lg w-10"
+              >
+                Type
+              </th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-slate-800">Date</th>
+              <th
+                class="px-4 py-3 text-left text-xs font-semibold text-slate-800 hidden sm:table-cell"
+              >
+                Day
+              </th>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-slate-800">Training</th>
+              <th
+                class="px-4 py-3 text-left text-xs font-semibold text-slate-800 hidden lg:table-cell"
+              >
+                Focus
+              </th>
+              <th
+                class="px-4 py-3 text-center text-xs font-semibold text-slate-800 last:rounded-tr-lg"
+              >
+                Nutrition
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white">
+            <tr
+              v-for="day in week.rows"
+              :key="day.date"
+              :id="`d-${day.date}`"
+              :class="getRowClasses(day)"
+              class="border-b border-slate-200/80 hover:bg-slate-50/50 transition-colors duration-150 last:border-b-0"
+            >
+              <!-- Type Column - Training Intensity Indicator -->
+              <td class="px-3 py-3 text-center w-10">
+                <div class="flex justify-center">
                   <div
-                    :class="getTrainingTextClasses(day)"
-                    class="leading-snug font-medium text-sm"
-                    :title="getTrainingExplanation(day.training)"
+                    :class="getTypeIconClasses(day)"
+                    class="w-7 h-5 rounded-full flex items-center justify-center"
                   >
-                    {{ day.training || 'Off day' }}
+                    <component
+                      :is="getTrainingIntensity(day).icon"
+                      class="w-3.5 h-3.5"
+                      :title="getTrainingIntensity(day).description"
+                    />
                   </div>
                 </div>
-              </div>
-            </td>
+              </td>
 
-            <!-- Focus Column -->
-            <td class="px-4 py-3 hidden lg:table-cell">
-              <div class="text-xs text-slate-600 leading-snug font-medium">
-                {{ day.food || '-' }}
-              </div>
-            </td>
-
-            <!-- Nutrition Column -->
-            <td class="px-4 py-3 w-32">
-              <div class="flex flex-col items-center space-y-1.5">
-                <!-- Static nutrition display -->
-                <div class="inline-flex items-center justify-center w-7 h-7 text-blue-600 bg-blue-50 rounded-md border border-blue-200">
-                  <span class="text-[13px]">📋</span>
+              <!-- Date Column -->
+              <td class="px-4 py-3 w-24">
+                <div class="flex flex-col">
+                  <span :class="getDateTextClasses(day)" class="font-semibold text-xs">
+                    {{ formatDayDate(day.date) }}
+                  </span>
+                  <span class="text-[10px] text-slate-500 font-medium">
+                    {{ getDayName(day.date) }}
+                  </span>
                 </div>
-                <!-- Calorie display -->
-                <span class="text-[10px] text-slate-600 font-bold bg-slate-100 px-1.5 py-0.5 rounded">
-                  ~{{ getCaloriesForDay(day) }} kcal
+              </td>
+
+              <!-- Day Badge -->
+              <td class="px-4 py-3 hidden sm:table-cell w-20">
+                <span
+                  :class="getDayBadgeClasses(day)"
+                  class="px-2.5 py-0.5 rounded-md text-[10px] font-bold"
+                >
+                  {{ getDayAbbr(day.date) }}
                 </span>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+              </td>
+
+              <!-- Training Column -->
+              <td class="px-4 py-3">
+                <div class="flex items-start space-x-2">
+                  <!-- Activity dot indicator -->
+                  <div
+                    :class="getActivityDotClasses(day)"
+                    class="w-2.5 h-2.5 rounded-full mt-1 shadow-sm"
+                  ></div>
+                  <div class="flex-1">
+                    <div
+                      :class="getTrainingTextClasses(day)"
+                      class="leading-snug font-medium text-sm"
+                      :title="getTrainingExplanation(day.training)"
+                    >
+                      {{ day.training || 'Off day' }}
+                    </div>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Focus Column -->
+              <td class="px-4 py-3 hidden lg:table-cell">
+                <div class="text-xs text-slate-600 leading-snug font-medium">
+                  {{ day.food || '-' }}
+                </div>
+              </td>
+
+              <!-- Nutrition Column -->
+              <td class="px-4 py-3 w-32">
+                <div class="flex flex-col items-center space-y-1.5">
+                  <!-- Static nutrition display -->
+                  <div
+                    class="inline-flex items-center justify-center w-7 h-7 text-blue-600 bg-blue-50 rounded-md border border-blue-200"
+                  >
+                    <span class="text-[13px]">📋</span>
+                  </div>
+                  <!-- Calorie display -->
+                  <span
+                    class="text-[10px] text-slate-600 font-bold bg-slate-100 px-1.5 py-0.5 rounded"
+                  >
+                    ~{{ getCaloriesForDay(day) }} kcal
+                  </span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </Transition>
   </div>
@@ -230,8 +265,6 @@ const phaseText = computed(() => {
   }
 })
 
-
-
 // Date formatting functions
 const dateFormatter = new Intl.DateTimeFormat('en-US', {
   month: 'short',
@@ -263,7 +296,8 @@ const getRowClasses = (day: any) => {
       // Today's row gets yellow highlighting
       'bg-amber-50 border-l-4 border-amber-400': isToday,
       // Hovered row gets blue highlighting (only when week is expanded)
-      'bg-blue-50 border-l-4 border-blue-400 ring-1 ring-blue-300 ring-opacity-50': isHovered && props.isExpanded && !isToday
+      'bg-blue-50 border-l-4 border-blue-400 ring-1 ring-blue-300 ring-opacity-50':
+        isHovered && props.isExpanded && !isToday
     }
   ]
 
@@ -344,9 +378,14 @@ const getTrainingIntensity = (day: any) => {
   }
 
   // Check for high-intensity indicators (double chevron up)
-  if (training.includes('tempo') || training.includes('threshold') ||
-      training.includes('hard') || training.includes('intensive') ||
-      training.includes('maximum') || training.includes('peak')) {
+  if (
+    training.includes('tempo') ||
+    training.includes('threshold') ||
+    training.includes('hard') ||
+    training.includes('intensive') ||
+    training.includes('maximum') ||
+    training.includes('peak')
+  ) {
     return {
       level: 'high',
       icon: ChevronDoubleUpIcon,
@@ -356,9 +395,14 @@ const getTrainingIntensity = (day: any) => {
   }
 
   // Check for moderate-intensity indicators (single chevron up)
-  if (training.includes('long z2') || training.includes('endurance') ||
-      training.includes('moderate') || training.includes('sustained') ||
-      training.includes('stair tempo') || training.includes('gym')) {
+  if (
+    training.includes('long z2') ||
+    training.includes('endurance') ||
+    training.includes('moderate') ||
+    training.includes('sustained') ||
+    training.includes('stair tempo') ||
+    training.includes('gym')
+  ) {
     return {
       level: 'moderate',
       icon: ChevronUpIcon,
@@ -368,8 +412,12 @@ const getTrainingIntensity = (day: any) => {
   }
 
   // Check for easy/recovery indicators (single chevron up)
-  if (training.includes('easy') || training.includes('recovery') ||
-      training.includes('light') || training.includes('mobility')) {
+  if (
+    training.includes('easy') ||
+    training.includes('recovery') ||
+    training.includes('light') ||
+    training.includes('mobility')
+  ) {
     return {
       level: 'easy',
       icon: ChevronUpIcon,
@@ -410,21 +458,25 @@ const getTrainingExplanation = (training: string | undefined): string => {
   if (!training) return ''
 
   const explanations: Record<string, string> = {
-    'Stairs': 'Repeats or continuous climbing. Tall posture, short steps, strong arms. Build aerobic power + leg strength.',
-    'Run‑walk': 'Alternate short jogs with short walks to keep Z2. Build aerobic base without stress.',
-    'Long Z2': 'Steady aerobic pace. Nose breathing, can hold conversation. Build fat-burning efficiency.',
+    Stairs:
+      'Repeats or continuous climbing. Tall posture, short steps, strong arms. Build aerobic power + leg strength.',
+    'Run‑walk':
+      'Alternate short jogs with short walks to keep Z2. Build aerobic base without stress.',
+    'Long Z2':
+      'Steady aerobic pace. Nose breathing, can hold conversation. Build fat-burning efficiency.',
     'Gym Lower': 'Squat/hinge, step-ups, lunges, calves. Focus on form and controlled movement.',
     'Gym Upper': 'Push/pull, core, stabilization. Complement running with strength balance.',
-    'Recovery': 'Easy movement, stretching, massage. Active rest to enhance adaptation.',
-    'Tempo': 'Comfortably hard pace. Slightly breathless but sustainable. Lactate threshold training.',
-    'Track': 'Structured speed work. Intervals with rest. Build neuromuscular power and speed.',
-    'Fartlek': 'Play with pace. Random speed bursts during run. Fun way to build speed endurance.',
-    'Hills': 'Uphill repeats or rolling terrain. Build power, strength, and mental toughness.',
-    'Peak': 'Race-pace efforts. Practice goal pace and race fueling strategies.',
-    'Brick': 'Back-to-back activities. Practice transitions and race-day logistics.',
+    Recovery: 'Easy movement, stretching, massage. Active rest to enhance adaptation.',
+    Tempo:
+      'Comfortably hard pace. Slightly breathless but sustainable. Lactate threshold training.',
+    Track: 'Structured speed work. Intervals with rest. Build neuromuscular power and speed.',
+    Fartlek: 'Play with pace. Random speed bursts during run. Fun way to build speed endurance.',
+    Hills: 'Uphill repeats or rolling terrain. Build power, strength, and mental toughness.',
+    Peak: 'Race-pace efforts. Practice goal pace and race fueling strategies.',
+    Brick: 'Back-to-back activities. Practice transitions and race-day logistics.',
     'Time trial': 'Solo race effort. Test fitness and practice pacing strategies.',
-    'Shakeout': 'Short, easy movement. Prepare legs for hard effort or race day.',
-    'Off': 'Complete rest or gentle movement. Recovery is when adaptation happens.'
+    Shakeout: 'Short, easy movement. Prepare legs for hard effort or race day.',
+    Off: 'Complete rest or gentle movement. Recovery is when adaptation happens.'
   }
 
   // Find matching explanation

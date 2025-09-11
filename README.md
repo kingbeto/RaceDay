@@ -1,335 +1,168 @@
 # 🏃‍♂️ RaceDay - Training & Nutrition Planner
 
-A modern, comprehensive Single Page Application (SPA) designed for managing multi-day race training programs, nutrition plans, and logistics. Built specifically for **El Cruce de los Andes** but adaptable for any endurance race training.
+A modern, full-stack application designed for managing multi-day race training programs, nutrition plans, and logistics. Built specifically for **El Cruce de los Andes** but adaptable for any endurance race training.
 
 ![RaceDay](https://img.shields.io/badge/RaceDay-v1.0.0-success?style=for-the-badge&logo=vue.js)
 ![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue?style=for-the-badge&logo=typescript)
-![Tailwind](https://img.shields.io/badge/Tailwind-CSS-38B2AC?style=for-the-badge&logo=tailwind-css)
+![Express](https://img.shields.io/badge/Express.js-API-000000?style=for-the-badge&logo=express)
+![Prisma](https://img.shields.io/badge/Prisma-Database-2D3748?style=for-the-badge&logo=prisma)
 
 ## 🎯 **Core Features**
 
 - **📅 Interactive Training Calendar** - Full calendar view with training phases and daily activities
 - **🍽️ Nutrition Management** - Detailed meal planning with macro tracking and Argentine cuisine focus
 - **🛒 Smart Grocery Lists** - Automatically generated shopping lists organized by training weeks
-- **📊 Progress Tracking** - Visual indicators for training intensity and nutrition compliance  
+- **📊 Progress Tracking** - Visual indicators for training intensity and nutrition compliance
 - **🖨️ Print-Friendly** - Export weekly meal plans and grocery lists for offline use
 - **📱 Mobile Responsive** - Optimized for all devices with modern UI/UX
 
 ## 🛠️ **Technology Stack**
 
-### **Frontend** (`/app` folder)
-- **Vue.js 3** with Composition API & TypeScript
-- **Vite** for lightning-fast build system and dev server
-- **Vue Router** for SPA navigation
-- **Pinia** for reactive state management
-- **Tailwind CSS** for responsive, utility-first styling
-- **VueUse** for powerful composables and utilities
-
-### **Backend** (`/api` folder)
-- **Express.js Server** (Node.js)
-- **RESTful API endpoints** (ready for Supabase integration)
-- **JSON-based data storage** for initial development
-- **CORS-enabled** for cross-origin requests
-
-### **Database & Hosting**
-- **JSON files** for initial data (`/app/data/`)
-- **Supabase** ready for database migration
-- **Vercel** deployment with automatic CI/CD
-- **Environment variables** for secure configuration
-
-## 📁 **Project Structure**
-
-```
-raceday/
-├── app/                      # Vue.js frontend source
-│   ├── components/           # Reusable Vue components
-│   │   ├── calendar/         # Calendar-specific components
-│   │   ├── training/         # Training plan components
-│   │   ├── nutrition/        # Nutrition management components
-│   │   ├── grocery/          # Grocery list components
-│   │   ├── layout/           # Layout components (header, sidebar)
-│   │   └── ui/               # Base UI components (buttons, modals)
-│   ├── composables/          # Reusable logic hooks
-│   ├── stores/               # Pinia state stores
-│   ├── data/                 # JSON data files
-│   │   ├── el-cruce-plan.json     # Training plan data
-│   │   ├── nutrition-plan.json    # Nutrition data
-│   │   └── grocery-lists.json     # Grocery lists by week
-│   ├── types/                # TypeScript interfaces
-│   ├── pages/                # Vue Router pages/views
-│   ├── router/               # Router configuration
-│   ├── assets/               # Static assets
-│   ├── vite.config.ts        # Vite configuration
-│   ├── tailwind.config.cjs   # Tailwind CSS configuration
-│   ├── postcss.config.cjs    # PostCSS configuration
-│   └── index.html            # Entry HTML file
-│
-├── api/                      # Express.js API server
-│   ├── routes/               # Express route handlers
-│   │   ├── training-plans.js # Training plan API routes
-│   │   ├── nutrition.js      # Nutrition data API routes
-│   │   ├── groceries.js      # Grocery lists API routes
-│   │   └── hello.js          # API info and health check routes
-│   └── server.js             # Main Express server file
-├── context/                  # Project documentation
-│   ├── API.md                # API documentation
-│   ├── REQUIREMENTS.md       # Application requirements
-│   └── [other docs...]       # Behavioral specifications
-├── public/                   # Static public assets
-├── vercel.json               # Vercel deployment configuration
-├── tsconfig.json             # TypeScript configuration
-├── package.json              # Dependencies and scripts
-└── README.md                 # This file
-```
+- **Frontend**: Vue.js 3 + TypeScript + Tailwind CSS + Pinia
+- **Backend**: Express.js + Prisma ORM + SQLite/PostgreSQL
+- **Development**: Vite + ESLint + Prettier + Vitest
+- **Deployment**: Vercel-ready with environment-based configuration
 
 ## 🚀 **Quick Start**
 
 ### **Prerequisites**
-- Node.js 18+ and npm
+
+- **Node.js 20.x** and npm
 - Git for version control
 
 ### **Installation**
 
-1. **Clone the repository:**
+1. **Clone and install:**
+
    ```bash
    git clone https://github.com/your-org/raceday.git
    cd raceday
-   ```
-
-2. **Install dependencies:**
-   ```bash
    npm install
    ```
 
-3. **Set up environment variables:**
+2. **Set up database:**
+
    ```bash
-   # Create .env.local file (optional for initial setup)
-   echo "VITE_APP_TITLE=RaceDay" > .env.local
-   echo "VITE_APP_VERSION=1.0.0" >> .env.local
+   npm run db:setup:dev
    ```
 
-4. **Start development server:**
-   ```bash
-   npm run dev
-   ```
-   
-   Open [http://localhost:5173](http://localhost:5173) in your browser.
+3. **Start development servers:**
 
-5. **Build for production:**
    ```bash
-   npm run build
+   npm run dev:full
    ```
+
+4. **Access the application:**
+   - **Frontend**: http://localhost:5173
+   - **API**: http://localhost:3001
+   - **Health Check**: http://localhost:3001/health
 
 ### **Available Scripts**
 
 ```bash
-# Frontend
-npm run dev      # Start Vue.js development server
-npm run build    # Build for production
-npm run preview  # Preview production build locally
+# Development
+npm run dev:full      # Start both frontend and backend
+npm run dev           # Frontend only (localhost:5173)
+npm run server:dev    # Backend only (localhost:3001)
 
-# Backend API
-npm run server:dev   # Start Express server with auto-reload
-npm run server:prod  # Start Express server in production mode
-npm run server       # Start Express server (production)
-npm start            # Start Express server (production)
+# Database
+npm run db:setup:dev  # Setup SQLite for development
+npm run db:studio     # Open Prisma Studio (database GUI)
+npm run db:seed       # Seed database with sample data
+
+# Production
+npm run build         # Build complete application
+npm start            # Start production server
+
+# Code Quality
+npm run lint:fix      # Fix linting issues
+npm run format        # Format code
+npm run test          # Run tests
 ```
 
-## 🏗️ **Architecture Overview**
+## 🏗️ **Project Structure**
 
-### **Component Structure**
-- **Pages** - Route-level components (`HomePage`, `CalendarPage`, etc.)
-- **Layout** - App structure components (`AppHeader`, `AppSidebar`)
-- **Feature** - Domain-specific components (`TrainingWeek`, `NutritionModal`)
-- **UI** - Reusable base components (`BaseButton`, `BaseModal`)
-
-### **State Management**
-- **Training Store** - Manages training plan data and user selections
-- **Nutrition Store** - Handles meal planning and macro calculations
-- **Grocery Store** - Manages shopping lists and ingredients
-
-### **Data Flow**
-1. **JSON files** provide initial data structure
-2. **Pinia stores** manage reactive state
-3. **Composables** provide reusable business logic
-4. **API endpoints** ready for database integration
-
-## 📊 **Data Models**
-
-### **Training Plan Structure**
-```typescript
-interface TrainingPlan {
-  id: string
-  title: string
-  subtitle: string
-  raceDate: string
-  startDate: string
-  endDate: string
-  description: string
-  weeks: Week[]
-}
-
-interface Week {
-  id: string
-  label: string
-  start: string
-  end: string
-  summary: string
-  phase: 'base' | 'build' | 'peak' | 'taper' | 'race'
-  rows: TrainingDay[]
-}
+```
+raceday/
+├── api/                  # Express.js backend
+│   ├── routes/           # API endpoints
+│   ├── utils/            # Utilities (response handling)
+│   └── prisma/           # Database config & migrations
+├── app/                  # Vue.js frontend
+│   ├── components/       # Vue components
+│   ├── stores/           # Pinia state management
+│   ├── services/         # API services
+│   └── types/            # TypeScript interfaces
+├── data/                 # Centralized data source
+├── context/              # Technical documentation (for AI agents)
+├── tests/                # Test suites
+└── [config files...]    # ESLint, Prettier, etc.
 ```
 
-### **Nutrition Data Structure**
-```typescript
-interface DailyNutrition {
-  totalCalories: number
-  totalProtein: number
-  totalCarbs: number
-  totalFats: number
-  meals: Meal[]
-}
-```
+## 📊 **API Endpoints**
 
-## 🌐 **Deployment**
+All endpoints return standardized JSON responses:
 
-### **Deployment Options**
-
-#### **Option 1: Vercel (Recommended)**
-Deploy the complete application to Vercel with static API responses:
-
-1. **Connect to Vercel:**
-   ```bash
-   npx vercel
-   ```
-
-2. **Automatic Configuration:**
-   - Vercel will automatically detect and use the `vercel.json` configuration
-   - Build Command: `cd app && npm run build`
-   - Output Directory: `app/dist`
-   - Node.js Version: 18.x
-
-3. **API Endpoints:**
-   - API routes are served as static JSON files from `/public/api/`
-   - Health endpoint available at `/health`
-   - All endpoints return the same data as the Express server
-
-#### **Option 2: Full-Stack Deployment**
-For deploying both frontend and Express.js backend:
-
-**Recommended platforms:**
-- **Railway** - Simple Node.js deployment
-- **Render** - Free tier available
-- **Heroku** - Traditional Node.js hosting
-- **DigitalOcean App Platform** - Scalable cloud deployment
-
-**Deployment steps:**
-```bash
-# 1. Build the frontend
-npm run build
-
-# 2. Start the production server
-npm start
-```
-
-3. **Environment Variables:**
-   ```
-   NODE_ENV=production
-   PORT=3001
-   FRONTEND_URL=https://your-frontend-domain.com
-   VITE_SUPABASE_URL=your_production_supabase_url
-   VITE_SUPABASE_ANON_KEY=your_production_supabase_key
-   ```
-
-### **API Endpoints**
-- `GET /health` - Server health check and status
-- `GET /api/hello` - API information and available endpoints
-- `GET /api/training-plans` - Retrieve complete training plan data
-- `GET /api/nutrition` - Get all nutrition data
-- `GET /api/nutrition?date=YYYY-MM-DD` - Get nutrition for specific date
-- `GET /api/groceries` - Get all grocery lists
-- `GET /api/groceries?weekId=W1` - Get grocery list for specific week
+- `GET /api/training-plans` - Complete training plan data
+- `GET /api/nutrition?date=YYYY-MM-DD` - Daily nutrition data
+- `GET /api/groceries?weekId=W1` - Weekly grocery lists
+- `GET /health` - Server health check
 
 ## 🎨 **Customization**
 
-### **Training Plan Data**
-Edit `/app/data/el-cruce-plan.json` to customize:
-- Training phases and duration
-- Daily activities and descriptions
-- Calorie targets and notes
-
-### **Nutrition Plans**
-Modify `/app/data/nutrition-plan.json` for:
-- Custom meal plans
-- Macro nutrient targets
-- Cultural cuisine preferences
-
-### **Styling**
-- **Colors**: Update `tailwind.config.cjs` for brand colors
-- **Fonts**: Modify CSS imports in `index.html`
-- **Layout**: Customize components in `/app/components/layout/`
-
-## 🔧 **Development**
-
-### **Adding New Features**
-1. Create components in appropriate folders
-2. Add TypeScript interfaces in `/app/types/`
-3. Implement business logic in composables
-4. Update stores for state management
-5. Add API endpoints in `/api/` folder
-
-### **Code Standards**
-- **TypeScript** throughout for type safety
-- **Composition API** for Vue components
-- **Conventional Commits** for git messages
-- **Component-based** architecture
-- **Responsive design** first approach
-
-## 🚦 **Future Enhancements**
-
-### **Database Integration**
-- [ ] Supabase database schema migration
-- [ ] User authentication and profiles
-- [ ] Multi-user training plan sharing
-- [ ] Progress tracking and analytics
-
-### **Advanced Features**
-- [ ] Offline mode with service workers
-- [ ] Push notifications for training reminders
-- [ ] Integration with fitness trackers
-- [ ] Social features and community sharing
-- [ ] AI-powered nutrition recommendations
-
-### **Mobile App**
-- [ ] Progressive Web App (PWA) features
-- [ ] Native mobile app with Capacitor
-- [ ] Camera integration for meal logging
-- [ ] GPS tracking for training routes
+- **Training Plans**: Edit data in `/data/el-cruce-plan.json`
+- **Nutrition Plans**: Modify `/data/nutrition-plan.json`
+- **Styling**: Update Tailwind config in `/app/tailwind.config.cjs`
+- **API Behavior**: Customize routes in `/api/routes/`
 
 ## 🤝 **Contributing**
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'feat: add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Make changes and test: `npm run test && npm run lint`
+4. Commit: `git commit -m 'feat: add amazing feature'`
+5. Push and create Pull Request
 
-## 📄 **License**
+**Development Guidelines:**
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+- Use TypeScript throughout
+- Follow Vue 3 Composition API patterns
+- Write tests for new features
+- Use conventional commit messages
+- Run `npm run format` before committing
 
-## 🙏 **Acknowledgments**
+## 🔧 **Development Setup**
 
-- **El Cruce de los Andes** race organizers for inspiration
-- **Vue.js** team for the amazing framework
-- **Tailwind CSS** for beautiful, utility-first styling
-- **Vercel** for seamless deployment and hosting
+**Prerequisites:**
+
+- Node.js 20.x (check with `node --version`)
+- npm 8.x or higher
+
+**Environment Setup:**
+
+1. The project includes `.nvmrc` for Node version management
+2. ESLint and Prettier are pre-configured
+3. Database migrations run automatically with `db:setup:dev`
+4. Hot reload enabled for both frontend and backend
+
+**Common Tasks:**
+
+- **Add new API endpoint**: Create route in `/api/routes/`
+- **Add Vue component**: Place in appropriate `/app/components/` subdirectory
+- **Database changes**: Update `/api/prisma/schema.prisma` and run `npm run db:migrate`
+- **Add tests**: Place in `/tests/` directory
+
+## 📄 **License & Version**
+
+This project is licensed under the MIT License.
+
+**Version History:**
+
+- **v1.0.0** (2025-01-11): Full-stack architecture with Express.js API, Prisma database, standardized responses, and improved project structure
+- **v0.9.0** (2024-09-10): Initial Vue.js frontend with JSON data storage
 
 ---
 
 **Built with ❤️ for endurance athletes and training enthusiasts**
 
----
-
-*Last updated: December 2024 - Express.js backend migration complete*
-
+_For detailed technical documentation and AI agent contextualization, see `/context/` directory_

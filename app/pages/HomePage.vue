@@ -2,22 +2,24 @@
   <!-- Static RaceDay Application - No Interactive Behaviors -->
   <div class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30">
     <!-- Static Header -->
-    <header class="bg-white/80 backdrop-blur-xl border-b border-slate-200/60 sticky top-0 z-50 shadow-sm">
+    <header
+      class="bg-white/80 backdrop-blur-xl border-b border-slate-200/60 sticky top-0 z-50 shadow-sm"
+    >
       <div class="max-w-full mx-auto px-6 lg:px-12">
         <div class="py-6">
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-6">
               <!-- Brand -->
               <div class="flex items-center space-x-4">
-                <div class="w-[72px] h-[72px] rounded-2xl flex items-center justify-center overflow-hidden">
-                  <img
-                    :src="logoSrc"
-                    alt="RaceDay Logo"
-                    class="w-[60px] h-[60px] object-contain"
-                  />
+                <div
+                  class="w-[72px] h-[72px] rounded-2xl flex items-center justify-center overflow-hidden"
+                >
+                  <img :src="logoSrc" alt="RaceDay Logo" class="w-[60px] h-[60px] object-contain" />
                 </div>
                 <div>
-                  <h1 class="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
+                  <h1
+                    class="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent"
+                  >
                     RaceDay
                   </h1>
                   <p class="text-sm text-slate-600 font-medium">
@@ -27,7 +29,9 @@
               </div>
 
               <!-- Race Date Badge -->
-              <div class="hidden md:flex items-center space-x-2 px-4 py-3 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/60 rounded-xl">
+              <div
+                class="hidden md:flex items-center space-x-2 px-4 py-3 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/60 rounded-xl"
+              >
                 <div class="w-2 h-2 bg-orange-500 rounded-full"></div>
                 <span class="text-sm font-semibold text-amber-900">Race: December 1, 2025</span>
               </div>
@@ -36,10 +40,14 @@
             <!-- Static Info Display -->
             <div class="hidden lg:flex items-center space-x-6">
               <!-- Nutrition Info -->
-              <div class="px-4 py-3 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200/60 rounded-xl">
+              <div
+                class="px-4 py-3 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200/60 rounded-xl"
+              >
                 <div class="flex items-center space-x-2">
                   <span class="text-emerald-600">🍽️</span>
-                  <span class="text-sm font-medium text-emerald-900">Training: ~2,500 kcal | Rest: ~2,100 kcal</span>
+                  <span class="text-sm font-medium text-emerald-900"
+                    >Training: ~2,500 kcal | Rest: ~2,100 kcal</span
+                  >
                 </div>
               </div>
             </div>
@@ -51,18 +59,32 @@
     <!-- Main Content -->
     <main class="max-w-full mx-auto px-6 lg:px-12 py-8">
       <div class="lg:grid lg:grid-cols-12 lg:gap-12">
-
         <!-- Left Sidebar: Calendar & Shopping (1/3 width) -->
         <aside class="lg:col-span-4 mb-12 lg:mb-0">
           <div class="sticky top-32 space-y-8">
-
             <!-- Static Today's Focus - Moved to top for prominence -->
-            <div class="bg-white rounded-2xl border border-slate-200/60 overflow-hidden shadow-lg shadow-slate-100/50">
-              <div class="p-6 border-b border-slate-200/60 bg-gradient-to-r from-amber-50 via-white to-orange-50/30">
+            <div
+              class="bg-white rounded-2xl border border-slate-200/60 overflow-hidden shadow-lg shadow-slate-100/50"
+            >
+              <div
+                class="p-6 border-b border-slate-200/60 bg-gradient-to-r from-amber-50 via-white to-orange-50/30"
+              >
                 <div class="flex items-center space-x-3">
-                  <div class="w-8 h-8 bg-gradient-to-r from-amber-500 to-orange-500 rounded-lg flex items-center justify-center">
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  <div
+                    class="w-8 h-8 bg-gradient-to-r from-amber-500 to-orange-500 rounded-lg flex items-center justify-center"
+                  >
+                    <svg
+                      class="w-5 h-5 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
                     </svg>
                   </div>
                   <div>
@@ -79,11 +101,17 @@
                       Training
                     </h4>
                     <div class="flex items-center gap-2">
-                      <span :class="`px-2 py-1 text-xs font-semibold rounded-full text-white ${
-                        trainingIntensity.color === 'red' ? 'bg-red-500' :
-                        trainingIntensity.color === 'orange' ? 'bg-orange-500' :
-                        trainingIntensity.color === 'blue' ? 'bg-blue-500' : 'bg-green-500'
-                      }`">
+                      <span
+                        :class="`px-2 py-1 text-xs font-semibold rounded-full text-white ${
+                          trainingIntensity.color === 'red'
+                            ? 'bg-red-500'
+                            : trainingIntensity.color === 'orange'
+                              ? 'bg-orange-500'
+                              : trainingIntensity.color === 'blue'
+                                ? 'bg-blue-500'
+                                : 'bg-green-500'
+                        }`"
+                      >
                         {{ trainingIntensity.label }}
                       </span>
                       <span class="text-xs text-slate-600 font-medium">
@@ -91,7 +119,9 @@
                       </span>
                     </div>
                   </div>
-                  <p class="text-sm text-slate-700 leading-relaxed">{{ todaysTraining?.training || 'No training scheduled' }}</p>
+                  <p class="text-sm text-slate-700 leading-relaxed">
+                    {{ todaysTraining?.training || 'No training scheduled' }}
+                  </p>
                 </div>
                 <div class="bg-emerald-50 rounded-xl p-4">
                   <h4 class="text-sm font-bold text-slate-900 mb-2 flex items-center">
@@ -100,31 +130,47 @@
                   </h4>
                   <p class="text-sm text-slate-700 leading-relaxed">{{ nutritionFocus }}</p>
                   <div class="mt-2 text-xs text-slate-600">
-                    <span class="font-medium">Calories:</span> {{ todaysTraining?.calories || (todaysTraining?.isExercise ? 2300 : 2100) }} kcal
+                    <span class="font-medium">Calories:</span>
+                    {{
+                      todaysTraining?.calories || (todaysTraining?.isExercise ? 2300 : 2100)
+                    }}
+                    kcal
                   </div>
                 </div>
-                <div class="text-xs text-slate-600 font-medium">
-                  📋 Meal plan details available
-                </div>
+                <div class="text-xs text-slate-600 font-medium">📋 Meal plan details available</div>
               </div>
             </div>
 
             <!-- Calendar Section with Controls -->
-            <div class="bg-white rounded-2xl border border-slate-200/60 overflow-hidden shadow-lg shadow-slate-100/50">
-              <div class="p-4 border-b border-slate-200/60 bg-gradient-to-r from-slate-50 via-white to-blue-50/30">
+            <div
+              class="bg-white rounded-2xl border border-slate-200/60 overflow-hidden shadow-lg shadow-slate-100/50"
+            >
+              <div
+                class="p-4 border-b border-slate-200/60 bg-gradient-to-r from-slate-50 via-white to-blue-50/30"
+              >
                 <div class="flex items-center justify-between">
                   <!-- Left side: Title and info -->
-                <div class="flex items-center space-x-3">
-                    <div class="w-7 h-7 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-md flex items-center justify-center">
-                      <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                    </svg>
-                  </div>
-                  <div>
+                  <div class="flex items-center space-x-3">
+                    <div
+                      class="w-7 h-7 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-md flex items-center justify-center"
+                    >
+                      <svg
+                        class="w-4 h-4 text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        />
+                      </svg>
+                    </div>
+                    <div>
                       <h2 class="text-base font-semibold text-slate-900">Training Calendar</h2>
-                      <p class="text-xs text-slate-600 font-medium">
-                      Aug 18 → Dec 1, 2025 (Race)
-                    </p>
+                      <p class="text-xs text-slate-600 font-medium">Aug 18 → Dec 1, 2025 (Race)</p>
                     </div>
                   </div>
 
@@ -137,7 +183,12 @@
                       title="Previous Month"
                     >
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M15 19l-7-7 7-7"
+                        />
                       </svg>
                     </button>
 
@@ -157,7 +208,12 @@
                       title="Next Month"
                     >
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M9 5l7 7-7 7"
+                        />
                       </svg>
                     </button>
                   </div>
@@ -178,12 +234,28 @@
             </div>
 
             <!-- Static Shopping List Section -->
-            <div class="bg-white rounded-2xl border border-slate-200/60 overflow-hidden shadow-lg shadow-slate-100/50">
-              <div class="p-6 border-b border-slate-200/60 bg-gradient-to-r from-emerald-50 via-white to-green-50/30">
+            <div
+              class="bg-white rounded-2xl border border-slate-200/60 overflow-hidden shadow-lg shadow-slate-100/50"
+            >
+              <div
+                class="p-6 border-b border-slate-200/60 bg-gradient-to-r from-emerald-50 via-white to-green-50/30"
+              >
                 <div class="flex items-center space-x-3">
-                  <div class="w-8 h-8 bg-gradient-to-r from-emerald-500 to-green-500 rounded-lg flex items-center justify-center">
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 7m0 6v6a1 1 0 001 1h8a1 1 0 001-1v-6M7 13v-2"/>
+                  <div
+                    class="w-8 h-8 bg-gradient-to-r from-emerald-500 to-green-500 rounded-lg flex items-center justify-center"
+                  >
+                    <svg
+                      class="w-5 h-5 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 7m0 6v6a1 1 0 001 1h8a1 1 0 001-1v-6M7 13v-2"
+                      />
                     </svg>
                   </div>
                   <div>
@@ -196,24 +268,22 @@
                 <GroceryList />
               </div>
             </div>
-
-
-
           </div>
         </aside>
 
         <!-- Static Main Content: Training Plan (2/3 width) -->
         <div class="lg:col-span-8">
-          <div class="bg-white rounded-2xl border border-slate-200/60 overflow-hidden shadow-xl shadow-slate-100/50">
-
-
-
+          <div
+            class="bg-white rounded-2xl border border-slate-200/60 overflow-hidden shadow-xl shadow-slate-100/50"
+          >
             <!-- Static Training Plan Content -->
             <div class="min-h-96 p-8">
               <!-- Loading State -->
               <div v-if="isLoading" class="flex items-center justify-center min-h-96">
                 <div class="text-center">
-                  <div class="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
+                  <div
+                    class="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"
+                  ></div>
                   <p class="text-slate-600 font-medium">Loading training plan...</p>
                 </div>
               </div>
@@ -221,14 +291,29 @@
               <!-- Error State -->
               <div v-else-if="error" class="flex items-center justify-center min-h-96">
                 <div class="text-center">
-                  <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                  <div
+                    class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4"
+                  >
+                    <svg
+                      class="w-6 h-6 text-red-600"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+                      />
                     </svg>
                   </div>
                   <p class="text-red-600 font-medium mb-2">Failed to load training plan</p>
                   <p class="text-slate-500 text-sm">{{ error }}</p>
-                  <button @click="loadTrainingPlan" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                  <button
+                    @click="loadTrainingPlan"
+                    class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
                     Try Again
                   </button>
                 </div>
@@ -236,10 +321,10 @@
 
               <!-- Training Plan Content -->
               <div v-else-if="sampleTrainingPlan">
-              <TrainingPlanView
-                :plan="sampleTrainingPlan"
-                :selected-date="'2025-01-15'"
-                :is-expanded="true"
+                <TrainingPlanView
+                  :plan="sampleTrainingPlan"
+                  :selected-date="'2025-01-15'"
+                  :is-expanded="true"
                   :hovered-date="hoveredDate"
                 />
               </div>
@@ -247,9 +332,21 @@
               <!-- No Data State -->
               <div v-else class="flex items-center justify-center min-h-96">
                 <div class="text-center">
-                  <div class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                  <div
+                    class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4"
+                  >
+                    <svg
+                      class="w-6 h-6 text-slate-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                      />
                     </svg>
                   </div>
                   <p class="text-slate-500 font-medium">No training plan available</p>
@@ -258,7 +355,6 @@
             </div>
           </div>
         </div>
-
       </div>
     </main>
 
@@ -271,15 +367,15 @@ import { computed, ref, onMounted } from 'vue'
 import CalendarView from '@/components/calendar/CalendarView.vue'
 import TrainingPlanView from '@/components/training/TrainingPlanView.vue'
 import GroceryList from '@/components/grocery/GroceryList.vue'
+import { useTrainingStore } from '@/stores/training'
 import type { TrainingPlan } from '@/types'
 
 // Logo placeholder - in a real app, this would be the actual logo import
 const logoSrc = '/assets/images/raceday.svg'
 
-// Reactive training plan data loaded from JSON
-const trainingPlan = ref<TrainingPlan | null>(null)
-const isLoading = ref(true)
-const error = ref<string | null>(null)
+// Use training store for data management
+const trainingStore = useTrainingStore()
+const { currentPlan: trainingPlan, isLoading, error } = trainingStore
 
 // Shared reactive state for hover interactions between calendar and training plan
 const hoveredDate = ref<string | null>(null)
@@ -300,7 +396,10 @@ const handleCalendarLeave = () => {
 const navigateCalendar = (direction: number) => {
   if (direction === -1 && calendarMonthIndex.value > 0) {
     calendarMonthIndex.value--
-  } else if (direction === 1 && calendarMonthIndex.value < (sampleTrainingPlan.value?.weeks.length || 0) - 1) {
+  } else if (
+    direction === 1 &&
+    calendarMonthIndex.value < (sampleTrainingPlan.value?.weeks.length || 0) - 1
+  ) {
     calendarMonthIndex.value++
   }
 }
@@ -314,25 +413,9 @@ const handleMonthChanged = (newIndex: number) => {
   calendarMonthIndex.value = newIndex
 }
 
-// Load training plan from JSON
+// Load training plan using store
 const loadTrainingPlan = async () => {
-  try {
-    isLoading.value = true
-    error.value = null
-
-    const response = await fetch('/data/el-cruce-plan.json')
-    if (!response.ok) {
-      throw new Error(`Failed to load training plan: ${response.status}`)
-    }
-
-    const data = await response.json()
-    trainingPlan.value = data
-  } catch (err) {
-    console.error('Error loading training plan:', err)
-    error.value = err instanceof Error ? err.message : 'Unknown error'
-  } finally {
-    isLoading.value = false
-  }
+  await trainingStore.loadPlan()
 }
 
 // Load data on component mount
@@ -397,7 +480,7 @@ const trainingIntensity = computed(() => {
     case 'high':
       return { level: 'high', label: 'HIGH', color: 'orange' }
     case 'moderate':
-    return { level: 'moderate', label: 'MODERATE', color: 'blue' }
+      return { level: 'moderate', label: 'MODERATE', color: 'blue' }
     case 'off':
       return { level: 'off', label: 'OFF', color: 'green' }
     default:

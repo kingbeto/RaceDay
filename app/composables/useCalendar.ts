@@ -49,34 +49,34 @@ export const useCalendar = (trainingPlan: Ref<TrainingPlan | null>) => {
     const year = date.getFullYear()
     const month = date.getMonth()
     const today = new Date()
-    
+
     // Get first day of month and calculate starting day of week
     const firstDay = new Date(year, month, 1)
     const lastDay = new Date(year, month + 1, 0)
     const startingDayOfWeek = firstDay.getDay()
-    
+
     const days: CalendarDay[] = []
-    
+
     // Add previous month's trailing days
     const prevMonthLastDay = new Date(year, month, 0).getDate()
     for (let i = startingDayOfWeek - 1; i >= 0; i--) {
       const dayDate = new Date(year, month - 1, prevMonthLastDay - i)
       days.push(createCalendarDay(dayDate, false, today, plan))
     }
-    
+
     // Add current month's days
     for (let day = 1; day <= lastDay.getDate(); day++) {
       const dayDate = new Date(year, month, day)
       days.push(createCalendarDay(dayDate, true, today, plan))
     }
-    
+
     // Add next month's leading days to complete the grid
     const remainingDays = 42 - days.length // 6 weeks * 7 days
     for (let day = 1; day <= remainingDays; day++) {
       const dayDate = new Date(year, month + 1, day)
       days.push(createCalendarDay(dayDate, false, today, plan))
     }
-    
+
     return {
       name: firstDay.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }),
       year,
@@ -86,19 +86,19 @@ export const useCalendar = (trainingPlan: Ref<TrainingPlan | null>) => {
   }
 
   const createCalendarDay = (
-    date: Date, 
-    isCurrentMonth: boolean, 
-    today: Date, 
+    date: Date,
+    isCurrentMonth: boolean,
+    today: Date,
     plan: TrainingPlan
   ): CalendarDay => {
     const dateString = date.toISOString().split('T')[0]
     const isToday = date.toDateString() === today.toDateString()
     const isSelected = selectedDate.value === dateString
-    
+
     // Find training day for this date
     let trainingDay = null
     let hasTraining = false
-    
+
     for (const week of plan.weeks) {
       const day = week.rows.find(row => row.date === dateString)
       if (day) {
@@ -107,7 +107,7 @@ export const useCalendar = (trainingPlan: Ref<TrainingPlan | null>) => {
         break
       }
     }
-    
+
     return {
       date: dateString,
       day: date.getDate(),

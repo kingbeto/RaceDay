@@ -1,30 +1,49 @@
-# 📁 Context Folder Documentation
+# RaceDay Context Documentation
 
-## Overview
+This directory contains comprehensive technical documentation for AI agents to quickly understand and work with the RaceDay application architecture.
 
-This folder contains all behavioral and feature documentation for the RaceDay training application. These documents provide comprehensive specifications for understanding how the application works, its components interact, and the expected behaviors across different user scenarios.
+## 📚 **Documentation Structure**
 
-## 📚 Documentation Index
+### **Architecture Overview**
 
-### 🎯 **Primary Documentation**
+- **`ARCHITECTURE.md`** - Full-stack architecture, data flow, and system design
+- **`PROJECT_STRUCTURE.md`** - File organization and project layout
 
-- **[🔌 API.md](API.md)** - Express.js API server documentation and endpoints
-- **[📋 REQUIREMENTS.md](REQUIREMENTS.md)** - Complete consolidated behavior requirements and specifications
-- **[🍽️ MEALCARD.md](MEALCARD.md)** - MealCard component specifications and behavior
-- **[📅 CALENDAR_BEHAVIORS.md](CALENDAR_BEHAVIORS.md)** - Calendar component behaviors and color-coding
-- **[🏋️ TRAINING_BEHAVIORS.md](TRAINING_BEHAVIORS.md)** - Training plan display behaviors
-- **[🛒 GROCERY_BEHAVIORS.md](GROCERY_BEHAVIORS.md)** - Grocery list component behaviors
-- **[🧭 APP_BEHAVIORS.md](APP_BEHAVIORS.md)** - Main application behaviors
+### **Backend Documentation**
 
-### 📖 **How to Use These Documents**
+- **`API_ENDPOINTS.md`** - REST API documentation with response patterns
+- **`DATABASE.md`** - Prisma models, migrations, and data management
 
-1. **Start with REQUIREMENTS.md** for the complete consolidated specification
-2. **Refer to component-specific docs** for detailed behavior requirements
-3. **Use as reference** for development, testing, and maintenance
+### **Frontend Documentation**
 
----
+- **`FRONTEND.md`** - Vue.js architecture, components, and state management
+- **`UI_COMPONENTS.md`** - Component behaviors and UI/UX patterns
 
-**Last Updated**: December 2024
-**Current Version**: Express.js backend migration with enhanced API
-**Key Features**: Express.js server, RESTful API, individual week toggles, enhanced borders, green training indicators, simplified color scheme
-**Maintained by**: RaceDay Development Team
+### **Feature Documentation**
+
+- **`TRAINING_FEATURES.md`** - Training calendar and plan management
+- **`NUTRITION_FEATURES.md`** - Nutrition planning and meal management
+- **`GROCERY_FEATURES.md`** - Grocery list and shopping features
+
+### **Legacy Documentation**
+
+- **`REQUIREMENTS.md`** - Original application requirements and specifications
+
+## 🤖 **For AI Agents**
+
+**Quick Context Setup:**
+
+1. Read `ARCHITECTURE.md` for system overview
+2. Read relevant feature docs based on your task
+3. Reference `API_ENDPOINTS.md` for backend work or `FRONTEND.md` for frontend work
+4. Use component and feature docs for specific implementation details
+
+**Key Information:**
+
+- **Stack**: Vue.js 3 + Express.js + Prisma + SQLite/PostgreSQL
+- **Architecture**: Full-stack with API-first approach and fallback strategies
+- **State Management**: Pinia stores with API integration and caching
+- **Database**: Prisma ORM with multi-environment support
+- **API**: Standardized responses with consistent error handling
+
+This documentation is optimized for rapid AI agent contextualization and technical decision making.

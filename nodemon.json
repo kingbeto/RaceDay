@@ -1,0 +1,16 @@
+{
+  "watch": ["server.js", "api/"],
+  "ext": "js,json",
+  "ignore": [
+    "api/prisma/migrations/",
+    "node_modules/",
+    "dist/",
+    "app/dist/",
+    "*.test.js",
+    "*.spec.js"
+  ],
+  "delay": 1000,
+  "env": {
+    "NODE_ENV": "development"
+  }
+}

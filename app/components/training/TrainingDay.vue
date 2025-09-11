@@ -1,11 +1,6 @@
 <template>
   <!-- Static training day display - no interactions -->
-  <div
-    :class="[
-      'relative p-4 rounded-lg border',
-      dayClasses
-    ]"
-  >
+  <div :class="['relative p-4 rounded-lg border', dayClasses]">
     <!-- Race day banner -->
     <div
       v-if="day.isRaceDay"
@@ -36,9 +31,7 @@
       <div class="md:col-span-1">
         <div class="text-sm font-medium text-gray-700 mb-1">Alimentación</div>
         <div class="text-sm text-gray-600">{{ day.food }}</div>
-        <div class="text-xs text-slate-600 font-medium mt-1">
-          📋 Detalles disponibles
-        </div>
+        <div class="text-xs text-slate-600 font-medium mt-1">📋 Detalles disponibles</div>
       </div>
 
       <!-- Notes column -->
@@ -49,7 +42,10 @@
     </div>
 
     <!-- Exercise intensity indicator -->
-    <div v-if="day.isExercise" class="absolute left-0 top-0 bottom-0 w-1 bg-primary-500 rounded-l-lg"></div>
+    <div
+      v-if="day.isExercise"
+      class="absolute left-0 top-0 bottom-0 w-1 bg-primary-500 rounded-l-lg"
+    ></div>
   </div>
 </template>
 
@@ -101,21 +97,25 @@ const getTrainingExplanation = (training: string): string => {
   if (!training) return ''
 
   const explanations: Record<string, string> = {
-    'Stairs': 'Repeats or continuous climbing. Tall posture, short steps, strong arms. Build aerobic power + leg strength.',
-    'Run‑walk': 'Alternate short jogs with short walks to keep Z2. Build aerobic base without stress.',
-    'Long Z2': 'Steady aerobic pace. Nose breathing, can hold conversation. Build fat-burning efficiency.',
+    Stairs:
+      'Repeats or continuous climbing. Tall posture, short steps, strong arms. Build aerobic power + leg strength.',
+    'Run‑walk':
+      'Alternate short jogs with short walks to keep Z2. Build aerobic base without stress.',
+    'Long Z2':
+      'Steady aerobic pace. Nose breathing, can hold conversation. Build fat-burning efficiency.',
     'Gym Lower': 'Squat/hinge, step-ups, lunges, calves. Focus on form and controlled movement.',
     'Gym Upper': 'Push/pull, core, stabilization. Complement running with strength balance.',
-    'Recovery': 'Easy movement, stretching, massage. Active rest to enhance adaptation.',
-    'Tempo': 'Comfortably hard pace. Slightly breathless but sustainable. Lactate threshold training.',
-    'Track': 'Structured speed work. Intervals with rest. Build neuromuscular power and speed.',
-    'Fartlek': 'Play with pace. Random speed bursts during run. Fun way to build speed endurance.',
-    'Hills': 'Uphill repeats or rolling terrain. Build power, strength, and mental toughness.',
-    'Peak': 'Race-pace efforts. Practice goal pace and race fueling strategies.',
-    'Brick': 'Back-to-back activities. Practice transitions and race-day logistics.',
+    Recovery: 'Easy movement, stretching, massage. Active rest to enhance adaptation.',
+    Tempo:
+      'Comfortably hard pace. Slightly breathless but sustainable. Lactate threshold training.',
+    Track: 'Structured speed work. Intervals with rest. Build neuromuscular power and speed.',
+    Fartlek: 'Play with pace. Random speed bursts during run. Fun way to build speed endurance.',
+    Hills: 'Uphill repeats or rolling terrain. Build power, strength, and mental toughness.',
+    Peak: 'Race-pace efforts. Practice goal pace and race fueling strategies.',
+    Brick: 'Back-to-back activities. Practice transitions and race-day logistics.',
     'Time trial': 'Solo race effort. Test fitness and practice pacing strategies.',
-    'Shakeout': 'Short, easy movement. Prepare legs for hard effort or race day.',
-    'Off': 'Complete rest or gentle movement. Recovery is when adaptation happens.'
+    Shakeout: 'Short, easy movement. Prepare legs for hard effort or race day.',
+    Off: 'Complete rest or gentle movement. Recovery is when adaptation happens.'
   }
 
   // Find matching explanation

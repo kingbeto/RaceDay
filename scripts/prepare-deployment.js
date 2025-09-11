@@ -69,7 +69,6 @@ try {
   console.log('1. Set DATABASE_URL environment variable in Vercel')
   console.log('2. Run database migrations: npx prisma migrate deploy')
   console.log('3. Deploy to Vercel: vercel --prod')
-
 } catch (error) {
   console.error('❌ Deployment preparation failed:', error.message)
   process.exit(1)

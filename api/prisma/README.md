@@ -5,6 +5,7 @@ This directory contains the Prisma ORM implementation for RaceDay, providing a m
 ## 🚀 Overview
 
 The Prisma implementation provides:
+
 - **Type-safe database queries** with auto-generated TypeScript types
 - **Database migrations** using Prisma Migrate
 - **Seamless switching** between SQLite (dev) and Supabase (prod)
@@ -26,6 +27,7 @@ api/prisma/
 ## 🗄️ Database Models
 
 ### TrainingPlan
+
 ```prisma
 model TrainingPlan {
   id          String   @id
@@ -42,6 +44,7 @@ model TrainingPlan {
 ```
 
 ### NutritionData
+
 ```prisma
 model NutritionData {
   id           String   @id @default(cuid())
@@ -57,6 +60,7 @@ model NutritionData {
 ```
 
 ### GroceryList
+
 ```prisma
 model GroceryList {
   id        String   @id @default(cuid())
@@ -72,16 +76,19 @@ model GroceryList {
 ### Development Setup
 
 1. **Initialize database:**
+
    ```bash
    npm run db:init
    ```
 
 2. **Generate Prisma client:**
+
    ```bash
    npm run db:generate
    ```
 
 3. **Run migrations:**
+
    ```bash
    npm run db:migrate
    ```
@@ -94,6 +101,7 @@ model GroceryList {
 ### Production Setup (Supabase)
 
 1. **Update schema.prisma:**
+
    ```prisma
    datasource db {
      provider = "postgresql"
@@ -102,6 +110,7 @@ model GroceryList {
    ```
 
 2. **Set environment variables:**
+
    ```bash
    DATABASE_URL="postgresql://username:password@host:port/database"
    ```
@@ -134,6 +143,7 @@ npm run prisma:generate # Generate Prisma client
 The API routes have been updated to use Prisma:
 
 ### Training Plans
+
 ```javascript
 // Get all training plans
 const plans = await prisma.trainingPlan.findMany({
@@ -147,6 +157,7 @@ const plan = await prisma.trainingPlan.findUnique({
 ```
 
 ### Nutrition Data
+
 ```javascript
 // Get all nutrition data
 const nutrition = await prisma.nutritionData.findMany({
@@ -160,6 +171,7 @@ const dailyNutrition = await prisma.nutritionData.findUnique({
 ```
 
 ### Grocery Lists
+
 ```javascript
 // Get all grocery lists
 const groceries = await prisma.groceryList.findMany({
@@ -177,6 +189,7 @@ const weekGroceries = await prisma.groceryList.findUnique({
 ### From JSON to Database
 
 The seeding script automatically migrates data from:
+
 - `app/data/el-cruce-plan.json` → TrainingPlan table
 - `app/data/nutrition-plan.json` → NutritionData table
 - `app/data/grocery-lists.json` → GroceryList table
@@ -194,21 +207,25 @@ When deploying to production:
 ## 🎯 Benefits
 
 ### Type Safety
+
 - Auto-generated TypeScript types
 - Compile-time query validation
 - IntelliSense support
 
 ### Developer Experience
+
 - Prisma Studio for database browsing
 - Migration tracking and rollback
 - Automatic schema synchronization
 
 ### Production Ready
+
 - Connection pooling
 - Query optimization
 - Production-grade PostgreSQL support
 
 ### Flexibility
+
 - Easy switching between databases
 - JSON fields for complex data structures
 - Extensible schema design
@@ -216,16 +233,20 @@ When deploying to production:
 ## 🚨 Important Notes
 
 ### SQLite vs PostgreSQL
+
 - **SQLite**: File-based, perfect for development
 - **PostgreSQL**: Production-ready, scalable
 
 ### JSON Fields
+
 Complex nested structures (weeks, meals, categories) are stored as JSON for:
+
 - Flexibility in data structure
 - Easy querying and indexing
 - Compatibility with existing frontend
 
 ### Environment Variables
+
 ```env
 # Development (SQLite)
 DATABASE_URL="file:./dev.db"
@@ -239,11 +260,13 @@ DATABASE_URL="postgresql://user:pass@host:port/db"
 ### Common Issues
 
 1. **Migration errors:**
+
    ```bash
    npm run db:reset  # Reset and re-run migrations
    ```
 
 2. **Type errors:**
+
    ```bash
    npm run db:generate  # Regenerate Prisma client
    ```
@@ -254,9 +277,11 @@ DATABASE_URL="postgresql://user:pass@host:port/db"
    - Ensure database is running
 
 ### Prisma Studio
+
 ```bash
 npm run db:studio
 ```
+
 Opens a web interface for browsing and editing database data.
 
 ## 📈 Performance
@@ -294,11 +319,13 @@ Opens a web interface for browsing and editing database data.
 ### Step 2: Deploy to Vercel
 
 1. **Prepare deployment:**
+
    ```bash
    npm run deploy:prepare
    ```
 
 2. **Deploy to Vercel:**
+
    ```bash
    vercel --prod
    ```
@@ -329,11 +356,13 @@ npx prisma db seed
 ### Environment Variables
 
 **For Development:**
+
 ```env
 DATABASE_URL="file:./api/prisma/dev.db"
 ```
 
 **For Production:**
+
 ```env
 DATABASE_URL="postgresql://username:password@host:port/database?pgbouncer=true&connection_limit=1"
 VITE_SUPABASE_URL="https://your-project-id.supabase.co"
@@ -352,6 +381,7 @@ The application automatically switches between SQLite (development) and PostgreS
 **Common Issues:**
 
 1. **Build fails:**
+
    ```bash
    npm run deploy:prepare
    # Check for any errors in the build process
@@ -363,6 +393,7 @@ The application automatically switches between SQLite (development) and PostgreS
    - Check firewall settings
 
 3. **Migrations fail:**
+
    ```bash
    npx prisma migrate resolve --applied [migration-id]
    ```
@@ -375,6 +406,7 @@ The application automatically switches between SQLite (development) and PostgreS
 ### Vercel Configuration
 
 The `vercel.json` file is configured for:
+
 - ✅ Serverless API functions
 - ✅ Static asset serving
 - ✅ SPA routing
@@ -384,6 +416,7 @@ The `vercel.json` file is configured for:
 ### Database Management
 
 **Development:**
+
 ```bash
 npm run db:setup:dev    # Setup SQLite database
 npm run db:studio       # Open Prisma Studio
@@ -391,6 +424,7 @@ npm run db:seed         # Seed with sample data
 ```
 
 **Production:**
+
 ```bash
 npm run db:setup:prod   # Switch to PostgreSQL schema
 npx prisma migrate deploy  # Run migrations

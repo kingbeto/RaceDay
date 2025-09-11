@@ -10,19 +10,15 @@
 
       <!-- Dishes -->
       <div class="space-y-3">
-        <div
-          v-for="dish in meal.dishes"
-          :key="dish.name"
-          class="p-3 bg-gray-50 rounded-lg"
-        >
+        <div v-for="dish in meal.dishes" :key="dish.name" class="p-3 bg-gray-50 rounded-lg">
           <h5 class="font-medium text-gray-900 mb-2">{{ dish.name }}</h5>
-          
+
           <div class="space-y-2 text-sm">
             <div>
               <span class="font-medium text-gray-700">Ingredientes:</span>
               <p class="text-gray-600 mt-1">{{ dish.ingredients }}</p>
             </div>
-            
+
             <div>
               <span class="font-medium text-gray-700">Preparación:</span>
               <p class="text-gray-600 mt-1 italic">{{ dish.preparation }}</p>

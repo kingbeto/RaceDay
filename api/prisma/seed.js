@@ -139,8 +139,7 @@ async function seedGroceryLists() {
   console.log(`✅ Seeded ${seededCount} weeks of grocery lists`)
 }
 
-main()
-  .catch((e) => {
-    console.error(e)
-    process.exit(1)
-  })
+main().catch(e => {
+  console.error(e)
+  process.exit(1)
+})

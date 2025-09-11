@@ -3,7 +3,10 @@ import type { DailyNutrition, GroceryCategory, Week } from '@/types'
 
 export const usePrint = () => {
   // Static data formatting functions - no actual printing
-  const generateMealTableHTML = (weekData: Week, nutritionData: Record<string, DailyNutrition>): string => {
+  const generateMealTableHTML = (
+    weekData: Week,
+    nutritionData: Record<string, DailyNutrition>
+  ): string => {
     let tableHTML = `
       <h1>Plan de Comidas - ${weekData.label}</h1>
       <p><strong>Período:</strong> ${formatDate(weekData.start)} - ${formatDate(weekData.end)}</p>
@@ -25,18 +28,26 @@ export const usePrint = () => {
           <tr>
             <td>${day.day}<br><small>${formatDate(day.date)}</small></td>
             <td>
-              ${nutrition.meals.map(meal => `
+              ${nutrition.meals
+                .map(
+                  meal => `
                 <div>
                   <div>${meal.name} (${meal.calories} kcal)</div>
-                  ${meal.dishes.map(dish => `
+                  ${meal.dishes
+                    .map(
+                      dish => `
                     <div>
                       <div>${dish.name}</div>
                       <div>Ingredientes: ${dish.ingredients}</div>
                       <div>Preparación: ${dish.preparation}</div>
                     </div>
-                  `).join('')}
+                  `
+                    )
+                    .join('')}
                 </div>
-              `).join('')}
+              `
+                )
+                .join('')}
             </td>
             <td>
               <div>${nutrition.totalCalories} kcal</div>
@@ -67,9 +78,10 @@ export const usePrint = () => {
         <div>
           <div>${category.name}</div>
           <div>
-            ${category.items.split(',').map(item =>
-              `<div>${item.trim()}</div>`
-            ).join('')}
+            ${category.items
+              .split(',')
+              .map(item => `<div>${item.trim()}</div>`)
+              .join('')}
           </div>
         </div>
       `

@@ -60,30 +60,22 @@ const sampleDays = [
       {
         name: 'Desayuno',
         calories: 600,
-        dishes: [
-          { name: 'Avena con frutas', ingredients: 'Avena, plátano, nueces, miel' }
-        ]
+        dishes: [{ name: 'Avena con frutas', ingredients: 'Avena, plátano, nueces, miel' }]
       },
       {
         name: 'Almuerzo',
         calories: 800,
-        dishes: [
-          { name: 'Pollo con vegetales', ingredients: 'Pechuga de pollo, brócoli, quinoa' }
-        ]
+        dishes: [{ name: 'Pollo con vegetales', ingredients: 'Pechuga de pollo, brócoli, quinoa' }]
       },
       {
         name: 'Merienda',
         calories: 400,
-        dishes: [
-          { name: 'Yogur con frutos secos', ingredients: 'Yogur griego, almendras, miel' }
-        ]
+        dishes: [{ name: 'Yogur con frutos secos', ingredients: 'Yogur griego, almendras, miel' }]
       },
       {
         name: 'Cena',
         calories: 500,
-        dishes: [
-          { name: 'Pescado al horno', ingredients: 'Salmón, verduras al vapor' }
-        ]
+        dishes: [{ name: 'Pescado al horno', ingredients: 'Salmón, verduras al vapor' }]
       }
     ]
   },
@@ -94,30 +86,22 @@ const sampleDays = [
       {
         name: 'Desayuno',
         calories: 550,
-        dishes: [
-          { name: 'Tostadas integrales', ingredients: 'Pan integral, aguacate, huevo' }
-        ]
+        dishes: [{ name: 'Tostadas integrales', ingredients: 'Pan integral, aguacate, huevo' }]
       },
       {
         name: 'Almuerzo',
         calories: 750,
-        dishes: [
-          { name: 'Ensalada de quinoa', ingredients: 'Quinoa, vegetales mixtos, aderezo' }
-        ]
+        dishes: [{ name: 'Ensalada de quinoa', ingredients: 'Quinoa, vegetales mixtos, aderezo' }]
       },
       {
         name: 'Merienda',
         calories: 350,
-        dishes: [
-          { name: 'Fruta fresca', ingredients: 'Manzana, pera, nueces' }
-        ]
+        dishes: [{ name: 'Fruta fresca', ingredients: 'Manzana, pera, nueces' }]
       },
       {
         name: 'Cena',
         calories: 600,
-        dishes: [
-          { name: 'Pasta integral', ingredients: 'Pasta, salsa de tomate, verduras' }
-        ]
+        dishes: [{ name: 'Pasta integral', ingredients: 'Pasta, salsa de tomate, verduras' }]
       }
     ]
   }

@@ -2,23 +2,26 @@
   <!-- Static calendar view - no interactions -->
   <div class="max-h-[calc(100vh - 2rem)] overflow-y-auto">
     <div class="space-y-4">
-
       <!-- Months display with expand/collapse logic -->
       <div
         v-for="month in months"
         :key="month.name"
         v-show="shouldShowMonth(month.name)"
         class="border border-gray-200 rounded-lg overflow-hidden transition-all duration-300"
-        :class="{ 'opacity-100': shouldShowMonth(month.name), 'opacity-0': !shouldShowMonth(month.name) }"
+        :class="{
+          'opacity-100': shouldShowMonth(month.name),
+          'opacity-0': !shouldShowMonth(month.name)
+        }"
       >
         <!-- Month header - static -->
-        <div class="w-full px-4 py-3 bg-gradient-to-r from-slate-50 to-slate-100 border-b border-gray-200 flex items-center">
+        <div
+          class="w-full px-4 py-3 bg-gradient-to-r from-slate-50 to-slate-100 border-b border-gray-200 flex items-center"
+        >
           <span class="font-semibold text-gray-900">{{ month.name }}</span>
         </div>
 
         <!-- Month content - always visible -->
         <div class="p-4 bg-white">
-
           <!-- Day headers -->
           <div class="grid grid-cols-7 gap-1 mb-2">
             <div
@@ -173,20 +176,19 @@ const goToCurrentMonth = () => {
 }
 
 // Get calendar data from composable
-const {
-  months,
-  dateMap,
-  getEntryForDate
-} = useCalendar(toRef(props, 'trainingPlan'))
+const { months, dateMap, getEntryForDate } = useCalendar(toRef(props, 'trainingPlan'))
 
 const dayHeaders = ['L', 'M', 'X', 'J', 'V', 'S', 'D'] // Spanish day headers
 
 // Watch for changes to initialMonthIndex prop
-watch(() => props.initialMonthIndex, (newIndex) => {
-  if (newIndex !== undefined && newIndex !== currentVisibleMonthIndex.value) {
-    currentVisibleMonthIndex.value = newIndex
+watch(
+  () => props.initialMonthIndex,
+  newIndex => {
+    if (newIndex !== undefined && newIndex !== currentVisibleMonthIndex.value) {
+      currentVisibleMonthIndex.value = newIndex
+    }
   }
-})
+)
 
 // Listen for custom navigation events
 const handleNavigation = (event: CustomEvent) => {
@@ -216,6 +218,4 @@ onUnmounted(() => {
 const shouldShowMonth = (monthName: string) => {
   return monthName === visibleMonthName.value
 }
-
-
 </script>

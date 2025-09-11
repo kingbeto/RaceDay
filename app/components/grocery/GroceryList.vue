@@ -14,9 +14,7 @@
       <div class="space-y-3">
         <div class="flex items-center justify-between">
           <h4 class="font-medium text-gray-900">Lista para Semana 1 - Preparación Base</h4>
-          <div class="text-xs text-slate-600 font-medium">
-            📋 Lista de compras
-          </div>
+          <div class="text-xs text-slate-600 font-medium">📋 Lista de compras</div>
         </div>
 
         <div class="space-y-3">

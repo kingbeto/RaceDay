@@ -32,10 +32,6 @@
       "@/pages/*": ["./pages/*"]
     }
   },
-  "include": [
-    "app/**/*.ts",
-    "app/**/*.tsx",
-    "app/**/*.vue"
-  ],
+  "include": ["app/**/*.ts", "app/**/*.tsx", "app/**/*.vue"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

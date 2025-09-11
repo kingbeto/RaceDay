@@ -1,9 +1,6 @@
 <template>
   <div
-    :class="[
-      'relative p-2 text-sm rounded-md cursor-pointer',
-      dayClasses
-    ]"
+    :class="['relative p-2 text-sm rounded-md cursor-pointer', dayClasses]"
     :title="tooltipText"
     @mouseenter="emit('hover')"
     @mouseleave="emit('leave')"

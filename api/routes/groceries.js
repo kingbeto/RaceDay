@@ -1,11 +1,13 @@
 import express from 'express'
 import prisma from '../prisma/client.js'
+import { asyncHandler, sendSuccess, sendError } from '../utils/response.js'
 
 const router = express.Router()
 
 // GET /api/groceries
-router.get('/groceries', async (req, res) => {
-  try {
+router.get(
+  '/groceries',
+  asyncHandler(async (req, res) => {
     const { weekId } = req.query
 
     if (weekId) {
@@ -15,15 +17,9 @@ router.get('/groceries', async (req, res) => {
       })
 
       if (groceryRecord) {
-        res.status(200).json({
-          success: true,
-          data: groceryRecord.categories
-        })
+        sendSuccess(res, groceryRecord.categories, `Grocery list for week ${weekId}`)
       } else {
-        res.status(404).json({
-          success: false,
-          error: `No grocery list found for week ${weekId}`
-        })
+        sendError(res, `No grocery list found for week ${weekId}`, 404, 'GROCERY_NOT_FOUND')
       }
     } else {
       // Return all grocery data
@@ -33,23 +29,14 @@ router.get('/groceries', async (req, res) => {
         }
       })
 
-      const groceryData = {}
-      groceryRecords.forEach(record => {
-        groceryData[record.weekId] = record.categories
-      })
+      const groceryData = groceryRecords.reduce((acc, record) => {
+        acc[record.weekId] = record.categories
+        return acc
+      }, {})
 
-      res.status(200).json({
-        success: true,
-        data: groceryData
-      })
+      sendSuccess(res, groceryData, 'All grocery lists retrieved successfully')
     }
-  } catch (error) {
-    console.error('Error in groceries API:', error)
-    res.status(500).json({
-      success: false,
-      error: 'Internal server error'
-    })
-  }
-})
+  })
+)
 
 export default router

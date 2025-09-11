@@ -6,11 +6,16 @@
     </div>
 
     <LoadingSpinner v-if="isLoading" message="Cargando calendario..." />
-    
+
     <div v-else-if="error" class="text-center py-12">
       <div class="text-red-400 mb-4">
         <svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
         </svg>
       </div>
       <p class="text-gray-600 mb-4">{{ error }}</p>
@@ -40,17 +45,17 @@
               <h4 class="font-medium text-gray-900">{{ formatDate(selectedDay.date) }}</h4>
               <p class="text-sm text-gray-600">{{ selectedDay.day }}</p>
             </div>
-            
+
             <div>
               <h5 class="text-sm font-medium text-gray-700 mb-1">Entrenamiento</h5>
               <p class="text-sm text-gray-600">{{ selectedDay.training }}</p>
             </div>
-            
+
             <div>
               <h5 class="text-sm font-medium text-gray-700 mb-1">Alimentación</h5>
               <p class="text-sm text-gray-600">{{ selectedDay.food }}</p>
             </div>
-            
+
             <div>
               <h5 class="text-sm font-medium text-gray-700 mb-1">Notas</h5>
               <p class="text-sm text-gray-600">{{ selectedDay.notes }}</p>
@@ -95,23 +100,33 @@
         <BaseCard title="Fases de Entrenamiento">
           <div class="space-y-2 text-sm">
             <div class="flex items-center gap-2">
-              <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">Base</span>
+              <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800"
+                >Base</span
+              >
               <span class="text-gray-600">Construcción de base aeróbica</span>
             </div>
             <div class="flex items-center gap-2">
-              <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">Construcción</span>
+              <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800"
+                >Construcción</span
+              >
               <span class="text-gray-600">Incremento de intensidad</span>
             </div>
             <div class="flex items-center gap-2">
-              <span class="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">Pico</span>
+              <span class="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800"
+                >Pico</span
+              >
               <span class="text-gray-600">Máxima carga de entrenamiento</span>
             </div>
             <div class="flex items-center gap-2">
-              <span class="px-2 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-800">Descarga</span>
+              <span class="px-2 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-800"
+                >Descarga</span
+              >
               <span class="text-gray-600">Reducción antes de la carrera</span>
             </div>
             <div class="flex items-center gap-2">
-              <span class="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">Carrera</span>
+              <span class="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800"
+                >Carrera</span
+              >
               <span class="text-gray-600">Días de competencia</span>
             </div>
           </div>
@@ -120,10 +135,7 @@
     </div>
 
     <!-- Nutrition Modal -->
-    <NutritionModal 
-      v-model:show="showNutritionModal"
-      :date="selectedNutritionDate"
-    />
+    <NutritionModal v-model:show="showNutritionModal" :date="selectedNutritionDate" />
   </div>
 </template>
 

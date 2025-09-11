@@ -1,22 +1,32 @@
-// Simplified training store - no state management behaviors
 import { ref, computed, readonly } from 'vue'
 import type { TrainingPlan, TrainingDay } from '@/types'
+import { apiService } from '@/services/api'
 
 const currentPlan = ref<TrainingPlan | null>(null)
+const isLoading = ref(false)
+const error = ref<string | null>(null)
 
 // Static function to get the training plan
 const getTrainingPlan = (): TrainingPlan | null => {
   return currentPlan.value
 }
 
-// Load plan synchronously from static data
-const loadPlan = () => {
+// Load plan from API
+const loadPlan = async () => {
+  if (isLoading.value) return
+
   try {
-    // For now, return null since we're removing dynamic loading
-    // In a real app, this would load from static data
-    currentPlan.value = null
+    isLoading.value = true
+    error.value = null
+
+    const plan = await apiService.getTrainingPlans()
+    currentPlan.value = plan as TrainingPlan
   } catch (err) {
     console.error('Error loading training plan:', err)
+    error.value = err instanceof Error ? err.message : 'Failed to load training plan'
+    currentPlan.value = null
+  } finally {
+    isLoading.value = false
   }
 }
 
@@ -57,8 +67,10 @@ const today = ref(new Date().toISOString().split('T')[0])
 
 export const useTrainingStore = () => {
   return {
-    // Static data
+    // State
     currentPlan: readonly(currentPlan),
+    isLoading: readonly(isLoading),
+    error: readonly(error),
     today,
 
     // Getters
@@ -68,7 +80,7 @@ export const useTrainingStore = () => {
     raceDays,
     exerciseDays,
 
-    // Static functions
+    // Actions
     loadPlan,
     getTrainingPlan
   }

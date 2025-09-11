@@ -12,17 +12,15 @@
         <BaseCard title="Seleccionar Semana">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Semana de entrenamiento</label>
+              <label class="block text-sm font-medium text-gray-700 mb-2"
+                >Semana de entrenamiento</label
+              >
               <select
                 v-model="selectedWeekId"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               >
                 <option value="">Seleccionar semana...</option>
-                <option
-                  v-for="weekId in availableWeeks"
-                  :key="weekId"
-                  :value="weekId"
-                >
+                <option v-for="weekId in availableWeeks" :key="weekId" :value="weekId">
                   {{ getWeekLabel(weekId) }}
                 </option>
               </select>
@@ -57,7 +55,7 @@
                 {{ checkedItemsCount }} / {{ totalItemsCount }} completados
               </span>
               <div class="w-24 bg-gray-200 rounded-full h-2">
-                <div 
+                <div
                   class="bg-primary-600 h-2 rounded-full transition-all duration-300"
                   :style="{ width: `${progressPercentage}%` }"
                 ></div>
@@ -83,13 +81,13 @@
                     type="checkbox"
                     :id="`${category.name}-${index}`"
                     class="mt-1 h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                  >
+                  />
                   <label
                     :for="`${category.name}-${index}`"
                     :class="[
                       'flex-1 cursor-pointer transition-all duration-200',
-                      checkedItems[`${category.name}-${index}`] 
-                        ? 'line-through text-gray-500' 
+                      checkedItems[`${category.name}-${index}`]
+                        ? 'line-through text-gray-500'
                         : 'text-gray-900 hover:text-primary-600'
                     ]"
                   >
@@ -106,7 +104,12 @@
           <div class="text-center py-12">
             <div class="text-gray-400 mb-4">
               <svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5-6m0 0L4 5M7 13v6a2 2 0 002 2h6a2 2 0 002-2v-6" />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5-6m0 0L4 5M7 13v6a2 2 0 002 2h6a2 2 0 002-2v-6"
+                />
               </svg>
             </div>
             <p class="text-gray-600">No hay lista de compras disponible para esta semana.</p>
@@ -118,11 +121,18 @@
           <div class="text-center py-12">
             <div class="text-gray-400 mb-4">
               <svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                />
               </svg>
             </div>
             <p class="text-gray-600 mb-4">Selecciona una semana para ver su lista de compras.</p>
-            <p class="text-sm text-gray-500">Las listas están organizadas por categorías para facilitar las compras.</p>
+            <p class="text-sm text-gray-500">
+              Las listas están organizadas por categorías para facilitar las compras.
+            </p>
           </div>
         </BaseCard>
       </div>
@@ -132,20 +142,10 @@
         <!-- Quick actions -->
         <BaseCard title="Acciones Rápidas">
           <div class="space-y-3">
-            <BaseButton
-              @click="goToCurrentWeek"
-              variant="outline"
-              size="sm"
-              class="w-full"
-            >
+            <BaseButton @click="goToCurrentWeek" variant="outline" size="sm" class="w-full">
               📅 Semana Actual
             </BaseButton>
-            <BaseButton
-              @click="clearAllChecked"
-              variant="outline"
-              size="sm"
-              class="w-full"
-            >
+            <BaseButton @click="clearAllChecked" variant="outline" size="sm" class="w-full">
               🔄 Limpiar Lista
             </BaseButton>
             <BaseButton
@@ -221,13 +221,25 @@ const availableWeeks = computed(() => {
   return groceryStore.getAllWeekIds
 })
 
-const groceryData = computed(() => {
-  return groceryStore.getGroceriesForWeek(selectedWeekId.value)
-})
+const groceryData = ref([])
+
+// Load grocery data when week changes
+watch(
+  selectedWeekId,
+  async newWeekId => {
+    if (newWeekId) {
+      groceryData.value = await groceryStore.getGroceriesForWeek(newWeekId)
+    } else {
+      groceryData.value = []
+    }
+    clearAllChecked()
+  },
+  { immediate: false }
+)
 
 const getWeekLabel = (weekId: string): string => {
   if (!currentPlan.value) return weekId
-  
+
   const week = currentPlan.value.weeks.find(w => w.id === weekId)
   return week ? week.label : weekId
 }
@@ -264,7 +276,7 @@ const printGroceries = () => {
 const exportGroceries = () => {
   // Create a simple text format for mobile
   let text = `Lista de Compras - ${getWeekLabel(selectedWeekId.value)}\n\n`
-  
+
   groceryData.value.forEach(category => {
     text += `${category.name}\n`
     text += '─'.repeat(category.name.length) + '\n'
@@ -273,7 +285,7 @@ const exportGroceries = () => {
     })
     text += '\n'
   })
-  
+
   // Create downloadable file
   const blob = new Blob([text], { type: 'text/plain' })
   const url = URL.createObjectURL(blob)
@@ -286,12 +298,12 @@ const exportGroceries = () => {
 
 const goToCurrentWeek = () => {
   if (!currentPlan.value) return
-  
+
   const today = new Date().toISOString().split('T')[0]
   const currentWeek = currentPlan.value.weeks.find(week =>
     week.rows.some(day => day.date === today)
   )
-  
+
   if (currentWeek) {
     selectedWeekId.value = currentWeek.id
   }
@@ -313,13 +325,8 @@ const toggleAllChecked = () => {
   }
 }
 
-// Clear checked items when week changes
-watch(selectedWeekId, () => {
-  clearAllChecked()
-})
-
 onMounted(async () => {
   await trainingStore.loadPlan()
-  await groceryStore.loadGroceryData()
+  await groceryStore.loadAllGroceries()
 })
 </script>

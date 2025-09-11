@@ -17,14 +17,10 @@
                 v-model="selectedDate"
                 type="date"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-              >
+              />
             </div>
             <div class="flex items-end">
-              <BaseButton
-                v-if="selectedDate"
-                @click="loadNutritionForDate"
-                class="w-full"
-              >
+              <BaseButton v-if="selectedDate" @click="loadNutritionForDate" class="w-full">
                 Ver Plan de Nutrición
               </BaseButton>
             </div>
@@ -37,12 +33,16 @@
           <BaseCard title="Resumen de Macronutrientes">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div class="text-center p-4 bg-orange-50 rounded-lg">
-                <div class="text-3xl font-bold text-orange-600">{{ nutritionData.totalCalories }}</div>
+                <div class="text-3xl font-bold text-orange-600">
+                  {{ nutritionData.totalCalories }}
+                </div>
                 <div class="text-sm text-gray-600">Calorías</div>
                 <div class="text-xs text-gray-500 mt-1">{{ macroPercentages.calories }}</div>
               </div>
               <div class="text-center p-4 bg-blue-50 rounded-lg">
-                <div class="text-3xl font-bold text-blue-600">{{ nutritionData.totalProtein }}g</div>
+                <div class="text-3xl font-bold text-blue-600">
+                  {{ nutritionData.totalProtein }}g
+                </div>
                 <div class="text-sm text-gray-600">Proteínas</div>
                 <div class="text-xs text-gray-500 mt-1">{{ macroPercentages.protein }}</div>
               </div>
@@ -62,11 +62,7 @@
           <!-- Meals -->
           <BaseCard title="Comidas del Día">
             <div class="grid gap-6">
-              <MealCard
-                v-for="meal in nutritionData.meals"
-                :key="meal.name"
-                :meal="meal"
-              />
+              <MealCard v-for="meal in nutritionData.meals" :key="meal.name" :meal="meal" />
             </div>
           </BaseCard>
         </div>
@@ -76,11 +72,18 @@
           <div class="text-center py-12">
             <div class="text-gray-400 mb-4">
               <svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
               </svg>
             </div>
             <p class="text-gray-600 mb-4">No hay datos específicos de nutrición para esta fecha.</p>
-            <p class="text-sm text-gray-500">Se mostrará un plan nutricional generado automáticamente.</p>
+            <p class="text-sm text-gray-500">
+              Se mostrará un plan nutricional generado automáticamente.
+            </p>
           </div>
         </BaseCard>
       </div>
@@ -90,12 +93,7 @@
         <!-- Quick actions -->
         <BaseCard title="Acciones Rápidas">
           <div class="space-y-3">
-            <BaseButton
-              variant="outline"
-              size="sm"
-              @click="goToToday"
-              class="w-full"
-            >
+            <BaseButton variant="outline" size="sm" @click="goToToday" class="w-full">
               📅 Ir a Hoy
             </BaseButton>
             <BaseButton
@@ -115,7 +113,9 @@
           <div class="space-y-3 text-sm text-gray-600">
             <div class="p-3 bg-blue-50 rounded-lg">
               <h5 class="font-medium text-blue-900 mb-1">💧 Hidratación</h5>
-              <p>Mantén una hidratación constante, especialmente en días de entrenamiento intenso.</p>
+              <p>
+                Mantén una hidratación constante, especialmente en días de entrenamiento intenso.
+              </p>
             </div>
             <div class="p-3 bg-green-50 rounded-lg">
               <h5 class="font-medium text-green-900 mb-1">🥗 Timing</h5>
@@ -187,20 +187,20 @@ const restDaysCount = computed(() => {
   }, 0)
 })
 
-const loadNutritionForDate = () => {
+const loadNutritionForDate = async () => {
   if (!selectedDate.value) return
-  
+
   const day = trainingStore.getDayByDate(selectedDate.value)
-  nutritionData.value = nutritionStore.getOrGenerateNutrition(
-    selectedDate.value, 
+  nutritionData.value = await nutritionStore.getOrGenerateNutrition(
+    selectedDate.value,
     day?.isExercise ?? true
   )
 }
 
-const goToToday = () => {
+const goToToday = async () => {
   const today = new Date().toISOString().split('T')[0]
   selectedDate.value = today
-  loadNutritionForDate()
+  await loadNutritionForDate()
 }
 
 const printNutrition = () => {
@@ -210,11 +210,11 @@ const printNutrition = () => {
 
 onMounted(async () => {
   await trainingStore.loadPlan()
-  await nutritionStore.loadNutritionData()
-  
+  await nutritionStore.loadAllNutrition()
+
   // Set today as default
   const today = new Date().toISOString().split('T')[0]
   selectedDate.value = today
-  loadNutritionForDate()
+  await loadNutritionForDate()
 })
 </script>

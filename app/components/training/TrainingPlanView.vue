@@ -5,7 +5,9 @@
       <div class="space-y-1.5">
         <h1 class="text-3xl font-bold tracking-tight text-slate-900">{{ plan?.title }}</h1>
         <p class="text-base text-slate-600 font-medium">{{ plan?.subtitle }}</p>
-        <p class="text-slate-500 max-w-2xl mx-auto leading-relaxed text-sm">{{ plan?.description }}</p>
+        <p class="text-slate-500 max-w-2xl mx-auto leading-relaxed text-sm">
+          {{ plan?.description }}
+        </p>
       </div>
 
       <div v-if="plan" class="flex items-center justify-center gap-4 text-xs">
@@ -13,7 +15,9 @@
           <span class="font-semibold text-slate-700">Start</span>
           <span class="text-slate-900">{{ formatDate(plan.startDate) }}</span>
         </div>
-        <div class="flex items-center gap-2 px-3 py-1.5 bg-red-50 border border-red-200/60 rounded-lg">
+        <div
+          class="flex items-center gap-2 px-3 py-1.5 bg-red-50 border border-red-200/60 rounded-lg"
+        >
           <span class="font-semibold text-red-700">Race</span>
           <span class="text-red-900 font-semibold">{{ formatDate(plan.raceDate) }}</span>
         </div>
@@ -24,40 +28,56 @@
     <div class="mb-3 flex flex-col items-center gap-2 sm:flex-row sm:justify-between">
       <div class="text-center sm:text-left">
         <h2 class="text-lg font-semibold text-slate-800">Weekly Schedule and Progression</h2>
-        <p class="text-slate-600 text-xs">18-week comprehensive training program with structured progression</p>
+        <p class="text-slate-600 text-xs">
+          18-week comprehensive training program with structured progression
+        </p>
       </div>
       <!-- Expand/Collapse All Buttons -->
       <div class="flex items-center justify-center gap-2">
-      <button
-        @click="expandAllWeeks"
-        class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-md shadow-sm transition-all duration-200 flex items-center gap-1.5"
-        :class="{ 'opacity-50 cursor-not-allowed': allExpanded }"
-        :disabled="allExpanded"
-      >
-        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-        </svg>
-        Expand All
-      </button>
+        <button
+          @click="expandAllWeeks"
+          class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-md shadow-sm transition-all duration-200 flex items-center gap-1.5"
+          :class="{ 'opacity-50 cursor-not-allowed': allExpanded }"
+          :disabled="allExpanded"
+        >
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
+          Expand All
+        </button>
 
-      <button
-        @click="collapseAllWeeks"
-        class="px-3 py-1.5 bg-slate-600 hover:bg-slate-700 text-white text-xs font-medium rounded-md shadow-sm transition-all duration-200 flex items-center gap-1.5"
-        :class="{ 'opacity-50 cursor-not-allowed': !allExpanded && !expandedWeekId }"
-        :disabled="!allExpanded && !expandedWeekId"
-      >
-        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
-        </svg>
-        Collapse All
-      </button>
+        <button
+          @click="collapseAllWeeks"
+          class="px-3 py-1.5 bg-slate-600 hover:bg-slate-700 text-white text-xs font-medium rounded-md shadow-sm transition-all duration-200 flex items-center gap-1.5"
+          :class="{ 'opacity-50 cursor-not-allowed': !allExpanded && !expandedWeekId }"
+          :disabled="!allExpanded && !expandedWeekId"
+        >
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M5 15l7-7 7 7"
+            />
+          </svg>
+          Collapse All
+        </button>
       </div>
     </div>
 
     <!-- Training weeks - current week expanded, others collapsed -->
     <div
       class="max-h-[65vh] overflow-y-auto overflow-x-hidden transition-all duration-200"
-      :class="shouldHighlightContainer ? 'ring-2 ring-blue-400 ring-opacity-60 shadow-lg shadow-blue-200/50' : ''"
+      :class="
+        shouldHighlightContainer
+          ? 'ring-2 ring-blue-400 ring-opacity-60 shadow-lg shadow-blue-200/50'
+          : ''
+      "
     >
       <div class="space-y-8 pr-2">
         <TrainingWeek
@@ -101,9 +121,7 @@ const getHighlightedRow = computed(() => {
   if (!props.hoveredDate || allExpanded.value) return null
 
   // Find the week containing the hovered date
-  const week = props.plan?.weeks.find(w =>
-    w.rows.some(row => row.date === props.hoveredDate)
-  )
+  const week = props.plan?.weeks.find(w => w.rows.some(row => row.date === props.hoveredDate))
 
   if (!week) return null
 

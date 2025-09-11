@@ -1,13 +1,7 @@
 <template>
   <!-- Static loading indicator - no animation -->
   <div :class="containerClasses">
-    <div
-      :class="[
-        'rounded-full border-4 border-gray-300',
-        sizeClasses,
-        colorClasses
-      ]"
-    ></div>
+    <div :class="['rounded-full border-4 border-gray-300', sizeClasses, colorClasses]"></div>
     <p v-if="message" :class="textClasses">{{ message }}</p>
   </div>
 </template>

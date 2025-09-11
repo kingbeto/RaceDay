@@ -1,10 +1,11 @@
 import express from 'express'
+import { sendSuccess } from '../utils/response.js'
 
 const router = express.Router()
 
 // GET /api/hello
 router.get('/hello', (req, res) => {
-  res.json({
+  const apiInfo = {
     message: '¡Hola! Welcome to RaceDay API',
     status: 'OK',
     timestamp: new Date().toISOString(),
@@ -15,7 +16,9 @@ router.get('/hello', (req, res) => {
       'GET /api/groceries': 'Get grocery lists (optional: ?weekId=W1)',
       'GET /health': 'Health check endpoint'
     }
-  })
+  }
+
+  sendSuccess(res, apiInfo, 'API information retrieved successfully')
 })
 
 export default router
