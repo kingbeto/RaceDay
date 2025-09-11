@@ -11,7 +11,7 @@ const getDatabaseUrl = () => {
 
   // Fallback to development SQLite
   if (process.env.NODE_ENV !== 'production') {
-    return 'file:./database/raceday.db'
+    return 'file:../../database/raceday.db'
   }
 
   throw new Error('DATABASE_URL environment variable is required in production')
