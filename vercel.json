@@ -6,7 +6,7 @@
   "installCommand": "npm install",
   "devCommand": "npm run dev",
   "functions": {
-    "api/**/*.js": {
+    "server.js": {
       "maxDuration": 30
     }
   },
@@ -16,24 +16,16 @@
       "destination": "/data/$1"
     },
     {
-      "source": "/health",
-      "destination": "/health.json"
-    },
-    {
-      "source": "/api/(.*)",
-      "destination": "/api/$1"
-    },
-    {
       "source": "/assets/(.*)",
-      "destination": "/assets/*"
+      "destination": "/assets/$1"
     },
     {
       "source": "/favicon.ico",
       "destination": "/favicon.ico"
     },
     {
-      "source": "/((?!api|data|health|assets).*)",
-      "destination": "/index.html"
+      "source": "/(.*)",
+      "destination": "/server.js"
     }
   ],
   "headers": [
@@ -54,26 +46,10 @@
           "value": "public, max-age=31536000, immutable"
         }
       ]
-    },
-    {
-      "source": "/api/(.*)",
-      "headers": [
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "*"
-        },
-        {
-          "key": "Access-Control-Allow-Methods",
-          "value": "GET, POST, PUT, DELETE, OPTIONS"
-        },
-        {
-          "key": "Access-Control-Allow-Headers",
-          "value": "Content-Type, Authorization"
-        }
-      ]
     }
   ],
   "env": {
-    "NODE_ENV": "production"
+    "NODE_ENV": "production",
+    "VERCEL": "1"
   }
 }

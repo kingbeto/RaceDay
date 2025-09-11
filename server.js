@@ -42,8 +42,10 @@ app.use(morgan('combined'))
 app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true }))
 
-// Serve static files from the app directory
-app.use(express.static(path.join(__dirname, 'app')))
+// Serve static files from the dist directory (Vercel will serve from public/ automatically)
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  app.use(express.static(path.join(__dirname, 'dist')))
+}
 
 // Handle preflight OPTIONS requests
 app.options('*', cors())
@@ -59,13 +61,24 @@ app.get('/health', (req, res) => {
   res.json({
     status: 'OK',
     timestamp: new Date().toISOString(),
-    uptime: process.uptime()
+    uptime: process.uptime(),
+    version: '1.0.0',
+    environment: process.env.NODE_ENV || 'development'
   })
 })
 
 // SPA fallback - serve index.html for non-API routes
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'))
+  if (process.env.VERCEL) {
+    // On Vercel, static files are served automatically
+    res.status(404).json({
+      success: false,
+      error: 'Route not found'
+    })
+  } else {
+    // Local development
+    res.sendFile(path.join(__dirname, 'dist', 'index.html'))
+  }
 })
 
 // Error handling middleware
@@ -86,9 +99,14 @@ app.use((req, res) => {
   })
 })
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚀 RaceDay API server running on port ${PORT}`)
-  console.log(`📊 Health check available at http://localhost:${PORT}/health`)
-  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`)
-})
+// Start server (for local development)
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`🚀 RaceDay API server running on port ${PORT}`)
+    console.log(`📊 Health check available at http://localhost:${PORT}/health`)
+    console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`)
+  })
+}
+
+// Export the Express app for Vercel
+export default app
