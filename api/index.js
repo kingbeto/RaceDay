@@ -6,10 +6,10 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 
 // Import route modules
-import trainingPlansRoutes from './api/routes/training-plans.js'
-import nutritionRoutes from './api/routes/nutrition.js'
-import groceriesRoutes from './api/routes/groceries.js'
-import helloRoutes from './api/routes/hello.js'
+import trainingPlansRoutes from './routes/training-plans.js'
+import nutritionRoutes from './routes/nutrition.js'
+import groceriesRoutes from './routes/groceries.js'
+import helloRoutes from './routes/hello.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -44,7 +44,7 @@ app.use(express.urlencoded({ extended: true }))
 
 // Serve static files from the dist directory (Vercel will serve from public/ automatically)
 if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
-  app.use(express.static(path.join(__dirname, 'dist')))
+  app.use(express.static(path.join(__dirname, '..', 'dist')))
 }
 
 // Handle preflight OPTIONS requests
@@ -77,7 +77,7 @@ app.get('*', (req, res) => {
     })
   } else {
     // Local development
-    res.sendFile(path.join(__dirname, 'dist', 'index.html'))
+    res.sendFile(path.join(__dirname, '..', 'dist', 'index.html'))
   }
 })
 
@@ -99,9 +99,14 @@ app.use((req, res) => {
   })
 })
 
-// Start server (for local development only)
-app.listen(PORT, () => {
-  console.log(`🚀 RaceDay API server running on port ${PORT}`)
-  console.log(`📊 Health check available at http://localhost:${PORT}/health`)
-  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`)
-})
+// Start server (for local development)
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`🚀 RaceDay API server running on port ${PORT}`)
+    console.log(`📊 Health check available at http://localhost:${PORT}/health`)
+    console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`)
+  })
+}
+
+// Export the Express app for Vercel
+export default app

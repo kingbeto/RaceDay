@@ -67,8 +67,10 @@ After deployment:
 
 ### File Structure
 ```
-├── server.js          # Express app (exported for Vercel)
-├── api/routes/         # Express route modules
+├── server.js          # Express app for local development  
+├── api/
+│   ├── index.js       # Express app (exported for Vercel)
+│   └── routes/        # Express route modules
 ├── app/               # Vue.js frontend source
 ├── public/            # Static files served by Vercel
 ├── data/              # Static JSON data
