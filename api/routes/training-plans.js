@@ -1,5 +1,5 @@
 import express from 'express'
-import prisma from '../prisma/client.js'
+import prisma, { dbUtils } from '../prisma/client.js'
 import { asyncHandler, sendSuccess, sendError } from '../utils/response.js'
 
 const router = express.Router()
@@ -8,10 +8,20 @@ const router = express.Router()
 router.get(
   '/training-plans',
   asyncHandler(async (req, res) => {
+    const { basic } = req.query
+
+    // Use selective field queries to optimize data transfer
+    const selectFields =
+      basic === 'true'
+        ? dbUtils.selectFields.trainingPlan.basic
+        : dbUtils.selectFields.trainingPlan.full
+
     const trainingPlans = await prisma.trainingPlan.findMany({
+      select: selectFields,
       orderBy: {
         updatedAt: 'desc'
-      }
+      },
+      take: 1 // Only get the first plan for better performance
     })
 
     if (!trainingPlans || trainingPlans.length === 0) {
@@ -19,21 +29,32 @@ router.get(
     }
 
     // Return the first (and currently only) training plan
-    // TODO: In the future, this could support multiple plans or plan selection
     const trainingPlan = trainingPlans[0]
 
-    const fullPlan = {
-      id: trainingPlan.id,
-      title: trainingPlan.title,
-      subtitle: trainingPlan.subtitle,
-      raceDate: trainingPlan.raceDate,
-      startDate: trainingPlan.startDate,
-      endDate: trainingPlan.endDate,
-      description: trainingPlan.description,
-      weeks: trainingPlan.weeks
-    }
+    sendSuccess(res, trainingPlan, 'Training plan retrieved successfully')
+  })
+)
 
-    sendSuccess(res, fullPlan, 'Training plan retrieved successfully')
+// GET /api/training-plans/health - Database health check
+router.get(
+  '/training-plans/health',
+  asyncHandler(async (req, res) => {
+    const isHealthy = await dbUtils.isHealthy()
+    const dbInfo = await dbUtils.getDatabaseInfo()
+
+    if (isHealthy) {
+      sendSuccess(
+        res,
+        {
+          status: 'healthy',
+          database: dbInfo ? 'connected' : 'unknown',
+          timestamp: new Date().toISOString()
+        },
+        'Database connection is healthy'
+      )
+    } else {
+      sendError(res, 'Database connection failed', 503, 'DATABASE_UNHEALTHY')
+    }
   })
 )
 

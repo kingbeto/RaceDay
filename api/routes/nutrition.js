@@ -1,5 +1,5 @@
 import express from 'express'
-import prisma from '../prisma/client.js'
+import prisma, { dbUtils } from '../prisma/client.js'
 import { asyncHandler, sendSuccess, sendError } from '../utils/response.js'
 
 const router = express.Router()
@@ -25,16 +25,24 @@ const NUTRITION_CONSTANTS = {
 router.get(
   '/nutrition',
   asyncHandler(async (req, res) => {
-    const { date } = req.query
+    const { date, basic } = req.query
+
+    // Use selective field queries to optimize data transfer
+    const selectFields =
+      basic === 'true'
+        ? dbUtils.selectFields.nutritionData.basic
+        : dbUtils.selectFields.nutritionData.full
 
     if (date) {
-      // Return nutrition for specific date
+      // Return nutrition for specific date with optimized query
       const nutritionRecord = await prisma.nutritionData.findUnique({
-        where: { dateKey: date }
+        where: { dateKey: date },
+        select: selectFields
       })
 
       if (nutritionRecord) {
-        sendSuccess(res, nutritionRecord.meals, `Nutrition plan for ${date}`)
+        const response = basic === 'true' ? nutritionRecord : nutritionRecord.meals
+        sendSuccess(res, response, `Nutrition plan for ${date}`)
       } else {
         // Generate fallback nutrition if not found
         const fallbackNutrition = generateFallbackNutrition(date)
@@ -45,19 +53,25 @@ router.get(
         sendSuccess(res, response, `Generated fallback nutrition for ${date}`)
       }
     } else {
-      // Return all nutrition data
+      // Return all nutrition data with pagination for large datasets
+      const limit = parseInt(req.query.limit) || 50
+      const offset = parseInt(req.query.offset) || 0
+
       const nutritionRecords = await prisma.nutritionData.findMany({
+        select: selectFields,
         orderBy: {
           dateKey: 'asc'
-        }
+        },
+        take: limit,
+        skip: offset
       })
 
       const nutritionData = nutritionRecords.reduce((acc, record) => {
-        acc[record.dateKey] = record.meals
+        acc[record.dateKey] = basic === 'true' ? record : record.meals
         return acc
       }, {})
 
-      sendSuccess(res, nutritionData, 'All nutrition data retrieved successfully')
+      sendSuccess(res, nutritionData, `Retrieved ${nutritionRecords.length} nutrition records`)
     }
   })
 )

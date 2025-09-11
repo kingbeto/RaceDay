@@ -131,9 +131,7 @@
                   <p class="text-sm text-slate-700 leading-relaxed">{{ nutritionFocus }}</p>
                   <div class="mt-2 text-xs text-slate-600">
                     <span class="font-medium">Calories:</span>
-                    {{
-                      todaysTraining?.calories || (todaysTraining?.isExercise ? 2300 : 2100)
-                    }}
+                    {{ todaysTraining?.calories || (todaysTraining?.isExercise ? 2300 : 2100) }}
                     kcal
                   </div>
                 </div>
